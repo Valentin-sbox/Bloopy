@@ -1,0 +1,55 @@
+<!--
+  ============================================================================
+  BLOCK GUARD v4.0.0 - INDEX.HTML
+  ============================================================================
+  
+  Archivo HTML principal de la aplicación.
+  Este es el punto de entrada visual donde React monta toda la interfaz.
+  
+  ESTRUCTURA:
+  - head: Metadatos, fuentes, iconos y estilos base
+  - body: Contenedor #root donde React renderiza la aplicación
+  
+  FUENTES CARGADAS:
+  - Inter: Fuente principal para texto (UI y contenido)
+  - JetBrains Mono: Fuente monoespaciada para código y elementos técnicos
+  
+  ICONOS:
+  - Font Awesome 6.4.0: Biblioteca de iconos vectoriales
+  
+  RELACIONADO CON:
+  - src/index.js: Punto de entrada de React que monta en #root
+  - src/styles/index.css: Estilos CSS globales
+  ============================================================================
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Metadatos básicos -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="Block Guard - Editor de texto nativo para escritores">
+  <meta name="theme-color" content="#0a0a0a">
+  
+  <!-- Título de la ventana -->
+  <title>Block Guard</title>
+  
+  <!-- Preconexión a dominios externos para mejor rendimiento -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Fuentes de Google: Inter (principal) y JetBrains Mono (monoespaciada) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome: Iconos vectoriales -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- 
+    Contenedor raíz donde React montará toda la aplicación.
+    El contenido se genera dinámicamente por src/index.js -> src/App.js
+  -->
+  <div id="root"></div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+{
+  "name": "block-guard",
+  "productName": "Block Guard",
+  "version": "1.26.0",
+  "description": "Block Guard - Editor de texto nativo para escritores. Organiza proyectos, escribe con formato enriquecido y realiza un seguimiento de tu progreso.",
+  "main": "public/electron.js",
+  "homepage": ".",
+  "author": "Block Guard Team",
+  "license": "MIT",
+  
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "build-app": "node build-app.js",
+    "build-ultra": "node build-ultra.js",
+    "build-release": "node scripts/build-release.js",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "fs-extra": "^11.1.1",
+    "electron-updater": "^6.1.1"
+  },
+  
+  "devDependencies": {
+    "electron": "^25.0.0",
+    "electron-builder": "^24.4.0",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.0.1",
+    "ffmpeg-static": "^5.2.0"
+  },
+  
+  "build": {
+    "appId": "com.blockguard.app",
+    "productName": "Block Guard",
+    "files": [
+      "build/**/*",
+      "public/electron.js",
+      "public/preload.js",
+      "node_modules/**/*",
+      "package.json",
+      "electron-updater.yml"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Valentin-sbox",
+        "repo": "Blockguard"
+      }
+    ],
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "certificateFile": null,
+      "certificatePassword": null,
+      "sign": false,
+      "signDlls": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Block Guard",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
+    }
+  },
+  
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

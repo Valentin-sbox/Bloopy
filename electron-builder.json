@@ -1,0 +1,63 @@
+{
+  "appId": "com.blockguard.app",
+  "productName": "Block Guard",
+  "copyright": "Copyright © 2026 Block Guard",
+  "directories": {
+    "output": "dist",
+    "buildResources": "assets"
+  },
+  "files": [
+    "build/**/*",
+    "public/electron.js",
+    "public/preload.js",
+    "public/index.html",
+    "assets/**/*",
+    "node_modules/**/*",
+    "package.json"
+  ],
+  "extraMetadata": {
+    "main": "public/electron.js"
+  },
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "assets/icon.ico",
+    "certificateFile": null,
+    "certificatePassword": null,
+    "sign": false,
+    "signDlls": false,
+    "signingHashAlgorithms": null,
+    "signtool": null
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "allowToChangeDesktopIcon": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "createUninstallShortcut": true,
+    "shortcutName": "Block Guard",
+    "installerIcon": "assets/icon.ico",
+    "uninstallerIcon": "assets/icon.ico",
+    "installerHeaderIcon": "assets/icon.ico",
+    "artificialName": "Block Guard.exe",
+    "guid": "Block-Guard-1.0.0-com.blockguard.app",
+    "artifactName": "${productName}-${version}-setup.${ext}"
+  },
+  "buildDependenciesFromSource": false,
+  "publish": {
+    "provider": "github",
+    "owner": "wishpixel12-boop",
+    "repo": "blockGuard"
+  },
+  "sign": false,
+  "signDlls": false,
+  "certificateFile": null,
+  "certificatePassword": null
+}

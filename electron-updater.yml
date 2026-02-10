@@ -1,0 +1,11 @@
+# electron-updater configuration
+# See https://www.electron.build/auto-update for docs
+
+# GitHub provider configuration
+provider: github
+# GitHub owner (organization or user)
+owner: Valentin-sbox
+# GitHub repository name
+repo: Blockguard
+# GitHub token for private repos or higher rate limits (optional)
+# token: env.GH_TOKEN

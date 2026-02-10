@@ -1,0 +1,4965 @@
+/**
+ * ============================================================================
+ * BLOCK GUARD v4.0.0 - INDEX.CSS
+ * ============================================================================
+ * 
+ * HOJA DE ESTILOS PRINCIPAL DE LA APLICACIÓN
+ * 
+ * Este archivo contiene todas las variables CSS, estilos base y componentes
+ * principales de la interfaz de Block Guard.
+ * 
+ * ESTRUCTURA:
+ * 1. Variables CSS (Custom Properties) - Sistema de temas
+ * 2. Reset y estilos base
+ * 3. Layout principal (App Container, Sidebar, Main Content)
+ * 4. Pantalla de carga (Splash Screen)
+ * 5. Sidebar (barra lateral de proyectos)
+ * 6. Top Bar (barra superior)
+ * 7. Welcome Screen (pantalla de bienvenida)
+ * 8. Editor (área de edición de texto)
+ * 9. Footer del editor (estadísticas y controles)
+ * 10. Modales (configuración, confirmaciones, etc.)
+ * 11. Notificaciones
+ * 12. Responsive (adaptación a móviles)
+ * 
+ * SISTEMA DE TEMAS:
+ * Las variables CSS permiten cambiar todo el esquema de colores
+ * modificando solo los valores de las custom properties.
+ * 
+ * RELACIONADO CON:
+ * - public/index.html: Carga esta hoja de estilos
+ * - src/App.js: Aplica clases y usa variables CSS
+ * - src/utils/themes.js: Define valores para diferentes temas
+ * ============================================================================
+ */
+
+/* =============================================================================
+   SECCIÓN 1: VARIABLES CSS (CUSTOM PROPERTIES)
+   =============================================================================
+   Estas variables definen todo el sistema de diseño visual.
+   Al cambiar estos valores, se modifica toda la apariencia de la app.
+   
+   SISTEMA DE COLORES:
+   - bg-*: Fondos de diferentes niveles (primario, secundario, terciario)
+   - text-*: Colores de texto (primario, secundario, terciario)
+   - accent-*: Colores de acento para acciones e indicadores
+   - border-*: Colores de bordes y separadores
+   - shadow-*: Sombras para efectos de profundidad
+   
+   SISTEMA DE ESPACIADO:
+   - sidebar-width: Ancho de la barra lateral
+   - header/footer-height: Alturas fijas de barras
+   - border-radius-*: Radio de bordes para consistencia visual
+   ============================================================================ */
+
+:root {
+  /* --------------------------------------------------------------------------
+     PALETA DE COLORES - FONDOS
+     -------------------------------------------------------------------------- */
+  --bg-primary: #0a0a0a;
+  /* Fondo principal (más oscuro) */
+  --bg-secondary: #121212;
+  /* Fondo secundario (sidebar, paneles) */
+  --bg-tertiary: #1d1d1d;
+  /* Fondo terciario (elementos elevados) */
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  /* Efecto hover sutil */
+  --bg-active: rgba(0, 113, 227, 0.1);
+  /* Elemento activo/seleccionado */
+
+  /* --------------------------------------------------------------------------
+     PALETA DE COLORES - TEXTO
+     -------------------------------------------------------------------------- */
+  --text-primary: #f5f5f7;
+  /* Texto principal (máximo contraste) */
+  --text-secondary: #86868b;
+  /* Texto secundario (etiquetas, hints) */
+  --text-tertiary: #6e6e73;
+  /* Texto terciario (desactivado, placeholders) */
+
+  /* --------------------------------------------------------------------------
+     PALETA DE COLORES - ACENTOS
+     -------------------------------------------------------------------------- */
+  --accent-blue: #0071e3;
+  /* Azul principal (botones, enlaces) */
+  --accent-red: #ff3b30;
+  /* Rojo (errores, eliminar, alertas) */
+  --accent-orange: #ff9500;
+  /* Naranja (advertencias, cambios sin guardar) */
+  --accent-green: #34c759;
+  /* Verde (éxito, online, completado) */
+  --accent-purple: #af52de;
+  /* Púrpura (elementos especiales) */
+  --accent-pink: #ff2d55;
+  /* Rosa (destacados) */
+
+  /* --------------------------------------------------------------------------
+     BORDES Y SEPARADORES
+     -------------------------------------------------------------------------- */
+  --border-color: rgba(255, 255, 255, 0.08);
+  /* Borde estándar sutil */
+  --border-hover: rgba(255, 255, 255, 0.15);
+  /* Borde al hacer hover */
+
+  /* --------------------------------------------------------------------------
+     SOMBRAS (efectos de profundidad)
+     -------------------------------------------------------------------------- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  /* Sombra pequeña */
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  /* Sombra media */
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+  /* Sombra grande */
+  --shadow-float: 0 4px 20px rgba(0, 0, 0, 0.6);
+  /* Elemento flotante */
+
+  /* --------------------------------------------------------------------------
+     TRANSICIONES (animaciones suaves)
+     -------------------------------------------------------------------------- */
+  --transition-fast: 0.15s ease;
+  /* Transiciones rápidas (hover) */
+  --transition-normal: 0.25s ease;
+  /* Transiciones normales */
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Transiciones lentas */
+
+  /* --------------------------------------------------------------------------
+     DIMENSIONES FIJAS
+     -------------------------------------------------------------------------- */
+  --sidebar-width: 280px;
+  /* Ancho de la barra lateral expandida */
+  --sidebar-collapsed: 60px;
+  /* Ancho de la barra lateral colapsada */
+  --header-height: 50px;
+  /* Altura de la barra superior */
+  --footer-height: 45px;
+  /* Altura del footer del editor */
+
+  /* --------------------------------------------------------------------------
+     RADIO DE BORDES (consistencia visual)
+     -------------------------------------------------------------------------- */
+  --border-radius-sm: 6px;
+  /* Pequeño (botones, inputs) */
+  --border-radius-md: 10px;
+  /* Medio (tarjetas, elementos) */
+  --border-radius-lg: 16px;
+  /* Grande (modales, paneles) */
+  --border-radius-xl: 24px;
+  /* Extra grande (destacados) */
+}
+
+/* =============================================================================
+   SECCIÓN 2: RESET Y ESTILOS BASE
+   =============================================================================
+   Normalización de estilos entre navegadores y configuración base.
+   ============================================================================ */
+
+/* Reset de márgenes y paddings para todos los elementos */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* Incluye padding y border en el tamaño total */
+}
+
+/* Tamaño base de fuente (14px = 1rem) */
+html {
+  font-size: 14px;
+}
+
+/* Estilos base del body */
+body {
+  background-color: var(--bg-primary);
+  /* Fondo principal */
+  color: var(--text-primary);
+  /* Color de texto principal */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  height: 100vh;
+  /* Altura completa de la ventana */
+  overflow: hidden;
+  /* Sin scroll en el body */
+  line-height: 1.5;
+  /* Interlineado cómodo */
+  -webkit-font-smoothing: antialiased;
+  /* Mejor renderizado de fuentes en WebKit */
+  -moz-osx-font-smoothing: grayscale;
+  /* Mejor renderizado en Firefox */
+}
+
+/* Contenedor raíz de React */
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* =============================================================================
+   SCROLLBAR PERSONALIZADA
+   =============================================================================
+   Estilos para las barras de desplazamiento en WebKit (Chrome, Edge, Safari)
+   ============================================================================ */
+
+/* Barra de scroll completa */
+::-webkit-scrollbar {
+  width: 8px;
+  /* Ancho de scrollbar vertical */
+  height: 8px;
+  /* Alto de scrollbar horizontal */
+}
+
+/* Track (fondo de la scrollbar) */
+::-webkit-scrollbar-track {
+  background: transparent;
+  /* Transparente para no llamar atención */
+}
+
+/* Thumb (la parte que se arrastra) */
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  /* Color sutil */
+  border-radius: 4px;
+  /* Bordes redondeados */
+}
+
+/* Thumb al hacer hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+  /* Más visible al interactuar */
+}
+
+/* =============================================================================
+   SECCIÓN 3: LAYOUT PRINCIPAL
+   =============================================================================
+   Estructura general de la aplicación: contenedor, sidebar y contenido principal
+   ============================================================================ */
+
+/* Contenedor principal de toda la aplicación */
+.app-container {
+  display: flex;
+  /* Flexbox para layout horizontal */
+  height: 100vh;
+  /* Altura completa */
+  width: 100vw;
+  /* Ancho completo */
+  background: var(--bg-primary);
+}
+
+/* Contenido principal (área a la derecha del sidebar) */
+.main-content {
+  flex: 1;
+  /* Ocupa todo el espacio disponible */
+  display: flex;
+  flex-direction: column;
+  /* Apila elementos verticalmente */
+  overflow: hidden;
+  /* El scroll lo manejan los hijos */
+  transition: margin-left var(--transition-slow);
+}
+
+/* Estado cuando el sidebar está colapsado */
+.main-content.sidebar-collapsed {
+  margin-left: 0;
+}
+
+/* =============================================================================
+   SECCIÓN 4: PANTALLA DE CARGA (SPLASH SCREEN)
+   =============================================================================
+   Pantalla inicial que se muestra mientras carga la aplicación.
+   Muestra el logo de Block Guard con animación.
+   ============================================================================ */
+
+.splash-screen {
+  position: fixed;
+  /* Cubre toda la pantalla */
+  inset: 0;
+  /* top:0, right:0, bottom:0, left:0 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #2a2a2a;
+  /* Fondo gris como solicitado */
+  color: var(--text-primary);
+  z-index: 99999;
+  /* Por encima de todo */
+}
+
+/* Contenedor del logo en splash screen */
+.splash-logo {
+  font-size: 6rem;
+  /* Logo grande */
+  color: var(--accent-blue);
+  /* Color azul del logo */
+  margin-bottom: 24px;
+  animation: splash-pulse 2s ease-in-out infinite;
+  /* Animación de pulso */
+}
+
+/* Nombre de la app en splash */
+.splash-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+/* Subtítulo en splash */
+.splash-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Animación de pulso para el logo */
+@keyframes splash-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+}
+
+/* =============================================================================
+   SECCIÓN 5: SIDEBAR (BARRA LATERAL)
+   =============================================================================
+   Barra lateral izquierda que contiene:
+   - Perfil del usuario (avatar y nombre)
+   - Lista de proyectos y archivos
+   - Botón de configuración
+   ============================================================================ */
+
+/* Contenedor principal del sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  /* Ancho fijo definido en variables */
+  background: var(--bg-secondary);
+  /* Fondo secundario */
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1000;
+  /* Por encima del contenido */
+  transition: width var(--transition-slow), transform var(--transition-slow);
+  flex-shrink: 0;
+  /* No se encoge */
+}
+
+/* Estado colapsado del sidebar */
+.sidebar.collapsed {
+  width: 0;
+  transform: translateX(-100%);
+  /* Se desliza fuera de la pantalla */
+  border-right: none;
+  overflow: hidden;
+}
+
+/* Botón para colapsar/expandir el sidebar */
+.sidebar-collapse-btn {
+  position: absolute;
+  right: -12px;
+  /* Sale ligeramente del sidebar */
+  top: 20px;
+  width: 24px;
+  height: 24px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  /* Forma circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1002;
+  /* Por encima del sidebar */
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
+}
+
+.sidebar-collapse-btn:hover {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+/* --------------------------------------------------------------------------
+   HEADER DEL SIDEBAR (perfil de usuario)
+   -------------------------------------------------------------------------- */
+
+.sidebar-header {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+}
+
+/* Contenedor del perfil de usuario */
+.user-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  /* Permite truncar texto */
+}
+
+/* Contenedor del avatar */
+.avatar-container {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* No se encoge */
+}
+
+.avatar-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Cubre todo el espacio */
+}
+
+/* Placeholder cuando no hay avatar */
+.avatar-placeholder {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Información del usuario (nombre y estado) */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* Permite truncar */
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Añade "..." si es muy largo */
+}
+
+.user-status {
+  font-size: 0.7rem;
+  color: var(--accent-green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Indicador visual de estado online */
+.user-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--accent-green);
+  border-radius: 50%;
+}
+
+/* --------------------------------------------------------------------------
+   CONTENIDO DEL SIDEBAR (lista de proyectos)
+   -------------------------------------------------------------------------- */
+
+.sidebar-content {
+  flex: 1;
+  /* Ocupa todo el espacio restante */
+  overflow-y: auto;
+  /* Scroll si hay muchos proyectos */
+  padding: 12px 0;
+}
+
+/* Sección del sidebar (ej: PROYECTOS) */
+.sidebar-section {
+  margin-bottom: 16px;
+}
+
+/* Cabecera de sección con título y botón añadir */
+.section-header {
+  padding: 0 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Botón para añadir nuevo proyecto */
+.btn-add {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+}
+
+.btn-add:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Botones de navegación del sidebar (Home, Recientes, Tutorial) */
+.sidebar-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--border-radius-md);
+  text-align: left;
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+}
+
+.sidebar-nav-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+
+.sidebar-nav-btn i {
+  width: 20px;
+  text-align: center;
+  color: var(--accent-blue);
+}
+
+/* Lista de proyectos */
+.project-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* Item individual de proyecto */
+.project-item {
+  margin: 2px 8px;
+}
+
+/* Cabecera de un proyecto (nombre + toggle) */
+.project-header {
+  padding: 10px 12px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
+}
+
+.project-header:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Contenedor de iconos de carpeta */
+.folder-icons-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.folder-icons-wrapper:hover {
+  background: rgba(0, 113, 227, 0.15);
+}
+
+/* Icono de flecha para expandir/colapsar */
+.toggle-icon {
+  font-size: 0.85rem;
+  margin-right: 6px;
+  transition: transform var(--transition-fast), color var(--transition-fast);
+  cursor: pointer;
+  color: var(--accent-blue);
+  display: inline-flex;
+  align-items: center;
+}
+
+.toggle-icon:hover {
+  transform: translateX(-2px) scale(1.05);
+}
+
+/* Icono de carpeta */
+.folder-icon {
+  color: var(--accent-blue);
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+  font-size: 0.95rem;
+}
+
+.folder-icons-wrapper:hover .folder-icon {
+  opacity: 1;
+}
+
+/* Hacer que la zona del chevron sea más accesible */
+.folder-icons-wrapper {
+  padding: 4px;
+}
+
+/* Asegurar que el folder icon siempre sea visible y no desaparezca */
+.folder-icon {
+  color: var(--accent-blue);
+  opacity: 1;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  font-size: 0.95rem;
+}
+
+.folder-icons-wrapper:active .folder-icon,
+.folder-icons-wrapper:focus .folder-icon {
+  transform: scale(0.98);
+}
+
+/* Nombre del proyecto */
+.project-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Icono de acciones del proyecto */
+.project-actions {
+  opacity: 0;
+  /* Oculto por defecto */
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.project-header:hover .project-actions {
+  opacity: 1;
+  /* Visible al hacer hover */
+  color: var(--accent-blue);
+}
+
+/* Icono para ver estructura de proyecto */
+.project-view-icon {
+  opacity: 0;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.project-header:hover .project-view-icon {
+  opacity: 1;
+  color: var(--accent-blue);
+}
+
+/* Icono de menú para carpetas */
+.folder-menu-icon {
+  opacity: 0;
+  padding: 4px;
+  border-radius: 4px;
+  transition: opacity var(--transition-fast);
+  cursor: pointer;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.folder-header:hover .folder-menu-icon {
+  opacity: 1;
+  color: var(--accent-blue);
+}
+
+/* Icono de menú para archivos */
+.file-menu-icon {
+  opacity: 0;
+  padding: 4px;
+  border-radius: 4px;
+  transition: opacity var(--transition-fast);
+  cursor: pointer;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.file-item:hover .file-menu-icon {
+  opacity: 1;
+  color: var(--accent-blue);
+}
+
+/* Lista de archivos dentro de un proyecto */
+.file-list {
+  list-style: none;
+  padding-left: 20px;
+  margin-top: 4px;
+}
+
+/* Item individual de archivo */
+.file-item {
+  padding: 6px 10px;
+  margin: 1px 0;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.file-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Archivo actualmente seleccionado/activo */
+.file-item.active {
+  background: var(--bg-active);
+  color: var(--accent-blue);
+}
+
+/* Contenedor del indicador de progreso circular */
+.file-progress {
+  flex-shrink: 0;
+}
+
+/* SVG de progreso circular */
+.circle-progress {
+  width: 18px;
+  height: 18px;
+  transform: rotate(-90deg);
+  /* Inicia desde arriba */
+}
+
+/* Círculo de fondo (gris) */
+.circle-progress .bg {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 3;
+}
+
+/* Círculo de progreso (coloreado) */
+.circle-progress .fg {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--transition-normal);
+}
+
+/* Nombre del archivo */
+.file-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Contenedor de información del archivo */
+.file-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+}
+
+/* Timestamp de última actualización */
+.file-updated {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  opacity: 0.8;
+}
+
+/* Botón para añadir nuevo archivo */
+.add-file-item {
+  padding: 8px 12px;
+  margin: 4px 0;
+  border-radius: var(--border-radius-md);
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border: 1px dashed var(--border-color);
+}
+
+.add-file-item:hover {
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+/* Elemento de carpeta en el árbol */
+.folder-item {
+  margin: 2px 0;
+}
+
+/* Cabecera de carpeta */
+.folder-header {
+  padding: 6px 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.folder-header:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Contenido de una carpeta (subarchivos) */
+.folder-contents {
+  list-style: none;
+  padding-left: 20px;
+}
+
+/* Estilos para nodos padres que no son carpetas (archivos con hijos) */
+.parent-item {
+  margin: 2px 0;
+}
+
+.parent-header {
+  padding: 8px 12px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.parent-header:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.parent-file-icon {
+  color: var(--text-secondary);
+}
+
+.folder-contents .drag-over,
+.parent-header.drag-over,
+.folder-header.drag-over {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   FOOTER DEL SIDEBAR (configuración)
+   -------------------------------------------------------------------------- */
+
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* --------------------------------------------------------------------------
+   PROJECT VIEWER (visor de proyecto) - estilos limpios y modernos
+   -------------------------------------------------------------------------- */
+.project-viewer-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.project-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.project-viewer-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.back-btn-project-viewer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: all var(--transition-fast);
+}
+
+.back-btn-project-viewer:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+  transform: translateX(-2px);
+}
+
+.project-viewer-title {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-project-viewer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-project-viewer:hover {
+  background: var(--accent-blue-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+}
+
+.btn-project-viewer:active {
+  transform: translateY(0);
+}
+
+.btn-new-file {
+  background: #34c759;
+}
+
+.btn-new-file:hover {
+  background: #2fa550;
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
+}
+
+.btn-new-folder {
+  background: #ff9500;
+}
+
+.btn-new-folder:hover {
+  background: #e68a00;
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);
+}
+
+.project-viewer-tree {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  max-height: calc(100vh - 240px);
+  overflow: auto;
+}
+
+.toggle-folder-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.toggle-folder-btn:hover {
+  background: var(--bg-hover);
+  color: var(--accent-blue);
+}
+
+.tree-item .tree-item-header:focus-within,
+.tree-item .tree-item-header:focus {
+  outline: 2px solid rgba(0, 113, 227, 0.12);
+  border-radius: 8px;
+}
+
+.tree-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tree-item .tree-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tree-item .tree-item-header:hover {
+  background: var(--bg-hover);
+}
+
+.tree-children {
+  padding-left: 20px;
+  border-left: 1px dashed rgba(255, 255, 255, 0.03);
+  margin-left: 8px;
+}
+
+.tree-item.folder-item .item-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tree-item.file-item .item-name {
+  color: var(--text-secondary);
+}
+
+.file-progress-small .circle-progress-small {
+  width: 20px;
+  height: 20px;
+}
+
+.file-info-project {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.file-updated-small {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.progress-percent {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Item del footer (ej: botón de configuración) */
+.footer-item {
+  padding: 10px 12px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.footer-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* =============================================================================
+   SECCIÓN 6: TOP BAR (BARRA SUPERIOR)
+   =============================================================================
+   Barra superior que muestra:
+   - Breadcrumb de navegación (Inicio > Proyecto > Archivo)
+   - Botones de acción (Guardar, Corrector, Idioma)
+   - Controles de ventana (minimizar, maximizar, cerrar) - Custom Title Bar
+   
+   NOTA: Con frame:false en Electron, esta barra se convierte en el título
+   de la ventana personalizado. El área del breadcrumb es draggable para
+   arrastrar la ventana, pero es respetuoso del -webkit-app-region.
+   ============================================================================ */
+
+.top-bar {
+  height: var(--header-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  flex-shrink: 0;
+
+  /* Hacer toda la barra draggable para arrastrar la ventana */
+  -webkit-app-region: drag;
+
+  /* Prevenir selección de texto al arrastrar */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Breadcrumb de navegación */
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  flex: 1;
+
+
+  /* Split layout when viewing a project: left viewer + right editor */
+  .project-split {
+    display: flex;
+    height: calc(100vh - var(--header-height) - var(--footer-height));
+  }
+
+  .project-viewer-container {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    border-right: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    padding: 12px;
+    overflow: auto;
+  }
+
+  /* Evitar que el EditorSidebar (posición fija derecha) solape el area derecha del editor
+   cuando ProjectViewer está visible. */
+  .project-split-right {
+    margin-right: 64px;
+    /* espacio para EditorSidebar */
+  }
+
+  .project-split-right {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project-empty-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    padding: 40px;
+  }
+
+  .project-viewer-tree .tree-item {
+    padding: 6px 8px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project-viewer-tree .tree-item .tree-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .project-viewer-tree .tree-children {
+    margin-left: 18px;
+    border-left: 1px dashed rgba(255, 255, 255, 0.03);
+    padding-left: 8px;
+  }
+
+  .project-viewer-header h2 {
+    margin-left: 8px;
+  }
+
+  /* ProjectViewer actions and item buttons */
+  .project-viewer-header .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .tree-item-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  .action-btn.danger {
+    color: var(--accent-red);
+  }
+
+  .action-btn.danger:hover {
+    background: rgba(255, 59, 48, 0.08);
+  }
+
+  /* Hacer area arrastrable */
+  -webkit-app-region: drag;
+}
+
+/* Botón para mostrar el sidebar cuando está colapsado */
+.show-sidebar-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-fast);
+  margin-right: 8px;
+
+  /* No draggable, clickeable */
+  -webkit-app-region: no-drag;
+}
+
+.show-sidebar-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Item individual del breadcrumb */
+.breadcrumb-item {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+
+  /* No draggable */
+  -webkit-app-region: no-drag;
+}
+
+.breadcrumb-item:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+/* Item clickeable en breadcrumb (proyecto) */
+.breadcrumb-item.clickeable {
+  color: var(--accent-blue);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.breadcrumb-item.clickeable:hover {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-blue);
+  background: var(--bg-active);
+}
+
+/* Item activo del breadcrumb (archivo actual) */
+.breadcrumb-item.active {
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: default;
+}
+
+.breadcrumb-item.active:hover {
+  background: transparent;
+}
+
+/* Separador entre items del breadcrumb */
+.breadcrumb-separator {
+  font-size: 0.6rem;
+  opacity: 0.4;
+}
+
+/* Indicador de cambios sin guardar */
+.unsaved-indicator {
+  color: var(--accent-orange);
+  margin-left: 4px;
+}
+
+/* Contenedor de botones de acción */
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+
+  /* No draggable */
+  -webkit-app-region: no-drag;
+}
+
+/* Botón primario pequeño (Guardar) */
+.btn-primary-small {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-primary-small:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary-small:active {
+  transform: translateY(0);
+}
+
+/* Botón de icono (Corrector) */
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-fast);
+}
+
+.btn-icon:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Selector de idioma */
+.language-selector {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: calc(var(--border-radius-sm) - 1px);
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.lang-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.lang-btn.active {
+  background: var(--accent-blue);
+  color: white;
+}
+
+/* Controles de ventana (Custom Title Bar) */
+.window-controls {
+  display: flex;
+  gap: 10px;
+  margin-left: 20px;
+  flex-shrink: 0;
+
+  /* Asegurar región no-draggable */
+  -webkit-app-region: no-drag;
+}
+
+.window-control-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+  border-radius: 0;
+}
+
+.window-control-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+/* Botón de cerrar con color rojo */
+.close-btn-window:hover {
+  background: var(--accent-red);
+  color: white;
+}
+
+/* Estado activo (maximized button) */
+.window-control-btn:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* =============================================================================
+   SECCIÓN 7: WELCOME SCREEN (PANTALLA DE BIENVENIDA)
+   =============================================================================
+   Pantalla que se muestra cuando no hay ningún archivo abierto.
+   Muestra el logo, acciones principales y archivos recientes.
+   ============================================================================ */
+
+.welcome-screen {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 24px;
+  overflow-y: auto;
+  background: var(--bg-primary);
+}
+
+/* Contenedor del contenido de bienvenida */
+.welcome-content {
+  max-width: 700px;
+  width: 100%;
+  text-align: left;
+}
+
+/* Logo grande en bienvenida */
+.welcome-logo {
+  font-size: 3.5rem;
+  color: var(--accent-blue);
+  margin-bottom: 24px;
+  opacity: 0.6;
+}
+
+/* Título principal */
+.welcome-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+/* Subtítulo */
+.welcome-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  font-size: 1rem;
+}
+
+/* Contenedor de botones de acción */
+.welcome-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+/* Botón primario */
+.btn-primary {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 0 20px;
+  height: 44px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Variante de peligro (eliminar) */
+.btn-primary.danger {
+  background: var(--accent-red);
+}
+
+/* Botón secundario */
+.btn-sub {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0 20px;
+  height: 44px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition-fast);
+}
+
+.btn-sub:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--text-tertiary);
+}
+
+/* Botón grande */
+.btn-large {
+  height: 52px;
+  padding: 0 28px;
+  font-size: 1rem;
+}
+
+/* Texto de ayuda */
+.welcome-hint {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  margin-bottom: 40px;
+}
+
+/* Grid de características */
+.welcome-features {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* Item de característica */
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.feature-item i {
+  color: var(--accent-blue);
+  font-size: 1.2rem;
+}
+
+/* Grid de proyectos */
+.projects-grid {
+  margin-top: 40px;
+}
+
+.projects-grid h3 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Lista de proyectos en tarjetas */
+.projects-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+/* Tarjeta de proyecto */
+.project-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.project-card:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+.project-card i {
+  font-size: 1.5rem;
+  color: var(--accent-blue);
+}
+
+.project-card .project-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.project-card .project-count {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+/* Sección de archivos recientes */
+.recent-files {
+  margin-top: 40px;
+}
+
+.recent-files h3 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Lista de archivos recientes */
+.recent-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Item de archivo reciente */
+.recent-file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.recent-file-item:hover {
+  border-color: var(--accent-blue);
+}
+
+.recent-file-item i {
+  color: var(--accent-blue);
+}
+
+.recent-file-item .file-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.recent-file-item .file-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.recent-file-item .file-project {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+/* Info del workspace */
+.workspace-info {
+  margin-top: 40px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+}
+
+.workspace-info i {
+  color: var(--accent-blue);
+}
+
+/* Estado vacío (sin proyectos) */
+.empty-projects {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-tertiary);
+}
+
+.empty-projects i {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-projects p {
+  margin-bottom: 20px;
+}
+
+/* =============================================================================
+   SECCIÓN 8: EDITOR (ÁREA DE EDICIÓN DE TEXTO)
+   =============================================================================
+   Componente principal donde el usuario escribe y edita contenido.
+   Soporta formato enriquecido (negrita, cursiva, títulos, etc.)
+   ============================================================================ */
+
+/* Contenedor del editor */
+.editor-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 40px 60px;
+  scroll-behavior: smooth;
+}
+
+/* Contenedor interno del editor */
+.editor-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* permitir que hijos con overflow se reduzcan correctamente */
+}
+
+/* Contenedor principal que agrupa editor y su sidebar interno */
+.editor-main {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  align-items: stretch;
+  /* estirar para que la sidebar ocupe toda la altura */
+  height: 100%;
+}
+
+.editor-body {
+  flex: 1;
+  /* el cuerpo del editor ocupa el espacio restante */
+  /* Permitir que el texto largo no se salga del contenedor */
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Metadatos del archivo (icono + título) */
+.editor-metadata {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-self: stretch;
+  width: 100%;
+}
+
+/* Icono grande del archivo */
+.file-icon-large {
+  font-size: 2.5rem;
+  color: var(--accent-blue);
+}
+
+/* Cabecera del archivo activo */
+.active-file-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Título del archivo */
+.active-file-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Cuerpo editable del editor */
+.editor-body {
+  width: 100%;
+  min-height: 60vh;
+  outline: none;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  text-align: left;
+  padding-bottom: 200px;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+/* Párrafos del editor */
+.editor-body p {
+  position: relative;
+  margin-bottom: 0.8em;
+  min-height: 1.5em;
+}
+
+/* Párrafo vacío (placeholder visual) */
+.editor-body p:empty::before {
+  content: '\00a0';
+  /* Espacio no rompible */
+}
+
+/* Efecto hover en párrafos */
+.editor-body p:hover {
+  background: var(--bg-hover);
+}
+
+/* Botón de comentario en párrafo (hover) - DESHABILITADO */
+.paragraph-comment-btn {
+  display: none;
+}
+
+/* Botón visible cuando se hace hover al párrafo - DESHABILITADO */
+.editor-body p:hover .paragraph-comment-btn {
+  display: none;
+}
+
+.paragraph-comment-btn:hover {
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.5);
+  background: var(--accent-blue-dark, #0056b3);
+}
+
+/* Contador de comentarios en botón */
+.paragraph-comment-btn .comment-count {
+  position: absolute;
+  background: var(--accent-red, #ff4444);
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  padding: 0 2px;
+}
+
+/* Quitar hover cuando el editor tiene foco */
+.editor-body:focus {
+  background: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   FORMATO DE TEXTO EN EL EDITOR
+   -------------------------------------------------------------------------- */
+
+/* Negrita */
+.editor-body b,
+.editor-body strong {
+  font-weight: 700;
+}
+
+/* Cursiva */
+.editor-body i,
+.editor-body em {
+  font-style: italic;
+}
+
+/* Subrayado */
+.editor-body u {
+  text-decoration: underline;
+  text-decoration-color: var(--accent-blue);
+  text-underline-offset: 2px;
+}
+
+/* Tachado */
+.editor-body s,
+.editor-body strike {
+  text-decoration: line-through;
+}
+
+/* Resaltado/Marcado */
+.editor-body mark {
+  background: rgba(255, 193, 7, 0.3);
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+/* Títulos */
+.editor-body h1,
+.editor-body h2,
+.editor-body h3 {
+  font-weight: 700;
+  margin: 1.5em 0 0.5em;
+  color: var(--text-primary);
+}
+
+.editor-body h1 {
+  font-size: 1.8rem;
+}
+
+.editor-body h2 {
+  font-size: 1.5rem;
+}
+
+.editor-body h3 {
+  font-size: 1.2rem;
+}
+
+/* Citas */
+.editor-body blockquote {
+  border-left: 3px solid var(--accent-blue);
+  padding-left: 16px;
+  margin: 1em 0;
+}
+
+.editor-body.enable-blockquote-style blockquote {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Listas */
+.editor-body ul,
+.editor-body ol {
+  margin: 1em 0;
+  padding-left: 2em;
+}
+
+.editor-body li {
+  margin: 0.3em 0;
+}
+
+/* Placeholder cuando está vacío */
+[contenteditable]:empty::before {
+  content: attr(placeholder);
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   BARRA DE HERRAMIENTAS DE FORMATO (flotante)
+   -------------------------------------------------------------------------- */
+
+.formatting-toolbar {
+  position: fixed;
+  z-index: 5000;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: var(--shadow-float);
+}
+
+/* Grupo de botones relacionados */
+.format-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+  border-right: 1px solid var(--border-color);
+}
+
+.format-group:last-child {
+  border-right: none;
+}
+
+/* Botón de formato individual */
+.format-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  transition: var(--transition-fast);
+  font-size: 0.9rem;
+}
+
+.format-btn:hover {
+  background: var(--bg-active);
+  color: var(--accent-blue);
+}
+
+/* Botón activo (formato aplicado) */
+.format-btn.active {
+  background: var(--accent-blue);
+  color: white;
+}
+
+/* --------------------------------------------------------------------------
+   COLOR PICKERS (para texto y resaltado)
+   -------------------------------------------------------------------------- */
+
+/* Contenedor del color picker */
+.highlight-picker,
+.text-color-picker {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  box-shadow: var(--shadow-float);
+  z-index: 5001;
+  min-width: 100px;
+}
+
+/* Opción de color individual */
+.color-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-option:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+/* =============================================================================
+   SECCIÓN 9: FOOTER DEL EDITOR
+   =============================================================================
+   Barra inferior que muestra estadísticas y controles del archivo actual.
+   ============================================================================ */
+
+.editor-footer {
+  height: var(--footer-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+  gap: 20px;
+}
+
+/* Estadísticas (líneas, palabras, caracteres) */
+.stats {
+  display: flex;
+  gap: 20px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  align-items: center;
+}
+
+.stats span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stats i {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Botón de análisis de estadísticas */
+.btn-stats-analytics {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.btn-stats-analytics:hover {
+  background: var(--bg-hover);
+  color: var(--accent-blue);
+}
+
+/* Contenedor derecho del footer */
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Indicador de auto-guardado (punto naranja parpadeante) */
+.autosave-indicator {
+  width: 8px;
+  height: 8px;
+  background: var(--accent-orange);
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Badge de estado del archivo */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* Botón de upgrade de estado */
+.btn-upgrade-footer {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-upgrade-footer:hover {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+.btn-upgrade-footer:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Contenedor de meta de caracteres */
+.footer-goal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.footer-goal i {
+  color: var(--accent-blue);
+}
+
+/* Input de meta pequeño */
+.mini-goal-input {
+  width: 60px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 4px 8px;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.mini-goal-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+/* Barra de progreso mini */
+.mini-progress {
+  width: 80px;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* Relleno de la barra de progreso */
+.mini-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width var(--transition-normal);
+}
+
+/* Texto de porcentaje */
+.progress-text {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  min-width: 35px;
+}
+
+/* =============================================================================
+   SECCIÓN 10: MODALES
+   =============================================================================
+   Ventanas emergentes para configuración, confirmaciones, etc.
+   ============================================================================ */
+
+/* Overlay del modal (fondo oscuro) */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  /* Efecto de desenfoque */
+  z-index: 10000;
+  display: none;
+  /* Oculto por defecto */
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Modal visible */
+.modal.open {
+  display: flex;
+}
+
+/* Contenedor del contenido del modal */
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  animation: modal-appear 0.3s ease;
+}
+
+/* Animación de aparición del modal */
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Tamaños de modal */
+.modal-content.small {
+  max-width: 350px;
+}
+
+.modal-content.medium {
+  max-width: 600px;
+}
+
+.modal-content.large {
+  max-width: 800px;
+}
+
+/* Modal de configuración (grande) */
+.modal-content.settings-large {
+  max-width: 900px;
+  width: 90%;
+  height: 80vh;
+}
+
+/* Alineación centrada de texto */
+.modal-content.text-center {
+  text-align: center;
+}
+
+/* Botón de cerrar (X) */
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-fast);
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Cuerpo del modal */
+.modal-body {
+  padding: 32px;
+}
+
+.modal-body h2 {
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+/* Acciones del modal (botones) */
+.modal-actions {
+  padding: 20px 32px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 12px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   MODAL DE CONFIGURACIÓN
+   -------------------------------------------------------------------------- */
+
+/* Layout del modal de configuración */
+.settings-layout {
+  display: flex;
+  height: 100%;
+}
+
+/* Sidebar del modal de configuración */
+.settings-sidebar {
+  width: 220px;
+  background: var(--bg-tertiary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* Cabecera del sidebar de configuración */
+.settings-sidebar-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-sidebar-header i {
+  font-size: 1.5rem;
+  color: var(--accent-blue);
+}
+
+.settings-sidebar-header span {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Navegación de pestañas */
+.settings-nav {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Botón de pestaña */
+.settings-nav-btn {
+  padding: 12px 16px;
+  border-radius: var(--border-radius-md);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: left;
+}
+
+.settings-nav-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.settings-nav-btn.active {
+  background: var(--accent-blue);
+  color: white;
+}
+
+/* Contenido principal del modal de configuración */
+.settings-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Cabecera del contenido */
+.settings-main-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-main-header h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+/* Área de contenido con scroll */
+.settings-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Footer del modal de configuración */
+.settings-main-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Contenido de una pestaña */
+.settings-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Item de configuración individual */
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setting-item label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Descripción de la configuración */
+.setting-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Inputs de configuración */
+.setting-item input[type="text"],
+.setting-item input[type="number"],
+.setting-item input[type="url"] {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+}
+
+.setting-item input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+/* Selector de color */
+.setting-item input[type="color"] {
+  width: 50px;
+  height: 40px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  background: transparent;
+}
+
+/* Configuración del avatar */
+.avatar-setting {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Preview grande del avatar */
+.avatar-preview-large {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-preview-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-preview-large i {
+  font-size: 2rem;
+  color: var(--text-secondary);
+
+  overflow-wrap: anywhere;
+   word-break: break-word;
+
+}
+/* Acciones del avatar */
+.avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Botón secundario pequeño */
+.btn-sub-small {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+}
+
+.btn-sub-small:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+/* Selector de temas */
+.theme-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Botón de tema individual */
+.theme-btn {
+  padding: 12px 24px;
+  border-radius: var(--border-radius-md);
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+
+.theme-btn:hover {
+  transform: translateY(-2px);
+}
+
+.theme-btn.active {
+  border-color: var(--accent-blue);
+}
+
+/* Editor de tema personalizado */
+.custom-theme-editor {
+  padding: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  margin-top: 16px;
+}
+
+.custom-theme-name {
+  margin-bottom: 20px;
+}
+
+.custom-theme-name label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.setting-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(0, 113, 227, 0.2);
+}
+
+/* Grid de colores */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.color-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.color-setting label {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.color-input-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.color-picker {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.color-picker:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 12px rgba(0, 113, 227, 0.2);
+}
+
+.color-value {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+/* Acciones del tema */
+.custom-theme-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.btn-primary:hover {
+  background: rgba(0, 113, 227, 0.8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.btn-sub {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 16px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.btn-sub:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-secondary);
+}
+
+/* Lista de estados configurables */
+.states-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Item de estado individual */
+.state-config-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-md);
+}
+
+/* Botones de reordenar estados */
+.state-reorder {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Botón de icono pequeño */
+.btn-icon-small {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.btn-icon-small:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-icon-small:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.btn-icon-small.danger:hover {
+  color: var(--accent-red);
+}
+
+/* Selector de color pequeño */
+.color-picker-small {
+  width: 36px !important;
+  height: 36px !important;
+  padding: 2px !important;
+}
+
+/* Campos de estado */
+.state-fields {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+}
+
+.state-fields input {
+  flex: 1;
+}
+
+/* Select de tipo de conteo */
+.state-config-item select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+/* Badge de estado por defecto */
+.default-badge {
+  background: var(--accent-blue);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Acciones de datos (exportar/importar) */
+.data-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Botón secundario */
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 20px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-tertiary);
+}
+
+/* Enlace tipo botón */
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+
+/* --------------------------------------------------------------------------
+   MODAL DE CORRECTOR ORTOGRÁFICO
+   -------------------------------------------------------------------------- */
+
+/* Cabecera del corrector */
+.spellcheck-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* Título del corrector */
+.spellcheck-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.spellcheck-title i {
+  font-size: 1.5rem;
+  color: var(--accent-blue);
+}
+
+.spellcheck-title h2 {
+  margin: 0;
+}
+
+/* Estadísticas del corrector */
+.spellcheck-stats {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Opciones del corrector */
+.spellcheck-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-md);
+}
+
+/* Grupo de opciones */
+.option-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.option-group label {
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 140px;
+}
+
+.option-group select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+/* Nombre de página por defecto */
+.default-page-name {
+  color: var(--text-secondary);
+}
+
+/* Grid de secciones de texto */
+.spell-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* Sección individual de texto */
+.spell-section {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: var(--transition-fast);
+}
+
+.spell-section:hover {
+  border-color: var(--accent-blue);
+}
+
+/* Info de la sección */
+.spell-section-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Número de sección */
+.spell-section-number {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Contador de caracteres */
+.spell-section-chars {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Botón de copiar sección */
+.btn-copy-section {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+}
+
+.btn-copy-section:hover {
+  filter: brightness(1.1);
+}
+
+/* Estado copiado */
+.btn-copy-section.copied {
+  background: var(--accent-green);
+}
+
+/* Footer del corrector */
+.spellcheck-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Cabecera del gestor de páginas */
+.spellcheck-manager-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Botón de volver */
+.btn-back {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+}
+
+.btn-back:hover {
+  color: var(--text-primary);
+}
+
+/* Lista de páginas */
+.spellcheck-pages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* Fila de página */
+.spellcheck-page-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-md);
+  border: 1px solid transparent;
+}
+
+.spellcheck-page-row.default {
+  border-color: var(--accent-blue);
+}
+
+.spellcheck-page-row input[type="radio"] {
+  cursor: pointer;
+}
+
+/* Estilo para blockquotes dentro del cuerpo del editor */
+.editor-body blockquote {
+  border-left: 4px solid var(--accent-blue);
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  background: transparent;
+}
+
+.editor-body.enable-blockquote-style blockquote {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Inputs de página */
+.page-inputs {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+}
+
+.page-inputs input {
+  flex: 1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+/* Acciones de página */
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-actions button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-fast);
+}
+
+.page-actions button:hover {
+  color: var(--accent-red);
+}
+
+/* Acciones del gestor */
+.spellcheck-manager-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* =============================================================================
+   SECCIÓN 11B: EDITOR CONTEXT MENU (MENÚ CONTEXTUAL DEL EDITOR)
+   =============================================================================
+   Menú que aparece al hacer clic derecho en el editor.
+   ============================================================================ */
+
+.editor-context-menu {
+  min-width: 220px;
+}
+
+.context-separator {
+  height: 1px;
+  background: var(--border-color);
+  margin: 6px 0;
+}
+
+.context-item {
+  padding: 10px 14px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+.context-item:hover {
+  background: var(--bg-hover);
+}
+
+.context-item i {
+  width: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.context-label {
+  flex: 1;
+}
+
+.context-hotkey {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+/* =============================================================================
+   SECCIÓN 11: MENÚ CONTEXTUAL (CLICK DERECHO)
+   =============================================================================
+   Menú que aparece al hacer clic derecho en proyectos o archivos.
+   ============================================================================ */
+
+.context-menu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 6px;
+  min-width: 180px;
+  box-shadow: var(--shadow-float);
+  z-index: 10000;
+}
+
+/* Item del menú contextual */
+.context-item {
+  padding: 10px 14px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+.context-item:hover {
+  background: var(--bg-hover);
+}
+
+/* Item de peligro (eliminar) */
+.context-item.danger {
+  color: var(--accent-red);
+}
+
+.context-item.danger:hover {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+/* =============================================================================
+   SECCIÓN 12: NOTIFICACIONES
+   =============================================================================
+   Sistema de notificaciones toast que aparece en la esquina inferior derecha.
+   ============================================================================ */
+
+/* Contenedor de notificaciones */
+#notification-container {
+  position: fixed;
+  bottom: 40px;
+  /* Más alejado del borde */
+  right: 24px;
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Notificación individual */
+.notification {
+  padding: 14px 20px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  animation: notification-slide-in 0.3s ease;
+  box-shadow: var(--shadow-md);
+  min-width: 280px;
+}
+
+/* Animación de entrada */
+@keyframes notification-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Tipos de notificación */
+.notification.success {
+  background: var(--accent-green);
+  color: white;
+}
+
+.notification.error {
+  background: var(--accent-red);
+  color: white;
+}
+
+.notification.info {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.notification i {
+  font-size: 1.1rem;
+}
+
+/* =============================================================================
+   SECCIÓN 13: PANEL DE COMENTARIOS
+   =============================================================================
+   Sidebar lateral que muestra comentarios del archivo actual.
+   ============================================================================ */
+
+.comments-sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 350px;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  animation: slide-in-right 0.3s ease;
+}
+
+/* Animación de entrada */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Cabecera del panel */
+.comments-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comments-header h3 {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comments-header h3 i {
+  color: var(--accent-blue);
+}
+
+/* Lista de comentarios */
+.comments-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* Estado vacío (sin comentarios) */
+.no-comments {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+}
+
+.no-comments i {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+/* Item de comentario */
+.comment-item {
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+/* Cabecera del comentario */
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Autor del comentario */
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.comment-author i {
+  color: var(--accent-blue);
+}
+
+/* Fecha del comentario */
+.comment-date {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Texto del comentario */
+.comment-text {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* Botón de eliminar comentario */
+.delete-comment-btn {
+  margin-top: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+}
+
+.delete-comment-btn:hover {
+  color: var(--accent-red);
+}
+
+/* Área de input de comentario */
+.comment-input-area {
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.comment-input-area textarea {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  resize: none;
+  margin-bottom: 12px;
+}
+
+.comment-input-area textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.comment-input-area button {
+  width: 100%;
+}
+
+/* Overlay del panel de comentarios */
+.comments-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+/* =============================================================================
+   SECCIÓN 14: ONBOARDING (PRIMERA VEZ)
+   =============================================================================
+   Pantallas que se muestran la primera vez que el usuario abre la app.
+   ============================================================================ */
+
+/* Contenedor del onboarding */
+.onboarding-container {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  z-index: 20000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+/* Contenido del onboarding */
+.onboarding-content {
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Logo del onboarding */
+.onboarding-logo {
+  font-size: 5rem;
+  color: var(--accent-blue);
+  margin-bottom: 32px;
+}
+
+/* Título del onboarding */
+.onboarding-content h1 {
+  font-size: 2rem;
+  margin-bottom: 16px;
+}
+
+/* Subtítulo del onboarding */
+.onboarding-content p {
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+/* Formulario del onboarding */
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: left;
+}
+
+/* Grupo de campo del formulario */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-group input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+/* Selector de avatar en onboarding */
+.avatar-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Preview del avatar */
+.avatar-preview-xl {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  border: 3px solid var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-preview-xl img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-preview-xl i {
+  font-size: 3rem;
+  color: var(--text-secondary);
+}
+
+/* Botón de seleccionar avatar */
+.btn-select-avatar {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition-fast);
+}
+
+.btn-select-avatar:hover {
+  border-color: var(--accent-blue);
+}
+
+/* Selector de ubicación del workspace */
+.workspace-location {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Ruta seleccionada */
+.selected-path {
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+/* Botón de seleccionar ubicación */
+.btn-select-location {
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-color);
+  color: var(--text-primary);
+  padding: 16px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition-fast);
+}
+
+.btn-select-location:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+/* Indicador de pasos */
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+/* Punto de paso */
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-color);
+  transition: var(--transition-fast);
+}
+
+.step-dot.active {
+  background: var(--accent-blue);
+}
+
+/* Botones de navegación del onboarding */
+.onboarding-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.onboarding-actions button {
+  flex: 1;
+}
+
+/* =============================================================================
+   SECCIÓN 14: TEXT ANALYTICS MODAL
+   =============================================================================
+   Modal que muestra análisis detallado del contenido del texto.
+   ============================================================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.text-analytics-modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: modal-appear 0.3s ease;
+}
+
+/* Header del modal */
+.modal-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-header i {
+  color: var(--accent-blue);
+  font-size: 1.5rem;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.3rem;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-fast);
+}
+
+.modal-close-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Body del modal */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Grid de analytics */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+/* Card individual de analytics */
+.analytics-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transition-fast);
+}
+
+.analytics-card:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+/* Icono de la card */
+.card-icon {
+  font-size: 1.5rem;
+  color: var(--accent-blue);
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenido de la card */
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.card-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Resumen del análisis */
+.analytics-summary {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.analytics-summary h3 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.analytics-summary p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.analytics-summary strong {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* Footer del modal */
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.state-dot:hover {
+  transform: scale(1.3);
+}
+
+/* =============================================================================
+   SECCIÓN 15: PROJECT VIEWER (VISOR DE PROYECTOS)
+   =============================================================================
+   Contenedor principal para el visor jerárquico de proyectos.
+   Se muestra como elemento del contenido principal (no modal).
+   ============================================================================ */
+
+/* Wrapper del editor para posicionamiento del sidebar */
+.editor-wrapper {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-viewer-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+/* Contenido del visor */
+.project-viewer-content {
+  position: relative;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.project-viewer-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.project-viewer-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.project-viewer-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.project-viewer-header .back-btn {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.project-viewer-header .back-btn:hover {
+  background: var(--accent-blue);
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+
+/* Alias para el nuevo style */
+.back-btn-title {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.back-btn-title:hover {
+  background: var(--accent-blue);
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+
+.project-viewer-tree {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+}
+
+/* Barra de desplazamiento personalizada */
+.project-viewer-tree::-webkit-scrollbar {
+  width: 8px;
+}
+
+.project-viewer-tree::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-viewer-tree::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.project-viewer-tree::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Árbol de items */
+.tree-item {
+  margin-bottom: 2px;
+}
+
+.tree-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.tree-item-header:hover {
+  background: var(--bg-hover);
+}
+
+.tree-item-header i:first-child {
+  width: 16px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.tree-item-header .folder-icon,
+.tree-item-header .file-progress-small {
+  font-size: 1rem;
+  color: var(--accent-blue);
+  flex-shrink: 0;
+}
+
+.file-progress-small {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-progress-small {
+  width: 100%;
+  height: 100%;
+}
+
+.circle-progress-small .bg {
+  stroke: var(--border-color);
+  stroke-width: 1;
+  fill: none;
+}
+
+.circle-progress-small .fg {
+  stroke-width: 1;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tree-item-header .item-name {
+  flex: 1;
+  user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-item-header .progress-percent {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  min-width: 35px;
+  text-align: right;
+}
+
+/* Contenedor de información de archivo en proyecto viewer */
+.file-info-project {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.file-updated-small {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree-children {
+  padding-left: 16px;
+  margin-top: 4px;
+}
+
+.folder-item .tree-item-header {
+  font-weight: 500;
+}
+
+.file-item .tree-item-header {
+  color: var(--text-secondary);
+}
+
+.file-item .tree-item-header:hover {
+  color: var(--text-primary);
+  background: var(--bg-active);
+}
+
+/* Estado vacío */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.project-viewer-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Grid de atajos de teclado (anterior) */
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* Categoría de atajos */
+.shortcuts-category {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.shortcuts-category:last-child {
+  border-bottom: none;
+}
+
+.category-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Lista de atajos por categoría */
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Item de atajo (mejorado) */
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  transition: all var(--transition-fast);
+  gap: 12px;
+}
+
+.shortcut-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-blue);
+}
+
+.shortcut-item.conflict {
+  border-color: var(--accent-red, #ff4444);
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.shortcut-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.shortcut-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.shortcut-label i {
+  flex-shrink: 0;
+  color: var(--accent-blue);
+}
+
+.shortcut-desc {
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  display: block;
+  white-space: wrap;
+  text-overflow: ellipsis;
+}
+
+.shortcut-keys {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85rem;
+  background: var(--bg-secondary);
+  padding: 6px 12px;
+  border-radius: 4px;
+  color: var(--accent-blue);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.shortcut-keys:hover {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.2);
+}
+
+/* Input para editar shortcuts */
+.shortcut-edit-input {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85rem;
+  background: var(--bg-secondary);
+  color: var(--accent-blue);
+  border: 2px solid var(--accent-blue);
+  border-radius: 4px;
+  padding: 6px 12px;
+  outline: none;
+  min-width: 150px;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  flex: 0 1 150px;
+}
+
+.shortcut-edit-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
+  background: var(--bg-active);
+}
+
+/* Item en edición */
+.shortcut-item.editing {
+  background: var(--bg-active);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.1);
+}
+
+/* Botón para resetear atajo */
+.btn-reset-shortcut {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.btn-reset-shortcut:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
+}
+
+/* =============================================================================
+   SECCIÓN: FIND & REPLACE PANEL (BUSCADOR Y REEMPLAZADOR)
+   =============================================================================
+   Panel para buscar y reemplazar texto en el editor con Ctrl+F
+   ============================================================================ */
+
+.find-replace-panel {
+  position: absolute;
+  /* Dentro de .editor-container */
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6000;
+  /* Por encima del toolbar flotante */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  animation: slideDownIn 0.15s ease;
+  max-width: 900px;
+  width: calc(100% - 80px);
+}
+
+@keyframes slideDownIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.find-replace-container {
+  max-width: none;
+  margin: 0;
+  padding: 12px 24px;
+}
+
+.find-replace-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.find-replace-row:last-child {
+  margin-bottom: 0;
+}
+
+.find-replace-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  width: 30px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.find-replace-input {
+  flex: 1;
+  max-width: 300px;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+}
+
+.find-replace-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(0, 113, 227, 0.2);
+}
+
+/* Contador de coincidencias */
+.match-counter {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  padding: 0 8px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.match-counter.no-match {
+  color: var(--accent-red);
+}
+
+/* Highlight para find match activo */
+.find-match-active {
+  animation: findPulse 2s ease;
+}
+
+@keyframes findPulse {
+
+  0%,
+  100% {
+    background-color: #ffeb3b;
+  }
+
+  50% {
+    background-color: #ff9800;
+  }
+}
+
+/* Divider (---) */
+.editor-divider {
+  border: none;
+  border-top: 2px solid var(--border-color, #333);
+  margin: 24px 0;
+  position: relative;
+}
+
+.editor-divider::after {
+  content: '• • •';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-primary, #1e1e1e);
+  padding: 0 12px;
+  color: var(--text-muted, #666);
+  font-size: 12px;
+  letter-spacing: 4px;
+}
+
+/* Prevenir que el panel de find/replace sea draggable en Electron */
+.find-replace-panel {
+  -webkit-app-region: no-drag !important;
+  user-select: none;
+}
+
+/* Botones del find/replace */
+.find-replace-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.find-replace-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.find-replace-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mensajes de Conflicto de Atajos */
+.shortcut-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: var(--border-radius);
+  border-left: 4px solid;
+  animation: slideDown 0.3s ease-out;
+  font-size: 0.9rem;
+}
+
+.shortcut-message i {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.shortcut-message-warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: var(--accent-yellow);
+  color: #f57f17;
+}
+
+.shortcut-message-success {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: var(--accent-green);
+  color: #2e7d32;
+}
+
+.shortcut-message-error {
+  background: rgba(244, 67, 54, 0.1);
+  border-color: var(--accent-red);
+  color: #c62828;
+}
+
+.shortcut-message-warning i,
+.shortcut-message-success i,
+.shortcut-message-error i {
+  color: currentColor;
+  font-weight: bold;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.find-replace-btn.icon-btn {
+  padding: 6px 8px;
+  font-size: 0.9rem;
+}
+
+.find-replace-btn.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.find-replace-btn.toggle-btn.active {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+.find-replace-btn.replace-btn {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  color: white;
+}
+
+.find-replace-btn.replace-btn:hover:not(:disabled) {
+  background: rgba(52, 199, 89, 0.8);
+  border-color: var(--accent-green);
+}
+
+.find-replace-btn.replace-all-btn {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: white;
+}
+
+.find-replace-btn.replace-all-btn:hover:not(:disabled) {
+  background: rgba(175, 82, 222, 0.8);
+  border-color: var(--accent-purple);
+}
+
+.find-replace-btn.close-btn {
+  margin-left: auto;
+}
+
+.find-replace-btn.close-btn:hover {
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
+/* =============================================================================
+   SECCIÓN 15: RESPONSIVE (ADAPTACIÓN A MÓVILES)
+   =============================================================================
+   Estilos que se aplican en pantallas pequeñas (tablets y móviles).
+   ============================================================================ */
+
+@media (max-width: 768px) {
+
+  /* Sidebar se convierte en drawer en móviles */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Menos padding en el editor */
+  .editor-wrapper {
+    padding: 20px;
+  }
+
+  /* Footer se apila en móviles */
+  .editor-footer {
+    flex-direction: column;
+    height: auto;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .footer-right {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Configuración en columna */
+  .settings-layout {
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .settings-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  /* Grid de secciones más compacto */
+  .spell-sections-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Panel de comentarios ocupa toda la pantalla */
+  .comments-sidebar {
+    width: 100%;
+  }
+}
+
+
+/* ============================================
+   CORRECCIONES - BLOCKQUOTE CONDICIONAL
+   ============================================ */
+
+/* Blockquote base (siempre aplicado) */
+.editor-body blockquote {
+  border-left: 3px solid var(--accent-blue);
+  padding-left: 16px;
+  margin: 1em 0;
+}
+
+/* Blockquote con estilo (solo si está habilitado) */
+.editor-body.enable-blockquote-style blockquote {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ============================================
+   CORRECCIONES - LAYOUT PROJECT VIEWER
+   ============================================ */
+
+/* Layout dividido para ProjectViewer + Editor */
+.project-split {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 0;
+  height: calc(100vh - var(--header-height) - var(--footer-height));
+  transition: grid-template-columns 0.3s ease;
+}
+
+.project-split-right {
+  overflow-y: auto;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-primary);
+}
+
+/* Mensaje cuando no hay archivo abierto en split view */
+.project-empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.project-empty-message h2 {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.project-empty-message p {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+/* Animación de entrada para ProjectViewer */
+.project-viewer-container {
+  animation: slideInLeft 0.3s ease;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   CORRECCIONES - SHORTCUTS EN SETTINGS
+   ============================================ */
+
+.shortcuts-category {
+  margin-bottom: 24px;
+}
+
+.category-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-fast);
+}
+
+.shortcut-item:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-hover);
+}
+
+.shortcut-item.editing {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.1);
+}
+
+.shortcut-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.shortcut-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.shortcut-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.shortcut-keys {
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-blue);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.shortcut-keys:hover {
+  background: var(--bg-active);
+  border-color: var(--accent-blue);
+}
+
+.shortcut-edit-input {
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--accent-blue);
+  border-radius: var(--border-radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-blue);
+  text-align: center;
+  min-width: 150px;
+}
+
+.btn-reset-shortcut {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  padding: 6px;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-fast);
+}
+
+.btn-reset-shortcut:hover {
+  background: var(--bg-hover);
+  color: var(--accent-blue);
+}
+
+.shortcut-message {
+  padding: 12px 16px;
+  border-radius: var(--border-radius-md);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  animation: slideDown 0.3s ease;
+}
+
+.shortcut-message-success {
+  background: rgba(52, 199, 89, 0.1);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+}
+
+.shortcut-message-warning {
+  background: rgba(255, 149, 0, 0.1);
+  border: 1px solid var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+.shortcut-message-error {
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ============================================
+   SELECTOR DE IDIOMA
+   ============================================ */
+
+.setting-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.setting-select:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-tertiary);
+}
+
+.setting-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.setting-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 8px;
+}
+
+/* Estilo para nombre de archivo en comentarios */
+.comments-file-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-left: 8px;
+  opacity: 0.7;
+}
+
+
+/* ============================================
+   SELECTOR DE IDIOMA EN WELCOME SCREEN
+   ============================================ */
+
+.language-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 32px 0;
+  max-width: 500px;
+  width: 100%;
+}
+
+.language-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 120px;
+}
+
+.language-option:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+}
+
+.language-option:active {
+  transform: translateY(0);
+}
+
+.language-flag {
+  font-size: 48px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.language-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Responsive para selector de idioma */
+@media (max-width: 600px) {
+  .language-selector-grid {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+  }
+  
+  .language-option {
+    min-height: 100px;
+    padding: 20px;
+  }
+  
+  .language-flag {
+    font-size: 40px;
+  }
+}
