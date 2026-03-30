@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - SHORTCUTS.JS
+ * - SHORTCUTS.JS
  * ============================================================================
  * 
  * UTILIDAD: SISTEMA CENTRALIZADO DE ATAJOS
@@ -22,7 +22,7 @@
  * 
  * // Usar en componentes
  * <button title={`Guardar (${SHORTCUTS.save.keys})`}>
- *   <i className="fas fa-save"></i>
+ *   <Icon path={mdiContentSave} size={0.7} />
  * </button>
  * 
  * // Registrar callback
@@ -30,6 +30,40 @@
  * 
  * ============================================================================
  */
+
+import * as mdi from '@mdi/js';
+const { 
+  mdiContentSave, 
+  mdiFilePlus, 
+  mdiFolderPlus, 
+  mdiClose, 
+  mdiFormatBold, 
+  mdiFormatItalic, 
+  mdiFormatUnderline, 
+  mdiFormatStrikethrough, 
+  mdiFormatHeaderPound, 
+  mdiCheckboxMarked, 
+  mdiUndo, 
+  mdiRedo, 
+  mdiContentCopy, 
+  mdiContentCut, 
+  mdiContentPaste, 
+  mdiComment, 
+  mdiSpellcheck, 
+  mdiChartLine, 
+  mdiCog, 
+  mdiMenu, 
+  mdiFolderOpen, 
+  mdiMinus, 
+  mdiWindowMaximize, 
+  mdiWindowClose,
+  mdiWindowRestore,
+  mdiPencil,
+  mdiSwapHorizontal,
+  mdiTrashCan,
+  mdiSync,
+  mdiMagnify
+} = mdi;
 
 /**
  * DEFINICIÓN DE ATAJOS PREDETERMINADOS
@@ -40,7 +74,7 @@ export const SHORTCUTS_DEFAULTS = {
   save: {
     id: 'save',
     label: 'Guardar',
-    icon: 'fa-save',
+    icon: mdiContentSave,
     keys: 'Ctrl+S',
     description: 'Guardar archivo actual',
     category: 'file'
@@ -48,7 +82,7 @@ export const SHORTCUTS_DEFAULTS = {
   newFile: {
     id: 'newFile',
     label: 'Nuevo Archivo',
-    icon: 'fa-file-plus',
+    icon: mdiFilePlus,
     keys: 'Ctrl+N',
     description: 'Crear nuevo archivo',
     category: 'file'
@@ -56,7 +90,7 @@ export const SHORTCUTS_DEFAULTS = {
   newProject: {
     id: 'newProject',
     label: 'Nuevo Proyecto',
-    icon: 'fa-folder-plus',
+    icon: mdiFolderPlus,
     keys: 'Ctrl+Shift+N',
     description: 'Crear nuevo proyecto',
     category: 'file'
@@ -64,7 +98,7 @@ export const SHORTCUTS_DEFAULTS = {
   closeFile: {
     id: 'closeFile',
     label: 'Cerrar Archivo',
-    icon: 'fa-times',
+    icon: mdiClose,
     keys: 'Escape',
     description: 'Cerrar archivo actual',
     category: 'file'
@@ -74,7 +108,7 @@ export const SHORTCUTS_DEFAULTS = {
   bold: {
     id: 'bold',
     label: 'Negrita',
-    icon: 'fa-bold',
+    icon: mdiFormatBold,
     keys: 'Ctrl+B',
     description: 'Aplicar negrita al texto',
     category: 'format'
@@ -82,7 +116,7 @@ export const SHORTCUTS_DEFAULTS = {
   italic: {
     id: 'italic',
     label: 'Cursiva',
-    icon: 'fa-italic',
+    icon: mdiFormatItalic,
     keys: 'Ctrl+I',
     description: 'Aplicar cursiva al texto',
     category: 'format'
@@ -90,7 +124,7 @@ export const SHORTCUTS_DEFAULTS = {
   underline: {
     id: 'underline',
     label: 'Subrayado',
-    icon: 'fa-underline',
+    icon: mdiFormatUnderline,
     keys: 'Ctrl+U',
     description: 'Aplicar subrayado al texto',
     category: 'format'
@@ -98,7 +132,7 @@ export const SHORTCUTS_DEFAULTS = {
   strikethrough: {
     id: 'strikethrough',
     label: 'Tachado',
-    icon: 'fa-strikethrough',
+    icon: mdiFormatStrikethrough,
     keys: 'Ctrl+Shift+X',
     description: 'Aplicar tachado al texto',
     category: 'format'
@@ -108,7 +142,7 @@ export const SHORTCUTS_DEFAULTS = {
   heading1: {
     id: 'heading1',
     label: 'Título 1',
-    icon: 'fa-heading',
+    icon: mdiFormatHeaderPound,
     keys: 'Ctrl+Alt+1',
     description: 'Convertir a Título 1',
     category: 'format'
@@ -116,7 +150,7 @@ export const SHORTCUTS_DEFAULTS = {
   heading2: {
     id: 'heading2',
     label: 'Título 2',
-    icon: 'fa-heading',
+    icon: mdiFormatHeaderPound,
     keys: 'Ctrl+Alt+2',
     description: 'Convertir a Título 2',
     category: 'format'
@@ -124,7 +158,7 @@ export const SHORTCUTS_DEFAULTS = {
   heading3: {
     id: 'heading3',
     label: 'Título 3',
-    icon: 'fa-heading',
+    icon: mdiFormatHeaderPound,
     keys: 'Ctrl+Alt+3',
     description: 'Convertir a Título 3',
     category: 'format'
@@ -134,7 +168,7 @@ export const SHORTCUTS_DEFAULTS = {
   selectAll: {
     id: 'selectAll',
     label: 'Seleccionar Todo',
-    icon: 'fa-check-square',
+    icon: mdiCheckboxMarked,
     keys: 'Ctrl+A',
     description: 'Seleccionar todo el texto',
     category: 'edit'
@@ -142,7 +176,7 @@ export const SHORTCUTS_DEFAULTS = {
   undo: {
     id: 'undo',
     label: 'Deshacer',
-    icon: 'fa-undo',
+    icon: mdiUndo,
     keys: 'Ctrl+Z',
     description: 'Deshacer último cambio',
     category: 'edit'
@@ -150,7 +184,7 @@ export const SHORTCUTS_DEFAULTS = {
   redo: {
     id: 'redo',
     label: 'Rehacer',
-    icon: 'fa-redo',
+    icon: mdiRedo,
     keys: 'Ctrl+Shift+Z',
     description: 'Rehacer cambio deshecho',
     category: 'edit'
@@ -158,7 +192,7 @@ export const SHORTCUTS_DEFAULTS = {
   copy: {
     id: 'copy',
     label: 'Copiar',
-    icon: 'fa-copy',
+    icon: mdiContentCopy,
     keys: 'Ctrl+C',
     description: 'Copiar texto seleccionado',
     category: 'edit'
@@ -166,7 +200,7 @@ export const SHORTCUTS_DEFAULTS = {
   cut: {
     id: 'cut',
     label: 'Cortar',
-    icon: 'fa-cut',
+    icon: mdiContentCut,
     keys: 'Ctrl+X',
     description: 'Cortar texto seleccionado',
     category: 'edit'
@@ -174,7 +208,7 @@ export const SHORTCUTS_DEFAULTS = {
   paste: {
     id: 'paste',
     label: 'Pegar',
-    icon: 'fa-paste',
+    icon: mdiContentPaste,
     keys: 'Ctrl+V',
     description: 'Pegar desde clipboard',
     category: 'edit'
@@ -184,7 +218,7 @@ export const SHORTCUTS_DEFAULTS = {
   comment: {
     id: 'comment',
     label: 'Comentar',
-    icon: 'fa-comment',
+    icon: mdiComment,
     keys: 'Ctrl+Shift+C',
     description: 'Añadir comentario',
     category: 'tools'
@@ -192,7 +226,7 @@ export const SHORTCUTS_DEFAULTS = {
   spellCheck: {
     id: 'spellCheck',
     label: 'Corrector',
-    icon: 'fa-spell-check',
+    icon: mdiSpellcheck,
     keys: 'Ctrl+K',
     description: 'Abrir corrector ortográfico',
     category: 'tools'
@@ -200,7 +234,7 @@ export const SHORTCUTS_DEFAULTS = {
   analytics: {
     id: 'analytics',
     label: 'Análisis',
-    icon: 'fa-chart-line',
+    icon: mdiChartLine,
     keys: 'Ctrl+Shift+A',
     description: 'Análisis de texto',
     category: 'tools'
@@ -208,7 +242,7 @@ export const SHORTCUTS_DEFAULTS = {
   settings: {
     id: 'settings',
     label: 'Configuración',
-    icon: 'fa-cog',
+    icon: mdiCog,
     keys: 'Ctrl+,',
     description: 'Abrir configuración',
     category: 'view'
@@ -216,7 +250,7 @@ export const SHORTCUTS_DEFAULTS = {
   toggleSidebar: {
     id: 'toggleSidebar',
     label: 'Toggle Sidebar',
-    icon: 'fa-bars',
+    icon: mdiMenu,
     keys: 'Ctrl+M',
     description: 'Mostrar/Ocultar sidebar',
     category: 'view'
@@ -224,7 +258,7 @@ export const SHORTCUTS_DEFAULTS = {
   viewProject: {
     id: 'viewProject',
     label: 'Ver Proyecto',
-    icon: 'fa-folder-open',
+    icon: mdiFolderOpen,
     keys: 'Ctrl+Shift+P',
     description: 'Ver estructura del proyecto',
     category: 'view'
@@ -234,7 +268,7 @@ export const SHORTCUTS_DEFAULTS = {
   minimizeWindow: {
     id: 'minimizeWindow',
     label: 'Minimizar Ventana',
-    icon: 'fa-minus',
+    icon: mdiMinus,
     keys: 'Alt+F9',
     description: 'Minimizar ventana',
     category: 'window'
@@ -242,7 +276,7 @@ export const SHORTCUTS_DEFAULTS = {
   maximizeWindow: {
     id: 'maximizeWindow',
     label: 'Maximizar Ventana',
-    icon: 'fa-window-maximize',
+    icon: mdiWindowMaximize,
     keys: 'Alt+F10',
     description: 'Maximizar/Restaurar ventana',
     category: 'window'
@@ -250,15 +284,15 @@ export const SHORTCUTS_DEFAULTS = {
   closeWindow: {
     id: 'closeWindow',
     label: 'Cerrar Ventana',
-    icon: 'fa-times',
+    icon: mdiWindowClose,
     keys: 'Alt+F4',
-    description: 'Cerrar ventana',
+    description: 'Cerrar aplicación',
     category: 'window'
   },
   toggleTitleBar: {
     id: 'toggleTitleBar',
     label: 'Toggle Barra de Título',
-    icon: 'fa-window-restore',
+    icon: mdiWindowRestore,
     keys: 'Ctrl+Alt+T',
     description: 'Mostrar/Ocultar barra de título del sistema',
     category: 'window'
@@ -268,7 +302,7 @@ export const SHORTCUTS_DEFAULTS = {
   find: {
     id: 'find',
     label: 'Buscar',
-    icon: 'fa-search',
+    icon: mdiMagnify,
     keys: 'Ctrl+F',
     description: 'Abrir panel de búsqueda',
     category: 'editor'
@@ -276,7 +310,7 @@ export const SHORTCUTS_DEFAULTS = {
   findAndReplace: {
     id: 'findAndReplace',
     label: 'Buscar y Reemplazar',
-    icon: 'fa-exchange-alt',
+    icon: mdiSwapHorizontal,
     keys: 'Ctrl+H',
     description: 'Abrir panel de búsqueda y reemplazo',
     category: 'editor'
@@ -286,7 +320,7 @@ export const SHORTCUTS_DEFAULTS = {
   deleteProject: {
     id: 'deleteProject',
     label: 'Eliminar Proyecto',
-    icon: 'fa-trash',
+    icon: mdiTrashCan,
     keys: 'Ctrl+Shift+Delete',
     description: 'Eliminar proyecto actual',
     category: 'file'
@@ -294,7 +328,7 @@ export const SHORTCUTS_DEFAULTS = {
   renameItem: {
     id: 'renameItem',
     label: 'Renombrar',
-    icon: 'fa-pen',
+    icon: mdiPencil,
     keys: 'F2',
     description: 'Renombrar archivo o carpeta',
     category: 'file'
@@ -302,7 +336,7 @@ export const SHORTCUTS_DEFAULTS = {
   refreshSidebar: {
     id: 'refreshSidebar',
     label: 'Actualizar',
-    icon: 'fa-sync',
+    icon: mdiSync,
     keys: 'Ctrl+R',
     description: 'Actualizar lista de archivos',
     category: 'file'
@@ -436,7 +470,7 @@ export function updateShortcuts(newShortcuts = {}) {
   
   // Guardar en localStorage
   try {
-    localStorage.setItem('blockguard_shortcuts', JSON.stringify(customShortcuts));
+    localStorage.setItem('Bloopy_shortcuts', JSON.stringify(customShortcuts));
   } catch (err) {
     console.error('Error saving shortcuts to localStorage:', err);
   }
@@ -450,7 +484,7 @@ export function updateShortcuts(newShortcuts = {}) {
  */
 export function loadCustomShortcuts() {
   try {
-    const saved = localStorage.getItem('blockguard_shortcuts');
+    const saved = localStorage.getItem('Bloopy_shortcuts');
     if (saved) {
       customShortcuts = JSON.parse(saved);
     }
@@ -506,6 +540,20 @@ export function resetAllShortcuts() {
 }
 
 /**
+ * Obtiene los atajos predeterminados (sin personalizaciones)
+ * @returns {Object} Atajos predeterminados
+ */
+export function getDefaultShortcuts() {
+  return Object.entries(SHORTCUTS_DEFAULTS).reduce((acc, [key, shortcut]) => {
+    acc[key] = {
+      ...shortcut,
+      keys: shortcut.keys // Siempre usar las keys originales
+    };
+    return acc;
+  }, {});
+}
+
+/**
  * ATAJOS EXPORTADOS COMO OBJETO PARA COMPATIBILIDAD
  * Permite: import SHORTCUTS from '@/utils/shortcuts'
  */
@@ -556,18 +604,24 @@ export function isValidKeyCombo(keyCombo) {
   if (!keyCombo || typeof keyCombo !== 'string') return false;
   
   const parts = keyCombo.split('+').map(p => p.trim());
-  if (parts.length < 2) return false; // Al menos modificador + tecla
+  if (parts.length < 1) return false;
   
   const validModifiers = ['Ctrl', 'Shift', 'Alt', 'Cmd', 'Meta'];
   const modifiersInCombo = parts.slice(0, -1);
   
-  // Validar que todos los modificadores sean válidos
+  // Permitir atajos sin modificadores para teclas especiales
+  const key = parts[parts.length - 1];
+  const specialKeys = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'Esc', 'Space', 'Enter'];
+  
+  if (specialKeys.includes(key) && parts.length === 1) {
+    return true;
+  }
+  
+  // Validar modificadores
   if (!modifiersInCombo.every(mod => validModifiers.includes(mod))) {
     return false;
   }
   
-  // Validar que la última parte sea una tecla válida
-  const key = parts[parts.length - 1];
   return key.length > 0;
 }
 
@@ -604,6 +658,7 @@ export default {
   subscribeToShortcutChanges,
   resetShortcut,
   resetAllShortcuts,
+  getDefaultShortcuts,
   getShortcutCategories,
   getShortcutsByCategory,
   isValidKeyCombo,

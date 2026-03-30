@@ -1,0 +1,398 @@
+/**
+ * ============================================================================
+ * LEXICAL EDITOR STYLES
+ * ============================================================================
+ * 
+ * Estilos específicos para el editor Lexical
+ * Mantiene la apariencia del editor anterior
+ * ============================================================================
+ */
+
+/* Contenedor del editor Lexical */
+.editor-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* NUEVO: Contenedor interno que organiza el editor y el sidebar lateral */
+.editor-container-inner {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Columna para paneles variables - DEPRECATED, ahora se usan overlays */
+.editor-right-panel-column {
+  display: none;
+}
+
+.special-chars-column {
+  width: 280px;
+}
+
+/* Sobrescribir estilos de paneles cuando se usan como columnas */
+.editor-right-panel-column .comments-sidebar {
+  position: relative;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: none;
+  animation: none;
+}
+
+.editor-right-panel-column .comments-overlay {
+  display: none;
+}
+
+/* Panel de caracteres especiales como columna */
+.special-chars-column {
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+}
+
+.special-chars-column .special-chars-panel {
+  position: relative;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: none;
+  border: none;
+  animation: none;
+}
+
+/* Ajustes específicos para el contenido de caracteres en columna */
+.special-chars-column .chars-grid {
+  grid-template-columns: repeat(4, 1fr); /* Menos columnas en sidebar estrecho */
+}
+
+.special-chars-column .special-chars-content {
+  padding: 12px;
+}
+
+.editor-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editor-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.editor-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 40px 60px;
+  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+/* Limitar el ancho de los elementos internos para legibilidad */
+.editor-metadata,
+.editor-main {
+  width: 100%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.editor-body {
+  position: relative;
+  outline: none;
+  min-height: 400px;
+  user-select: text;
+  -webkit-user-select: text;
+  width: 100%;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  text-align: left;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Placeholder del editor */
+.editor-placeholder {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+/* Ocultar placeholder cuando hay contenido */
+.editor-body:not(:empty) + .editor-placeholder,
+.editor-body:focus + .editor-placeholder {
+  display: none;
+}
+
+/* Párrafos */
+.editor-paragraph {
+  margin: 0;
+  margin-bottom: 12px;
+  position: relative;
+  line-height: 1.8;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+/* Headings */
+.editor-heading-h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 24px 0 16px 0;
+  line-height: 1.2;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.editor-heading-h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 20px 0 12px 0;
+  line-height: 1.3;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.editor-heading-h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 16px 0 10px 0;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+/* Blockquotes */
+.editor-quote {
+  margin: 16px 0;
+  padding: 16px 20px;
+  border-left: 4px solid var(--accent-blue);
+  background: var(--bg-tertiary);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.enable-blockquote-style .editor-quote {
+  background: var(--bg-active);
+  border-left-color: var(--accent-blue);
+}
+
+/* Listas */
+.editor-list-ul,
+.editor-list-ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.editor-listitem {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
+.editor-nested-listitem {
+  list-style-type: none;
+}
+
+/* Enlaces */
+.editor-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: var(--transition-fast);
+}
+
+.editor-link:hover {
+  border-bottom-color: var(--accent-blue);
+}
+
+/* Formato de texto */
+.editor-text-bold {
+  font-weight: 700;
+}
+
+.editor-text-italic {
+  font-style: italic;
+}
+
+.editor-text-underline {
+  text-decoration: underline;
+}
+
+.editor-text-strikethrough {
+  text-decoration: line-through;
+}
+
+.editor-text-code {
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: var(--border-radius-sm);
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.9em;
+  color: var(--accent-green);
+}
+
+/* Bloques de código */
+.editor-code {
+  background: var(--bg-tertiary);
+  padding: 16px;
+  border-radius: var(--border-radius-md);
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.9em;
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--border-color);
+}
+
+/* Selección de texto */
+.editor-body ::selection {
+  background: var(--bg-active);
+}
+
+/* Focus del editor */
+.editor-body:focus {
+  outline: none;
+}
+
+/* Animaciones suaves */
+.editor-paragraph,
+.editor-heading-h1,
+.editor-heading-h2,
+.editor-heading-h3,
+.editor-quote {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .editor-body {
+    padding: 16px;
+    padding-right: 16px; /* En móvil, sin espacio extra para sidebar */
+  }
+
+  .editor-heading-h1 {
+    font-size: 2rem;
+  }
+
+  .editor-heading-h2 {
+    font-size: 1.5rem;
+  }
+
+  .editor-heading-h3 {
+    font-size: 1.25rem;
+  }
+}
+
+
+/* ============================================================================
+   LINKS CON TOOLTIP
+   ============================================================================ */
+
+.editor-link {
+  color: var(--accent-blue);
+  text-decoration: underline;
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.editor-link:hover {
+  color: var(--accent-blue);
+  filter: brightness(1.2);
+}
+
+/* Tooltip para links */
+.editor-link::after {
+  content: attr(href);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  border: 1px solid var(--border-color);
+  z-index: 1000;
+}
+
+.editor-link:hover::after {
+  opacity: 1;
+}
+
+/* Flecha del tooltip */
+.editor-link::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  border: 6px solid transparent;
+  border-top-color: var(--bg-tertiary);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  z-index: 1000;
+}
+
+.editor-link:hover::before {
+  opacity: 1;
+}
+
+/* Divisor horizontal (---) */
+.editor-body hr,
+.editor-paragraph + hr,
+.lexical-hr {
+  display: block;
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 20px 0;
+  padding: 0;
+  height: 0;
+  background: none;
+}

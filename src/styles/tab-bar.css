@@ -1,0 +1,417 @@
+/**
+ * ============================================================================
+ * TAB BAR STYLES - MEJORADO
+ * ============================================================================
+ * 
+ * Estilo minimalista oscuro sin background principal en el contenedor.
+ * Diseñado para integrarse con el tema existente de Bloopy.
+ */
+
+.tab-bar {
+  display: flex;
+  align-items: flex-end;
+  flex: 1;
+  overflow: hidden;
+  user-select: none;
+  height: 36px;
+  padding: 0 4px;
+  /* Sin background - se integra con el contenedor padre */
+}
+
+.tab-list {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: 1;
+  height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.tab-list::-webkit-scrollbar {
+  height: 3px;
+}
+
+.tab-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+/* Tab individual */
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 120px;
+  max-width: 200px;
+  height: 32px;
+  position: relative;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.tab-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tab-item.active {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Indicador de tab activa - línea sutil arriba */
+.tab-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: var(--accent-blue);
+  border-radius: 0 0 2px 2px;
+  opacity: 1;
+}
+
+/* Icono del archivo */
+.tab-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.tab-item:hover .tab-icon,
+.tab-item.active .tab-icon {
+  opacity: 1;
+}
+
+/* Nombre del archivo */
+.tab-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.tab-item.active .tab-name {
+  font-weight: 500;
+}
+
+/* Botón de cerrar (X) */
+.tab-close {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+  margin-left: 2px;
+}
+
+.tab-item:hover .tab-close {
+  opacity: 0.6;
+}
+
+.tab-close:hover {
+  opacity: 1 !important;
+  background: var(--bg-hover);
+  color: #ef4444;
+}
+
+.tab-item.active .tab-close {
+  opacity: 0.6;
+}
+
+/* Grupo de botones de acción inline en cada tab */
+.tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.tab-item:hover .tab-actions,
+.tab-item.active .tab-actions {
+  opacity: 1;
+}
+
+/* Botón de acción genérico (split, explorador) */
+.tab-action-btn {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.tab-action-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Indicador de cambios sin guardar */
+.tab-unsaved {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF9500;
+  flex-shrink: 0;
+  animation: unsavedPulse 2s ease-in-out infinite;
+}
+
+@keyframes unsavedPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* ============================================================================
+ * SPLIT TAB - Pestaña fusionada para vista dividida
+ * ============================================================================ */
+
+.tab-item.split-tab {
+  min-width: 280px;
+  max-width: 400px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  padding: 6px 10px;
+  height: 34px;
+}
+
+.tab-item.split-tab.active {
+  background: var(--bg-primary);
+}
+
+/* Tab que pertenece a un split persistido pero oculto */
+.tab-item.split-persisted {
+  opacity: 0.85;
+}
+
+.split-tab-files {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.split-tab-file {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.split-tab-file:hover {
+  background: var(--bg-hover);
+}
+
+.split-label {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--accent-blue);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.split-tab-file .tab-name {
+  font-size: 12px;
+}
+
+.split-divider-icon {
+  color: var(--border-color);
+  opacity: 0.5;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Botón de cerrar en split tab */
+.split-tab-files .tab-close {
+  margin-left: 6px;
+  opacity: 0.6;
+}
+
+/* ============================================================================
+ * DRAG & DROP
+ * ============================================================================ */
+
+.tab-item.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.tab-item.drag-over {
+  position: relative;
+}
+
+.tab-item.drag-over::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 20%;
+  bottom: 20%;
+  width: 2px;
+  background: var(--accent-blue);
+  border-radius: 1px;
+  animation: dropIndicatorPulse 1s ease-in-out infinite;
+}
+
+@keyframes dropIndicatorPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ============================================================================
+ * MENÚ CONTEXTUAL
+ * ============================================================================ */
+
+.context-menu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 180px;
+  z-index: 1000;
+  animation: contextMenuAppear 0.1s ease-out;
+}
+
+@keyframes contextMenuAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.context-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: all 0.1s;
+}
+
+.context-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.context-item.danger {
+  color: #ef4444;
+}
+
+.context-item.danger:hover {
+  background: var(--bg-hover);
+}
+
+.context-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+/* ============================================================================
+ * TAB "HOME" CUANDO NO HAY ARCHIVOS
+ * ============================================================================ */
+
+.home-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+/* ============================================================================
+ * RESPONSIVE
+ * ============================================================================ */
+
+@media (max-width: 768px) {
+  .tab-item {
+    min-width: 100px;
+    max-width: 160px;
+    padding: 8px 10px;
+  }
+  
+  .tab-item.split-tab {
+    min-width: 220px;
+    max-width: 320px;
+  }
+  
+  .tab-name {
+    max-width: 80px;
+  }
+}
+
+/* ============================================================================
+ * ESTADOS ESPECIALES
+ * ============================================================================ */
+
+/* Tab con error */
+.tab-item.error {
+  color: #ef4444;
+}
+
+.tab-item.error .tab-icon {
+  color: #ef4444;
+}
+
+/* Tab cargando */
+.tab-item.loading {
+  opacity: 0.6;
+}
+
+/* Hover suave para toda la barra */
+.tab-bar:hover .tab-list::-webkit-scrollbar-thumb {
+  background: var(--text-tertiary);
+}

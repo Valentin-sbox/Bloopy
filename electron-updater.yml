@@ -6,6 +6,8 @@ provider: github
 # GitHub owner (organization or user)
 owner: Valentin-sbox
 # GitHub repository name
-repo: Blockguard
+repo: Bloopy
+# Cache directory name for updater
+updaterCacheDirName: bloopy-updater
 # GitHub token for private repos or higher rate limits (optional)
 # token: env.GH_TOKEN

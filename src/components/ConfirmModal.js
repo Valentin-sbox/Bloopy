@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - CONFIRMMODAL.JS
+ *  CONFIRMMODAL.JS
  * ============================================================================
  * 
  * COMPONENTE: MODAL DE CONFIRMACIÓN
@@ -23,8 +23,10 @@
 
 import React from 'react';
 import { useTranslation } from '../utils/i18n';
+import Icon from '@mdi/react';
+import { mdiClose, mdiHelpCircle, mdiAlert } from '@mdi/js';
 
-function ConfirmModal({ title, text, icon = 'fa-question-circle', onConfirm, onCancel }) {
+function ConfirmModal({ title, text, icon = mdiHelpCircle, onConfirm, onCancel }) {
   const { t } = useTranslation();
   
   return (
@@ -32,19 +34,19 @@ function ConfirmModal({ title, text, icon = 'fa-question-circle', onConfirm, onC
       <div className="modal-content small text-center">
         {/* Botón de cerrar */}
         <button className="close-btn" onClick={onCancel}>
-          <i className="fas fa-times"></i>
+          <Icon path={mdiClose} size={0.7} />
         </button>
         
         <div className="modal-body">
           {/* Icono según el tipo de confirmación */}
-          <i 
-            className={`fas ${icon}`} 
+          <Icon 
+            path={icon} 
+            size={2.5}
             style={{ 
-              fontSize: '2.5rem', 
-              color: icon === 'fa-exclamation-triangle' ? 'var(--accent-red)' : 'var(--accent-blue)',
+              color: icon === mdiAlert ? 'var(--accent-red)' : 'var(--accent-blue)',
               marginBottom: '16px'
             }}
-          ></i>
+          />
           
           <h2>{title}</h2>
           <p style={{ margin: '16px 0', color: 'var(--text-secondary)' }}>{text}</p>

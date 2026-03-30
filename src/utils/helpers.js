@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - HELPERS.JS
+ * HELPERS.JS
  * ============================================================================
  * 
  * MÓDULO DE UTILIDADES Y FUNCIONES AUXILIARES
@@ -36,6 +36,7 @@
  * @returns {string} UUID único
  */
 export function generateUUID() {
+  // OPTIMIZACIÓN: Todas las funciones son puras y usan lógica eficiente
   // Math.random().toString(36) genera un string base36 aleatorio
   // .substr(2, 9) toma 9 caracteres después del '0.'
   // Date.now().toString(36) añade el timestamp en base36
@@ -64,13 +65,13 @@ export function generateUUID() {
 export function escapeHtml(text) {
   // Si el texto es falsy (null, undefined, ''), devolver string vacío
   if (!text) return '';
-  
+
   // Crear un div temporal
   const div = document.createElement('div');
-  
+
   // Asignar el texto como textContent (automáticamente escapa HTML)
   div.textContent = text;
-  
+
   // Devolver el HTML escapado
   return div.innerHTML;
 }
@@ -91,10 +92,10 @@ export function escapeHtml(text) {
 export function smartTruncate(text, maxLength) {
   // Si no hay texto, devolver string vacío
   if (!text) return '';
-  
+
   // Si el texto cabe, devolverlo completo
   if (text.length <= maxLength) return text;
-  
+
   // Truncar y añadir "..."
   return text.substring(0, maxLength - 3) + '...';
 }
@@ -117,14 +118,14 @@ export function smartTruncate(text, maxLength) {
 export function formatFileSize(bytes) {
   // Si es 0, devolver directamente
   if (bytes === 0) return '0 B';
-  
+
   // Unidades disponibles
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
-  
+
   // Calcular el índice de la unidad apropiada
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   // Formatear con 2 decimales y la unidad correspondiente
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
@@ -140,10 +141,10 @@ export function formatFileSize(bytes) {
 export function formatDate(timestamp) {
   // Si no hay timestamp, devolver vacío
   if (!timestamp) return '';
-  
+
   // Crear objeto Date
   const date = new Date(timestamp);
-  
+
   // Formatear a español
   return date.toLocaleDateString('es-ES', {
     year: 'numeric',
@@ -195,20 +196,22 @@ export async function copyToClipboard(text) {
 export function downloadFile(content, filename, type = 'text/plain') {
   // Crear blob con el contenido
   const blob = new Blob([content], { type });
-  
+
   // Crear URL del blob
   const url = URL.createObjectURL(blob);
-  
+
   // Crear elemento <a> temporal
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
-  
+
   // Añadir al DOM, hacer clic y eliminar
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
-  
+  if (document.body.contains(a)) {
+    document.body.removeChild(a);
+  }
+
   // Liberar la URL del blob
   URL.revokeObjectURL(url);
 }
@@ -222,10 +225,10 @@ export function downloadFile(content, filename, type = 'text/plain') {
 export function readFileAsText(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => resolve(e.target.result);
     reader.onerror = (e) => reject(e);
-    
+
     reader.readAsText(file);
   });
 }
@@ -240,23 +243,25 @@ export function readFileAsText(file) {
 export function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => resolve(e.target.result);
     reader.onerror = (e) => reject(e);
-    
+
     reader.readAsDataURL(file);
   });
 }
 
 /**
- * Sanitiza un nombre de archivo eliminando caracteres peligrosos.
+ * Sanitiza un nombre de archivo removiendo caracteres no permitidos.
  * 
- * @param {string} name - Nombre a sanitizar
- * @returns {string} Nombre seguro para archivos
+ * CARACTERES REMOVIDOS:
+ * - < > : " / \ | ? *
+ * 
+ * @param {string} name - Nombre de archivo a sanitizar
+ * @returns {string} Nombre sanitizado
  */
 export function sanitizeFileName(name) {
-  // Reemplazar caracteres no permitidos con '_'
-  return name.replace(/[^a-zA-Z0-9\-_\.\s]/g, '_').trim();
+  return name.replace(/[<>:"/\\|?*]/g, '');
 }
 
 /**
@@ -335,7 +340,7 @@ export function updateProjectPaths(projects, oldPath, newPath) {
  */
 export function calcRenamedPath(oldFullPath, newName, keepExtension = true) {
   if (!oldFullPath) return oldFullPath;
-  const lastSlash = oldFullPath.lastIndexOf('/');
+  const lastSlash = Math.max(oldFullPath.lastIndexOf('/'), oldFullPath.lastIndexOf('\\'));
   const dir = lastSlash >= 0 ? oldFullPath.slice(0, lastSlash + 1) : '';
   if (keepExtension && oldFullPath.includes('.') && !newName.includes('.')) {
     const ext = oldFullPath.slice(oldFullPath.lastIndexOf('.'));
@@ -381,13 +386,13 @@ export function removeFileExtension(filename) {
  */
 export function debounce(func, wait) {
   let timeout;
-  
+
   return function executedFunction(...args) {
     const later = () => {
       clearTimeout(timeout);
       func(...args);
     };
-    
+
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
@@ -404,7 +409,7 @@ export function debounce(func, wait) {
  */
 export function throttle(func, limit) {
   let inThrottle;
-  
+
   return function executedFunction(...args) {
     if (!inThrottle) {
       func(...args);
@@ -412,4 +417,101 @@ export function throttle(func, limit) {
       setTimeout(() => inThrottle = false, limit);
     }
   };
+}
+
+// =============================================================================
+// SECCIÓN 7: VALIDACIÓN DE SPLIT VIEW
+// =============================================================================
+
+/**
+ * Valida el estado de split view para asegurar consistencia.
+ * 
+ * VALIDACIONES:
+ * - Si isActive es false, el estado es válido (no hay nada que validar)
+ * - Los índices de tabs no deben ser null cuando isActive es true
+ * - Los índices deben estar dentro del rango válido del array de tabs
+ * - Los índices no deben ser iguales (no se puede tener la misma tab en ambos paneles)
+ * - Si se proporcionan leftPanelFile y rightPanelFile, los archivos en los índices deben coincidir
+ * 
+ * USO: Antes de operaciones críticas de split view para prevenir estados corruptos.
+ * 
+ * @param {Object} state - Estado de split view a validar
+ * @param {boolean} state.isActive - Si el split view está activo
+ * @param {number|null} state.leftTabIndex - Índice de la tab del panel izquierdo
+ * @param {number|null} state.rightTabIndex - Índice de la tab del panel derecho
+ * @param {Array} tabs - Array de tabs abiertas
+ * @param {Object|null} leftPanelFile - Archivo en el panel izquierdo (opcional)
+ * @param {Object|null} rightPanelFile - Archivo en el panel derecho (opcional)
+ * @returns {boolean} true si el estado es válido, false si está corrupto
+ */
+export function validateSplitViewState(state, tabs, leftPanelFile = null, rightPanelFile = null) {
+  // Si el split view no está activo, el estado es válido
+  if (!state.isActive) {
+    return true;
+  }
+
+  const { leftTabFullPath, rightTabFullPath } = state;
+
+  // Si está activo, ambas rutas deben existir
+  if (!leftTabFullPath || !rightTabFullPath) {
+    return false;
+  }
+
+  // Encontrar índices dinámicamente
+  const leftTabIndex = tabs.findIndex(t => t.fullPath === leftTabFullPath);
+  const rightTabIndex = tabs.findIndex(t => t.fullPath === rightTabFullPath);
+
+  if (leftTabIndex === -1 || rightTabIndex === -1) {
+    return false;
+  }
+
+  // Si se proporcionan los archivos de los paneles, validar que coincidan con los tabs
+  if (leftPanelFile && tabs[leftTabIndex]) {
+    if (tabs[leftTabIndex].fullPath !== leftPanelFile.fullPath) {
+      return false;
+    }
+  }
+
+  if (rightPanelFile && tabs[rightTabIndex]) {
+    if (tabs[rightTabIndex].fullPath !== rightPanelFile.fullPath) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// =============================================================================
+// SECCIÓN 8: VALIDACIÓN DE NOMBRES DE ARCHIVO
+// =============================================================================
+
+/**
+ * Valida un nombre de archivo.
+ * 
+ * VALIDACIONES:
+ * - No puede estar vacío
+ * - No puede exceder 255 caracteres
+ * - No puede contener caracteres especiales no permitidos
+ * 
+ * @param {string} name - Nombre de archivo a validar
+ * @returns {Object} { valid: boolean, error: string, sanitized: string }
+ */
+export function validateFileName(name) {
+  if (!name || name.trim().length === 0) {
+    return { valid: false, error: 'El nombre no puede estar vacío' };
+  }
+
+  if (name.length > 255) {
+    return { valid: false, error: 'El nombre es demasiado largo' };
+  }
+
+  const sanitized = sanitizeFileName(name);
+  if (sanitized !== name) {
+    return {
+      valid: false,
+      error: 'El nombre contiene caracteres no permitidos'
+    };
+  }
+
+  return { valid: true, sanitized };
 }

@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - THEMES.JS
+ *  THEMES.JS
  * ============================================================================
  * 
  * SISTEMA DE TEMAS DE COLORES
@@ -240,18 +240,25 @@ export const themes = {
  * 4. Guarda el tema en el atributo data-theme del body
  * 
  * @param {string} themeId - ID del tema a aplicar ('dark', 'light', etc.)
+ * @param {Object} customColors - Colores personalizados (opcional, para tema 'custom')
  */
-export function applyTheme(themeId) {
+export function applyTheme(themeId, customColors = null) {
   let theme = themes.dark;
 
   if (themeId === 'custom') {
-    try {
-      const storedCustom = localStorage.getItem('customTheme');
-      if (storedCustom) {
-        theme = JSON.parse(storedCustom);
+    // Primero intentar usar customColors pasado como parámetro
+    if (customColors) {
+      theme = customColors;
+    } else {
+      // Fallback: intentar cargar de localStorage (para compatibilidad)
+      try {
+        const storedCustom = localStorage.getItem('customTheme');
+        if (storedCustom) {
+          theme = JSON.parse(storedCustom);
+        }
+      } catch (e) {
+        console.error('Error loading custom theme:', e);
       }
-    } catch (e) {
-      console.error('Error loading custom theme:', e);
     }
   } else {
     theme = themes[themeId] || themes.dark;

@@ -1,6 +1,7 @@
+
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - SETTINGSMODAL.JS
+ *  SETTINGSMODAL.JS
  * ============================================================================
  * 
  * COMPONENTE: MODAL DE CONFIGURACIÓN
@@ -30,6 +31,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import BaseModal from './BaseModal';
 import { themes } from '../utils/themes';
 import {
   SHORTCUTS_DEFAULTS,
@@ -41,10 +43,36 @@ import {
   resetAllShortcuts
 } from '../utils/shortcuts';
 import { useTranslation } from '../utils/i18n';
+import '../styles/settings-modal.css';
+import Icon from '@mdi/react';
+import { 
+  mdiTune, 
+  mdiPalette, 
+  mdiTag, 
+  mdiKeyboard, 
+  mdiDatabase, 
+  mdiAccount, 
+  mdiCamera, 
+  mdiTrashCan, 
+  mdiUndo, 
+  mdiContentSave, 
+  mdiChevronUp, 
+  mdiChevronDown, 
+  mdiPlus, 
+  mdiAlert, 
+  mdiCheckCircle, 
+  mdiCloseCircle, 
+  mdiDownload, 
+  mdiUpload, 
+  mdiFolder, 
+  mdiGithub, 
+  mdiHeart,
+  mdiClose
+} from '@mdi/js';
 
-function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, onImport }) {
+function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, onImport, notify, onOpenUpdateModal }) {
   const { t, changeLanguage } = useTranslation();
-  
+
   // =============================================================================
   // ESTADOS LOCALES
   // =============================================================================
@@ -91,6 +119,8 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
 
   // Estado para versión de la app
   const [appVersion, setAppVersion] = useState('');
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState(null);
 
   useEffect(() => {
     if (window.electronAPI && window.electronAPI.getAppVersion) {
@@ -98,16 +128,30 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
     }
   }, []);
 
+  const handleOpenUpdates = () => {
+    if (onOpenUpdateModal) {
+      onOpenUpdateModal();
+      return;
+    }
+
+    // Fallback: si no hay callback, intentar abrir desde electronAPI
+    if (window.electronAPI?.checkForUpdates) {
+      window.electronAPI.checkForUpdates().catch(() => {
+        if (notify) notify('Error al abrir actualizaciones', 'error');
+      });
+    }
+  };
+
   // =============================================================================
   // CONFIGURACIÓN DE PESTAÑAS
   // =============================================================================
 
   const tabs = [
-    { id: 'general', label: 'General', icon: 'fa-sliders-h' },
-    { id: 'appearance', label: 'Apariencia', icon: 'fa-palette' },
-    { id: 'states', label: 'Estados', icon: 'fa-tag' },
-    { id: 'shortcuts', label: 'Atajos', icon: 'fa-keyboard' },
-    { id: 'data', label: 'Datos', icon: 'fa-database' }
+    { id: 'general', label: 'General', icon: mdiTune },
+    { id: 'appearance', label: 'Apariencia', icon: mdiPalette },
+    { id: 'states', label: 'Estados', icon: mdiTag },
+    { id: 'shortcuts', label: 'Atajos', icon: mdiKeyboard },
+    { id: 'data', label: 'Datos', icon: mdiDatabase }
   ];
 
   // =============================================================================
@@ -128,12 +172,12 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
       ...localConfig,
       shortcuts: shortcutsObj
     };
-    
+
     // Actualizar idioma inmediatamente si cambió
     if (updatedConfig.language && updatedConfig.language !== config.language) {
       changeLanguage(updatedConfig.language);
     }
-    
+
     onSave(updatedConfig, localUserName, localAvatar);
     onClose();
   };
@@ -148,11 +192,11 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
 
     // Validaciones
     if (!file.type.startsWith('image/')) {
-      alert('Por favor selecciona una imagen válida');
+      alert(t('settings.general.invalidImage'));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert('La imagen es demasiado grande (máx 5MB)');
+      alert(t('settings.general.imageTooLarge'));
       return;
     }
 
@@ -192,59 +236,78 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
   };
 
   /**
-   * Añade un nuevo estado de proyecto.
+   * Añade un nuevo estado custom (con checklist, sin tracking numérico).
    */
   const addState = () => {
     const newState = {
       id: `state_${Date.now()}`,
       name: 'Nuevo Estado',
       color: '#0071e3',
-      goal: 30000,
-      countType: 'absolute'
+      checklist: []
     };
     setLocalConfig({
       ...localConfig,
-      states: [...localConfig.states, newState]
+      customStates: [...(localConfig.customStates || []), newState]
     });
   };
 
   /**
-   * Actualiza un campo de un estado existente.
-   * @param {number} index - Índice del estado
-   * @param {string} field - Campo a actualizar
-   * @param {any} value - Nuevo valor
+   * Actualiza un campo de un estado custom existente.
    */
   const updateState = (index, field, value) => {
-    const newStates = [...localConfig.states];
+    const newStates = [...(localConfig.customStates || [])];
     newStates[index] = { ...newStates[index], [field]: value };
-    setLocalConfig({ ...localConfig, states: newStates });
+    setLocalConfig({ ...localConfig, customStates: newStates });
   };
 
   /**
-   * Elimina un estado.
-   * @param {number} index - Índice del estado a eliminar
+   * Elimina un estado custom.
    */
   const removeState = (index) => {
-    if (localConfig.states.length <= 1) {
-      alert('Debe haber al menos un estado');
-      return;
-    }
-    const newStates = localConfig.states.filter((_, i) => i !== index);
-    setLocalConfig({ ...localConfig, states: newStates });
+    const newStates = (localConfig.customStates || []).filter((_, i) => i !== index);
+    setLocalConfig({ ...localConfig, customStates: newStates });
   };
 
   /**
-   * Mueve un estado arriba o abajo en la lista.
-   * @param {number} index - Índice del estado
-   * @param {number} direction - -1 para arriba, 1 para abajo
+   * Mueve un estado custom arriba o abajo.
    */
   const moveState = (index, direction) => {
-    const newStates = [...localConfig.states];
+    const newStates = [...(localConfig.customStates || [])];
     const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= newStates.length) return;
-
     [newStates[index], newStates[newIndex]] = [newStates[newIndex], newStates[index]];
-    setLocalConfig({ ...localConfig, states: newStates });
+    setLocalConfig({ ...localConfig, customStates: newStates });
+  };
+
+  /**
+   * Agrega un item a la checklist de un estado custom.
+   */
+  const addChecklistItem = (stateIndex) => {
+    const newStates = [...(localConfig.customStates || [])];
+    const checklist = [...(newStates[stateIndex].checklist || []), ''];
+    newStates[stateIndex] = { ...newStates[stateIndex], checklist };
+    setLocalConfig({ ...localConfig, customStates: newStates });
+  };
+
+  /**
+   * Actualiza un item de checklist.
+   */
+  const updateChecklistItem = (stateIndex, itemIndex, value) => {
+    const newStates = [...(localConfig.customStates || [])];
+    const checklist = [...(newStates[stateIndex].checklist || [])];
+    checklist[itemIndex] = value;
+    newStates[stateIndex] = { ...newStates[stateIndex], checklist };
+    setLocalConfig({ ...localConfig, customStates: newStates });
+  };
+
+  /**
+   * Elimina un item de checklist.
+   */
+  const removeChecklistItem = (stateIndex, itemIndex) => {
+    const newStates = [...(localConfig.customStates || [])];
+    const checklist = (newStates[stateIndex].checklist || []).filter((_, i) => i !== itemIndex);
+    newStates[stateIndex] = { ...newStates[stateIndex], checklist };
+    setLocalConfig({ ...localConfig, customStates: newStates });
   };
 
   // =============================================================================
@@ -261,12 +324,12 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
             {localAvatar ? (
               <img src={localAvatar} alt="Avatar" />
             ) : (
-              <i className="fas fa-user"></i>
+              <Icon path={mdiAccount} size={2} />
             )}
           </div>
           <div className="avatar-actions">
             <label className="btn-primary-small">
-              <i className="fas fa-camera"></i> Cambiar
+              <Icon path={mdiCamera} size={0.7} /> Cambiar
               <input
                 type="file"
                 accept="image/*"
@@ -279,7 +342,7 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
                 className="btn-sub-small"
                 onClick={() => setLocalAvatar(null)}
               >
-                <i className="fas fa-trash"></i> Quitar
+                <Icon path={mdiTrashCan} size={0.7} /> Quitar
               </button>
             )}
           </div>
@@ -288,20 +351,20 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
 
       {/* Nombre de usuario */}
       <div className="setting-item">
-        <label>Nombre de Usuario</label>
-        <span className="setting-desc">Tu nombre que se mostrará en la interfaz.</span>
+        <label>{t('settings.general.userName')}</label>
+        <span className="setting-desc">{t('settings.general.userNameDesc')}</span>
         <input
           type="text"
           value={localUserName}
           onChange={(e) => setLocalUserName(e.target.value)}
-          placeholder="Tu nombre"
+          placeholder={t('settings.general.userNamePlaceholder')}
         />
       </div>
 
       {/* Idioma de la interfaz */}
       <div className="setting-item">
-        <label>Idioma de la Interfaz</label>
-        <span className="setting-desc">Selecciona el idioma de la aplicación.</span>
+        <label>{t('settings.general.language')}</label>
+        <span className="setting-desc">{t('settings.general.languageDesc')}</span>
         <select
           className="setting-select"
           value={localConfig.language || 'es'}
@@ -318,8 +381,8 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
 
       {/* Auto-guardado */}
       <div className="setting-item">
-        <label>Auto-guardado</label>
-        <span className="setting-desc">Intervalo en segundos para guardar automáticamente.</span>
+        <label>{t('settings.general.autosave')}</label>
+        <span className="setting-desc">{t('settings.general.autosaveDesc')}</span>
         <input
           type="number"
           value={localConfig.autosaveInterval}
@@ -331,10 +394,11 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
           max="300"
         />
       </div>
+
       {/* Notificaciones */}
       <div className="setting-item">
-        <label>Mostrar notificaciones</label>
-        <span className="setting-desc">Habilita o deshabilita las notificaciones emergentes.</span>
+        <label>{t('settings.general.notifications')}</label>
+        <span className="setting-desc">{t('settings.general.notificationsDesc')}</span>
         <div>
           <label className="switch">
             <input
@@ -347,66 +411,10 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
         </div>
       </div>
 
-      <div className="setting-item">
-        <label>Donar</label>
-        <span className="setting-desc">Si quieres apoyar el proyecto, puedes donar vía PayPal.</span>
-        <div className="donate-actions">
-          <button
-            className="btn-primary"
-            onClick={() => window.electronAPI.openExternal('https://www.paypal.me/Valenhere1')}
-          >
-            <i className="fas fa-donate"></i> Donar
-          </button>
-        </div>
-      </div>
-
-      <div className="setting-item">
-        <label>Repositorio del Proyecto</label>
-        <span className="setting-desc">Visita el repositorio en GitHub para reportar bugs o contribuir.</span>
-        <div className="donate-actions">
-          <button
-            className="btn-sub"
-            onClick={() => window.electronAPI.openExternal('https://github.com/Valentin-sbox/Blockguard/')}
-          >
-            <i className="fab fa-github"></i> Ver en GitHub
-          </button>
-        </div>
-      </div>
-
-      {/* Actualizaciones */}
-      <div className="setting-item">
-        <label>Acerca de Block Guard</label>
-        <span className="setting-desc">Versión actual: {appVersion || 'Cargando...'}</span>
-        <div className="donate-actions">
-          <button
-            className="btn-sub"
-            onClick={async () => {
-              if (window.electronAPI && window.electronAPI.checkForUpdates) {
-                try {
-                  const result = await window.electronAPI.checkForUpdates();
-                  if (result && result.hasUpdate) {
-                    alert('¡Nueva versión disponible! Descargando en segundo plano...');
-                  } else {
-                    alert('Block Guard está actualizado.');
-                  }
-                } catch (e) {
-                  console.error(e);
-                  alert('Error al buscar actualizaciones.');
-                }
-              } else {
-                alert('La búsqueda de actualizaciones no está disponible en este entorno.');
-              }
-            }}
-          >
-            <i className="fas fa-sync-alt"></i> Buscar Actualizaciones
-          </button>
-        </div>
-      </div>
-
       {/* Meta por defecto */}
       <div className="setting-item">
-        <label>Meta de caracteres por defecto</label>
-        <span className="setting-desc">Meta inicial para nuevos archivos.</span>
+        <label>{t('settings.general.defaultGoalLabel')}</label>
+        <span className="setting-desc">{t('settings.general.defaultGoalLabelDesc')}</span>
         <input
           type="number"
           value={localConfig.defaultGoal}
@@ -425,8 +433,8 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
     <div className="settings-tab-content">
       {/* Selector de temas predefinidos */}
       <div className="setting-item">
-        <label>Temas de color</label>
-        <span className="setting-desc">Elige un tema predefinido para personalizar la apariencia.</span>
+        <label>{t('settings.appearance.themeLabel')}</label>
+        <span className="setting-desc">{t('settings.appearance.themeLabelDesc')}</span>
         <div className="theme-selector">
           {Object.entries(themes).map(([key, theme]) => (
             <button
@@ -458,17 +466,17 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
 
       {/* Editor de colores personalizado */}
       <div className="setting-item">
-        <label>Colores personalizados</label>
-        <span className="setting-desc">Personaliza los colores principales de la interfaz.</span>
+        <label>{t('settings.appearance.customColors')}</label>
+        <span className="setting-desc">{t('settings.appearance.customColorsDesc')}</span>
 
         <div className="custom-theme-editor">
           {/* Nombre del tema */}
           <div className="custom-theme-name">
-            <label>Nombre del tema</label>
+            <label>{t('settings.appearance.themeName')}</label>
             <input
               type="text"
               className="setting-input"
-              placeholder="Mi tema personalizado"
+              placeholder={t('settings.appearance.themeNamePlaceholder')}
               value={localConfig.customThemeName || 'Mi Tema'}
               onChange={(e) => setLocalConfig({ ...localConfig, customThemeName: e.target.value })}
             />
@@ -524,18 +532,16 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
                 });
               }}
             >
-              <i className="fas fa-undo"></i> Restaurar Colores
+              <Icon path={mdiUndo} size={0.7} /> Restaurar Colores
             </button>
             <button
               className="btn-primary"
               onClick={() => {
-                // Guardar y aplicar tema personalizado
-                localStorage.setItem('customTheme', JSON.stringify(localConfig.customColors));
-                localStorage.setItem('customThemeName', localConfig.customThemeName || 'Mi Tema');
+                // Aplicar tema personalizado (se guardará al hacer clic en "Guardar" del modal)
                 setLocalConfig({ ...localConfig, theme: 'custom' });
               }}
             >
-              <i className="fas fa-save"></i> Guardar y Aplicar
+              <Icon path={mdiContentSave} size={0.7} /> Aplicar Tema
             </button>
           </div>
         </div>
@@ -543,89 +549,128 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
     </div>
   );
 
-  const renderStatesTab = () => (
-    <div className="settings-tab-content">
-      <div className="setting-item">
-        <label>Estados de proyecto</label>
-        <span className="setting-desc">Define los niveles de progreso para tus archivos.</span>
-        <div className="states-list">
-          {localConfig.states.map((state, index) => (
-            <div key={state.id} className="state-config-item">
-              {/* Botones de reordenar */}
-              <div className="state-reorder">
-                <button
-                  onClick={() => moveState(index, -1)}
-                  disabled={index === 0}
-                  className="btn-icon-small"
-                >
-                  <i className="fas fa-chevron-up"></i>
-                </button>
-                <button
-                  onClick={() => moveState(index, 1)}
-                  disabled={index === localConfig.states.length - 1}
-                  className="btn-icon-small"
-                >
-                  <i className="fas fa-chevron-down"></i>
-                </button>
-              </div>
+  const renderStatesTab = () => {
+    const BASE_STATES = [
+      { id: 'draft',  label: 'Primer Borrador', goal: 30000, tracking: 'Caracteres escritos' },
+      { id: 'review', label: 'Revisión',         goal: 15000, tracking: 'Caracteres editados' },
+      { id: 'final',  label: 'Finalizado',        goal: 5000,  tracking: 'Caracteres finales'  },
+    ];
+    const customStates = localConfig.customStates || [];
 
-              {/* Selector de color */}
-              <input
-                type="color"
-                value={state.color}
-                onChange={(e) => updateState(index, 'color', e.target.value)}
-                className="color-picker-small"
-              />
-
-              {/* Campos de nombre y meta */}
-              <div className="state-fields">
-                <input
-                  type="text"
-                  value={state.name}
-                  onChange={(e) => updateState(index, 'name', e.target.value)}
-                  placeholder="Nombre del estado"
-                />
-                <input
-                  type="number"
-                  value={state.goal}
-                  onChange={(e) => updateState(index, 'goal', parseInt(e.target.value) || 30000)}
-                  placeholder="Meta"
-                />
-              </div>
-
-              {/* Tipo de conteo */}
-              <select
-                value={state.countType}
-                onChange={(e) => updateState(index, 'countType', e.target.value)}
-              >
-                <option value="absolute">Contar Totales</option>
-                <option value="edited">Contar Ediciones</option>
-                <option value="delta">Contar Nuevos</option>
-              </select>
-
-              {/* Botón eliminar */}
-              <button
-                onClick={() => removeState(index)}
-                className="btn-icon-small danger"
-              >
-                <i className="fas fa-trash"></i>
-              </button>
-            </div>
-          ))}
+    return (
+      <div className="settings-tab-content">
+        {/* Estados base — fijos */}
+        <div className="setting-item">
+          <label>Estados base</label>
+          <span className="setting-desc">Estos 3 estados son fijos. Solo podés cambiar su color.</span>
+          <div className="states-list">
+            {BASE_STATES.map((base) => {
+              const stateInConfig = localConfig.states?.find(s => s.id === base.id);
+              const color = stateInConfig?.color || '#0071e3';
+              return (
+                <div key={base.id} className="state-config-item state-base">
+                  <div className="state-color-dot" style={{ background: color }} />
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(e) => {
+                      const newStates = (localConfig.states || []).map(s =>
+                        s.id === base.id ? { ...s, color: e.target.value } : s
+                      );
+                      setLocalConfig({ ...localConfig, states: newStates });
+                    }}
+                    className="color-picker-small"
+                    title="Cambiar color"
+                  />
+                  <div className="state-fields">
+                    <span className="state-base-name">{base.label}</span>
+                    <span className="state-base-meta">{base.tracking} · meta {base.goal.toLocaleString()}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Botón añadir estado */}
-        <button onClick={addState} className="btn-sub">
-          <i className="fas fa-plus"></i> Añadir Estado
-        </button>
+        {/* Estados custom — con checklist */}
+        <div className="setting-item">
+          <label>Estados personalizados</label>
+          <span className="setting-desc">Se insertan entre Revisión y Finalizado. Solo tienen checklist, sin tracking numérico.</span>
+          <div className="states-list">
+            {customStates.map((state, index) => (
+              <div key={state.id} className="state-config-item state-custom">
+                {/* Reordenar */}
+                <div className="state-reorder">
+                  <button onClick={() => moveState(index, -1)} disabled={index === 0} className="btn-icon-small">
+                    <Icon path={mdiChevronUp} size={0.6} />
+                  </button>
+                  <button onClick={() => moveState(index, 1)} disabled={index === customStates.length - 1} className="btn-icon-small">
+                    <Icon path={mdiChevronDown} size={0.6} />
+                  </button>
+                </div>
+
+                {/* Color */}
+                <input
+                  type="color"
+                  value={state.color}
+                  onChange={(e) => updateState(index, 'color', e.target.value)}
+                  className="color-picker-small"
+                />
+
+                {/* Nombre */}
+                <div className="state-fields" style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={state.name}
+                    onChange={(e) => updateState(index, 'name', e.target.value)}
+                    placeholder="Nombre del estado"
+                    style={{ width: '100%' }}
+                  />
+
+                  {/* Checklist items */}
+                  <div className="checklist-editor">
+                    {(state.checklist || []).map((item, itemIndex) => (
+                      <div key={itemIndex} className="checklist-editor-item">
+                        <input
+                          type="text"
+                          value={item}
+                          onChange={(e) => updateChecklistItem(index, itemIndex, e.target.value)}
+                          placeholder={`Tarea ${itemIndex + 1}`}
+                        />
+                        <button
+                          className="btn-icon-small danger"
+                          onClick={() => removeChecklistItem(index, itemIndex)}
+                        >
+                          <Icon path={mdiClose} size={0.5} />
+                        </button>
+                      </div>
+                    ))}
+                    <button className="btn-sub-small" onClick={() => addChecklistItem(index)}>
+                      <Icon path={mdiPlus} size={0.6} /> Agregar tarea
+                    </button>
+                  </div>
+                </div>
+
+                {/* Eliminar estado */}
+                <button onClick={() => removeState(index)} className="btn-icon-small danger">
+                  <Icon path={mdiTrashCan} size={0.7} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={addState} className="btn-sub">
+            <Icon path={mdiPlus} size={0.7} /> Añadir Estado Personalizado
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderDataTab = () => {
     const handleExportShortcuts = () => {
       const profile = {
-        profileName: config.appName || 'BlockGuard',
+        profileName: config.appName || 'Bloopy',
         shortcuts: shortcuts,
         customTheme: config.customTheme || null,
         exportDate: new Date().toISOString()
@@ -636,10 +681,12 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `blockguard-shortcuts-${Date.now()}.json`;
+      link.download = `Bloopy-shortcuts-${Date.now()}.json`;
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      if (document.body.contains(link)) {
+        document.body.removeChild(link);
+      }
       URL.revokeObjectURL(url);
 
       setConflictMessage({
@@ -665,7 +712,7 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
             if (!profile.shortcuts || typeof profile.shortcuts !== 'object') {
               setConflictMessage({
                 type: 'error',
-                text: '✗ Archivo inválido: no contiene configuración de atajos'
+                text: t('settings.shortcuts.invalidFile') || '✗ Archivo inválido: no contiene configuración de atajos'
               });
               setTimeout(() => setConflictMessage(null), 3000);
               return;
@@ -704,7 +751,7 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
           } catch (error) {
             setConflictMessage({
               type: 'error',
-              text: '✗ Error al leer archivo: formato JSON inválido'
+              text: t('settings.shortcuts.invalidJSON') || '✗ Error al leer archivo: formato JSON inválido'
             });
             setTimeout(() => setConflictMessage(null), 3000);
           }
@@ -719,10 +766,10 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
         {/* Mensaje de conflicto/éxito/error */}
         {conflictMessage && (
           <div className={`shortcut-message shortcut-message-${conflictMessage.type}`}>
-            <i className={`fas ${conflictMessage.type === 'warning' ? 'fa-exclamation-triangle' :
-              conflictMessage.type === 'success' ? 'fa-check-circle' :
-                'fa-times-circle'
-              }`}></i>
+            <Icon path={conflictMessage.type === 'warning' ? mdiAlert :
+              conflictMessage.type === 'success' ? mdiCheckCircle :
+                mdiCloseCircle
+              } size={0.7} />
             <span>{conflictMessage.text}</span>
           </div>
         )}
@@ -732,10 +779,10 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
           <span className="setting-desc">Exporta o importa tu configuración y datos.</span>
           <div className="data-actions">
             <button onClick={onExport} className="btn-primary">
-              <i className="fas fa-download"></i> Exportar Todo (JSON)
+              <Icon path={mdiDownload} size={0.7} /> Exportar Todo (JSON)
             </button>
             <button onClick={onImport} className="btn-sub">
-              <i className="fas fa-upload"></i> Importar Datos
+              <Icon path={mdiUpload} size={0.7} /> Importar Datos
             </button>
           </div>
         </div>
@@ -745,10 +792,10 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
           <span className="setting-desc">Exporta e importa tus configuraciones de atajos personalizados.</span>
           <div className="data-actions">
             <button onClick={handleExportShortcuts} className="btn-primary">
-              <i className="fas fa-save"></i> Exportar Atajos
+              <Icon path={mdiContentSave} size={0.7} /> Exportar Atajos
             </button>
             <button onClick={handleImportShortcuts} className="btn-sub">
-              <i className="fas fa-upload"></i> Importar Atajos
+              <Icon path={mdiUpload} size={0.7} /> Importar Atajos
             </button>
           </div>
         </div>
@@ -765,19 +812,36 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
 
     const handleKeyCapture = (e, shortcutId) => {
       e.preventDefault();
+      e.stopPropagation();
 
-      // Construir la combinación de teclas
+      // Construir combinación de teclas
       const modifiers = [];
       if (e.ctrlKey || e.metaKey) modifiers.push(e.metaKey ? 'Cmd' : 'Ctrl');
       if (e.shiftKey) modifiers.push('Shift');
       if (e.altKey) modifiers.push('Alt');
 
-      const keyName = e.key.toUpperCase();
-      if (!['CONTROL', 'SHIFT', 'ALT', 'META'].includes(keyName)) {
-        modifiers.push(keyName);
+      // Normalizar nombre de tecla
+      let keyName = e.key;
+
+      // Mapear teclas especiales
+      const keyMap = {
+        ' ': 'Space',
+        'Escape': 'Esc',
+        'ArrowUp': 'Up',
+        'ArrowDown': 'Down',
+        'ArrowLeft': 'Left',
+        'ArrowRight': 'Right'
+      };
+
+      keyName = keyMap[keyName] || keyName.toUpperCase();
+
+      // Ignorar teclas modificadoras solas
+      if (['CONTROL', 'SHIFT', 'ALT', 'META', 'CMD'].includes(keyName)) {
+        return;
       }
 
-      const newShortcut = modifiers.length > 0 ? modifiers.join('+') : '';
+      modifiers.push(keyName);
+      const newShortcut = modifiers.join('+');
 
       if (newShortcut) {
         // Detectar conflictos con otros atajos
@@ -816,7 +880,7 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
         } else {
           setConflictMessage({
             type: 'error',
-            text: '⚠️ Combinación de teclas inválida'
+            text: t('settings.shortcuts.invalidKeyCombination') || '✗ Combinación de teclas inválida'
           });
 
           setTimeout(() => setConflictMessage(null), 3000);
@@ -831,10 +895,10 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
         {/* Mensaje de conflicto/éxito/error */}
         {conflictMessage && (
           <div className={`shortcut-message shortcut-message-${conflictMessage.type}`}>
-            <i className={`fas ${conflictMessage.type === 'warning' ? 'fa-exclamation-triangle' :
-              conflictMessage.type === 'success' ? 'fa-check-circle' :
-                'fa-times-circle'
-              }`}></i>
+            <Icon path={conflictMessage.type === 'warning' ? mdiAlert :
+              conflictMessage.type === 'success' ? mdiCheckCircle :
+                mdiCloseCircle
+              } size={0.7} />
             <span>{conflictMessage.text}</span>
           </div>
         )}
@@ -847,7 +911,7 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
         {Object.entries(shortcutsByCategory).map(([category, shortcutList]) => (
           <div key={category} className="shortcuts-category">
             <h4 className="category-title">
-              <i className="fas fa-folder"></i>{' '}
+              <Icon path={mdiFolder} size={0.7} />{' '}
               {category === 'file' && 'Archivo'}
               {category === 'edit' && 'Editar'}
               {category === 'format' && 'Formato'}
@@ -865,7 +929,7 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
                 >
                   <div className="shortcut-info">
                     <div className="shortcut-label">
-                      <i className={`fas ${shortcut.icon}`}></i>
+                      {shortcut.icon && <Icon path={shortcut.icon} size={0.7} />}
                       {shortcut.label}
                     </div>
                     <small className="shortcut-desc">{shortcut.description}</small>
@@ -910,7 +974,7 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
                       }}
                       title="Restaurar valor por defecto"
                     >
-                      <i className="fas fa-undo"></i>
+                      <Icon path={mdiUndo} size={0.7} />
                     </button>
                   )}
                 </div>
@@ -935,7 +999,7 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
               resetAllShortcuts();
             }}
           >
-            <i className="fas fa-undo"></i> Restaurar Todos
+            <Icon path={mdiUndo} size={0.7} /> Restaurar Todos
           </button>
         </div>
       </div>
@@ -947,59 +1011,74 @@ function SettingsModal({ config, userName, avatar, onClose, onSave, onExport, on
   // =============================================================================
 
   return (
-    <div className="modal open" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content settings-large">
-        <button className="close-btn" onClick={onClose}>
-          <i className="fas fa-times"></i>
-        </button>
-
-        <div className="settings-layout">
-          {/* Sidebar de pestañas */}
-          <aside className="settings-sidebar">
-            <div className="settings-sidebar-header">
-              <i className="fas fa-shield-halved"></i>
-              <span>{t('settings.title')}</span>
-            </div>
-            <nav className="settings-nav">
-              {tabs.map(tab => (
-                <button
-                  key={tab.id}
-                  className={`settings-nav-btn ${activeTab === tab.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(tab.id)}
-                >
-                  <i className={`fas ${tab.icon}`}></i>
-                  {t(`settings.tabs.${tab.id}`)}
-                </button>
-              ))}
-            </nav>
-          </aside>
-
-          {/* Contenido de la pestaña activa */}
-          <main className="settings-main">
-            <header className="settings-main-header">
-              <h2>{tabs.find(t => t.id === activeTab)?.label}</h2>
-            </header>
-
-            <div className="settings-content">
-              {activeTab === 'general' && renderGeneralTab()}
-              {activeTab === 'appearance' && renderAppearanceTab()}
-              {activeTab === 'states' && renderStatesTab()}
-              {activeTab === 'shortcuts' && renderShortcutsTab()}
-              {activeTab === 'data' && renderDataTab()}
-            </div>
-
-            <footer className="settings-main-footer">
-              <button onClick={onClose} className="btn-sub">
-                {t('common.cancel')}
+    <BaseModal
+      isOpen={true}
+      onClose={onClose}
+      title={t('settings.title')}
+      size="large"
+      className="settings-modal-wrapper"
+    >
+      <div className="settings-layout">
+        {/* Sidebar de pestañas */}
+        <aside className="settings-sidebar">
+          <nav className="settings-nav">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                className={`settings-nav-btn ${activeTab === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <Icon path={tab.icon} size={0.7} />
+                {t(`settings.tabs.${tab.id}`)}
               </button>
-              <button onClick={handleSave} className="btn-primary">
-                {t('common.save')}
-              </button>
-            </footer>
-          </main>
-        </div>
+            ))}
+          </nav>
+
+          {/* Footer: GitHub, Donar, Versión */}
+          <div className="settings-sidebar-footer">
+            <button
+              className="settings-sidebar-icon-btn"
+              onClick={() => window.electronAPI.openExternal('https://github.com/Valentin-sbox/Bloopy/')}
+              title="GitHub"
+            >
+              <Icon path={mdiGithub} size={0.7} />
+            </button>
+            <button
+              className="settings-sidebar-icon-btn donate"
+              onClick={() => window.electronAPI.openExternal('https://www.paypal.me/Valenhere1')}
+              title="Donar"
+            >
+              <Icon path={mdiHeart} size={0.7} />
+            </button>
+            <span className="settings-sidebar-version">v{appVersion || '?'}</span>
+          </div>
+        </aside>
+
+        {/* Contenido de la pestaña activa */}
+        <main className="settings-main">
+          <header className="settings-main-header">
+            <h2>{tabs.find(t => t.id === activeTab)?.label}</h2>
+          </header>
+
+          <div className="settings-content">
+            {activeTab === 'general' && renderGeneralTab()}
+            {activeTab === 'appearance' && renderAppearanceTab()}
+            {activeTab === 'states' && renderStatesTab()}
+            {activeTab === 'shortcuts' && renderShortcutsTab()}
+            {activeTab === 'data' && renderDataTab()}
+          </div>
+
+          <footer className="settings-main-footer">
+            <button onClick={onClose} className="btn-sub">
+              {t('common.cancel')}
+            </button>
+            <button onClick={handleSave} className="btn-primary">
+              {t('common.save')}
+            </button>
+          </footer>
+        </main>
       </div>
-    </div>
+    </BaseModal>
   );
 }
 

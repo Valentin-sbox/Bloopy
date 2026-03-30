@@ -1,39 +1,45 @@
 {
-  "appId": "com.blockguard.app",
-  "productName": "Block Guard",
-  "copyright": "Copyright © 2026 Block Guard",
+  "appId": "com.bloopy.app",
+  "productName": "Bloopy",
+  "copyright": "Copyright © 2026 Bloopy",
   "directories": {
     "output": "dist",
-    "buildResources": "assets"
+    "buildResources": "public/assets"
   },
   "files": [
     "build/**/*",
-    "public/electron.js",
-    "public/preload.js",
-    "public/index.html",
     "assets/**/*",
-    "node_modules/**/*",
     "package.json"
   ],
   "extraMetadata": {
-    "main": "public/electron.js"
+    "main": "build/electron.js"
   },
+  "asarUnpack": [
+    "build/src/main/**/*",
+    "node_modules/uuid/**/*",
+    "node_modules/js-yaml/**/*",
+    "node_modules/argparse/**/*",
+    "node_modules/esprima/**/*"
+  ],
   "win": {
     "target": [
       {
         "target": "nsis",
         "arch": [
-          "x64"
+          "x64",
+          "ia32"
         ]
       }
     ],
-    "icon": "assets/icon.ico",
+    "icon": "/workspaces/Blockguard/public/assets/icon.ico",
     "certificateFile": null,
     "certificatePassword": null,
     "sign": false,
     "signDlls": false,
     "signingHashAlgorithms": null,
-    "signtool": null
+    "signtool": null,
+    "publisherName": "Bloopy",
+    "rcedit": false
   },
   "nsis": {
     "oneClick": false,
@@ -42,20 +48,24 @@
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "createUninstallShortcut": true,
-    "shortcutName": "Block Guard",
-    "installerIcon": "assets/icon.ico",
-    "uninstallerIcon": "assets/icon.ico",
-    "installerHeaderIcon": "assets/icon.ico",
-    "artificialName": "Block Guard.exe",
-    "guid": "Block-Guard-1.0.0-com.blockguard.app",
-    "artifactName": "${productName}-${version}-setup.${ext}"
+    "shortcutName": "Bloopy",
+    "installerIcon": "public/assets/icon.ico",
+    "uninstallerIcon": "public/assets/icon.ico",
+    "installerHeaderIcon": "public/assets/icon.ico",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
+    "deleteAppDataOnUninstall": false
   },
   "buildDependenciesFromSource": false,
-  "publish": {
-    "provider": "github",
-    "owner": "wishpixel12-boop",
-    "repo": "blockGuard"
-  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "Valentin-sbox",
+      "repo": "Bloopy",
+      "releaseType": "release",
+      "publishAutoUpdate": true
+    }
+  ],
+  "generateUpdatesFilesForAllChannels": true,
   "sign": false,
   "signDlls": false,
   "certificateFile": null,

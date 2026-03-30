@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - FINDREPLACE.JS
+ *  FINDREPLACE.JS
  * ============================================================================
  * 
  * COMPONENTE: BUSCADOR Y REEMPLAZADOR DE TEXTO
@@ -27,6 +27,18 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from '../utils/i18n';
+import Icon from '@mdi/react';
+import * as mdi from '@mdi/js';
+const { 
+  mdiMagnify, 
+  mdiClose, 
+  mdiChevronUp, 
+  mdiChevronDown, 
+  mdiFormatLetterCase, 
+  mdiSwapHorizontal,
+  mdiCheck,
+  mdiCheckAll
+} = mdi;
 
 export default function FindReplace({ isOpen, onClose, content, onReplace, onNavigate, editorRef }) {
   const { t } = useTranslation();
@@ -167,7 +179,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
         {/* Fila de búsqueda */}
         <div className="find-replace-row">
           <label className="find-replace-label">
-            <i className="fas fa-search"></i>
+            <Icon path={mdiMagnify} size={0.7} />
           </label>
           <input
             ref={searchInputRef}
@@ -187,7 +199,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
           )}
           {matchCount === 0 && searchTerm && (
             <span className="match-counter no-match">
-              <i className="fas fa-times"></i> {t('findReplace.noMatches')}
+              <Icon path={mdiClose} size={0.5} /> {t('findReplace.noMatches')}
             </span>
           )}
 
@@ -198,7 +210,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
             disabled={matchCount === 0}
             title={t('findReplace.previous')}
           >
-            <i className="fas fa-chevron-up"></i>
+            <Icon path={mdiChevronUp} size={0.7} />
           </button>
           <button
             className="find-replace-btn icon-btn"
@@ -206,7 +218,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
             disabled={matchCount === 0}
             title={t('findReplace.next')}
           >
-            <i className="fas fa-chevron-down"></i>
+            <Icon path={mdiChevronDown} size={0.7} />
           </button>
 
           {/* Toggle Case-Sensitive */}
@@ -215,7 +227,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
             onClick={() => setCaseSensitive(!caseSensitive)}
             title={t('findReplace.caseSensitive')}
           >
-            <i className="fas fa-strikethrough"></i>
+            <Icon path={mdiFormatLetterCase} size={0.7} />
             <span>aA</span>
           </button>
 
@@ -225,7 +237,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
             onClick={() => setShowReplace(!showReplace)}
             title={t('findReplace.replace')}
           >
-            <i className="fas fa-exchange-alt"></i>
+            <Icon path={mdiSwapHorizontal} size={0.7} />
           </button>
 
           {/* Botón cerrar */}
@@ -234,7 +246,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
             onClick={onClose}
             title={t('findReplace.close')}
           >
-            <i className="fas fa-times"></i>
+            <Icon path={mdiClose} size={0.7} />
           </button>
         </div>
 
@@ -242,7 +254,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
         {showReplace && (
           <div className="find-replace-row">
             <label className="find-replace-label">
-              <i className="fas fa-exchange-alt"></i>
+              <Icon path={mdiSwapHorizontal} size={0.7} />
             </label>
             <input
               type="text"
@@ -260,7 +272,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
               disabled={matchCount === 0}
               title={t('findReplace.replace')}
             >
-              <i className="fas fa-check"></i>
+              <Icon path={mdiCheck} size={0.7} />
               {t('findReplace.replace')}
             </button>
 
@@ -271,7 +283,7 @@ export default function FindReplace({ isOpen, onClose, content, onReplace, onNav
               disabled={matchCount === 0}
               title={t('findReplace.replaceAll')}
             >
-              <i className="fas fa-check-double"></i>
+              <Icon path={mdiCheckAll} size={0.7} />
               {t('findReplace.replaceAll')}
             </button>
           </div>

@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - PROJECTVIEWER.JS
+ *  PROJECTVIEWER.JS
  * ============================================================================
  * 
  * COMPONENTE: VISOR DE PROYECTO
@@ -29,30 +29,36 @@
  * ============================================================================
  */
 
-import React, { useState } from 'react';
-import { smartTruncate } from '../utils/helpers';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from '../utils/i18n';
+import { getIconById, DEFAULT_FILE_ICON } from '../utils/iconLibrary';
+import Icon from '@mdi/react';
+import { 
+  mdiChevronDown, 
+  mdiChevronRight, 
+  mdiClose 
+} from '@mdi/js';
 
-function ProjectViewer({ project, projectIndex, onOpenFile, onClose, config, onCreateFile, onRefresh, notify, onCreateSubFile }) {
+function ProjectViewer({ project, projectIndex, onOpenFile, onClose, config, onCreateFile, onRefresh, notify, onCreateSubFile, fileIcons }) {
   const { t } = useTranslation();
-  
+
   // Estado de carpetas expandidas (almacena rutas)
   const [expandedFolders, setExpandedFolders] = useState({});
 
   /**
    * Toggle de expansión de una carpeta
    */
-  const toggleFolder = (folderPath) => {
+  const toggleFolder = useCallback((nodeKey) => {
     setExpandedFolders(prev => ({
       ...prev,
-      [folderPath]: !prev[folderPath]
+      [nodeKey]: !prev[nodeKey]
     }));
-  };
+  }, []);
 
   /**
    * Renderiza recursivamente el árbol de items
    */
-  const renderItemTree = (items, basePath = '') => {
+  const renderItemTree = useCallback((items, basePath = '') => {
     const getRelativeTime = (timestamp) => {
       if (!timestamp) return t('sidebar.never');
       const now = Date.now();
@@ -68,9 +74,17 @@ function ProjectViewer({ project, projectIndex, onOpenFile, onClose, config, onC
       return new Date(timestamp).toLocaleDateString('es-ES');
     };
 
-    return items.map((item, index) => {
+    // Sort items by order for consistency
+    const sortedItems = [...items].sort((a, b) => {
+      const orderA = a.order ?? 0;
+      const orderB = b.order ?? 0;
+      if (orderA !== orderB) return orderA - orderB;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+
+    return sortedItems.map((item) => {
       const currentPath = basePath ? `${basePath}/${item.name}` : item.name;
-      const isExpanded = expandedFolders[currentPath];
+      const isExpanded = expandedFolders[item.fullPath];
 
       // Si es carpeta
       if (item.type === 'folder') {
@@ -80,81 +94,18 @@ function ProjectViewer({ project, projectIndex, onOpenFile, onClose, config, onC
             <div className="tree-item-header">
               <button
                 className="toggle-folder-btn"
-                onClick={() => hasChildren && toggleFolder(currentPath)}
+                onClick={() => hasChildren && toggleFolder(item.fullPath)}
                 aria-expanded={isExpanded}
-                title={isExpanded ? 'Colapsar carpeta' : 'Expandir carpeta'}
+                title={isExpanded ? t('projectViewer.collapseFolder') : t('projectViewer.expandFolder')}
               >
                 {hasChildren ? (
-                  <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`}></i>
+                  <Icon path={isExpanded ? mdiChevronDown : mdiChevronRight} size={0.6} />
                 ) : (
                   <span style={{ width: 14 }} />
                 )}
               </button>
 
-              <i className="fas fa-folder folder-icon"></i>
-              <span className="item-name">{smartTruncate(item.name, 30)}</span>
-
-              <div className="tree-item-actions">
-                <button
-                  className="action-btn"
-                  title={t('projectViewer.newFile')}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const name = window.prompt(t('projectViewer.newFile'));
-                    if (name) {
-                      const final = name.endsWith('.txt') ? name : `${name}.txt`;
-                      if (onCreateFile) onCreateFile(projectIndex, final, item.fullPath);
-                      onRefresh && onRefresh();
-                    }
-                  }}
-                >
-                  <i className="fas fa-file-medical"></i>
-                </button>
-
-                <button
-                  className="action-btn"
-                  title={t('sidebar.rename')}
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    const newName = window.prompt(t('sidebar.rename'), item.name);
-                    if (newName && newName !== item.name) {
-                      try {
-                        if (window.electronAPI && window.electronAPI.renameFolder) {
-                          const newFull = item.fullPath.replace(item.name, newName);
-                          await window.electronAPI.renameFolder(item.fullPath, newName);
-                          onRefresh && onRefresh();
-                          notify && notify(t('projectViewer.renamed'), 'success');
-                        }
-                      } catch (err) {
-                        console.error(err);
-                        notify && notify(t('projectViewer.errorRenaming'), 'error');
-                      }
-                    }
-                  }}
-                >
-                  <i className="fas fa-edit"></i>
-                </button>
-
-                <button
-                  className="action-btn danger"
-                  title={t('common.delete')}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (confirm(t('projectViewer.confirmDelete', { name: item.name }))) {
-                      if (window.electronAPI && window.electronAPI.deleteItem) {
-                        window.electronAPI.deleteItem(item.fullPath, false).then(() => {
-                          onRefresh && onRefresh();
-                        }).catch(err => {
-                          console.error(err);
-                          notify && notify(t('projectViewer.errorDeleting'), 'error');
-                        });
-                      }
-                    }
-                  }}
-                >
-                  <i className="fas fa-trash"></i>
-                </button>
-              </div>
+              <span className="folder-name">{item.name}</span>
             </div>
 
             {isExpanded && hasChildren && (
@@ -168,10 +119,7 @@ function ProjectViewer({ project, projectIndex, onOpenFile, onClose, config, onC
 
       // Si es archivo
       const status = config?.states?.find(s => s.id === item.status) || config?.states?.[0];
-      const progress = Math.min(100, (item.lastCharCount / (item.goal || 30000)) * 100);
-      const circumference = 2 * Math.PI * 9;
-      const strokeDashoffset = circumference - (progress / 100) * circumference;
-      const lastUpdated = item.lastUpdated ? getRelativeTime(item.lastUpdated) : 'Sin fecha';
+      const progress = Math.min(100, (item.lastCharCount / (item.goal || 30000)) * 100) || 0;
 
       return (
         <div
@@ -186,7 +134,6 @@ function ProjectViewer({ project, projectIndex, onOpenFile, onClose, config, onC
             }}
             role="button"
             tabIndex={0}
-            title={`${t('sidebar.lastUpdated')}: ${lastUpdated}`}
           >
             <div className="tree-item-header">
               {/* Botón de expandir si tiene sub-archivos */}
@@ -195,94 +142,40 @@ function ProjectViewer({ project, projectIndex, onOpenFile, onClose, config, onC
                 onClick={(e) => {
                   if (item.items && item.items.length > 0) {
                     e.stopPropagation();
-                    toggleFolder(currentPath);
+                    toggleFolder(item.fullPath);
                   }
                 }}
                 style={{ visibility: (item.items && item.items.length > 0) ? 'visible' : 'hidden' }}
               >
-                <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`}></i>
+                <Icon path={isExpanded ? mdiChevronDown : mdiChevronRight} size={0.6} />
               </button>
 
-              <div className="file-progress-small">
-                <svg className="circle-progress-small" viewBox="0 0 24 24">
-                  <circle className="bg" cx="12" cy="12" r="9"></circle>
-                  <circle
-                    className="fg"
-                    cx="12"
-                    cy="12"
-                    r="9"
-                    style={{
-                      stroke: status?.color || '#0071e3',
-                      strokeDasharray: circumference,
-                      strokeDashoffset: strokeDashoffset
-                    }}
-                  ></circle>
-                </svg>
+              {/* Custom icon display */}
+              <div className="file-icon-display">
+                {(() => {
+                  // Get custom icon from fileIcons state or use default
+                  const customIconId = fileIcons?.get(item.fullPath);
+                  const iconData = customIconId ? getIconById(customIconId) : DEFAULT_FILE_ICON;
+                  const iconPath = iconData?.icon || DEFAULT_FILE_ICON.icon;
+
+                  return <Icon path={iconPath} size={0.7} title={iconData?.label || 'Archivo'} style={{ color: status?.color || 'var(--accent-primary)' }} />;
+                })()}
               </div>
-              <div className="file-info-project">
-                <span className="item-name">
-                  {smartTruncate(item.name.replace('.txt', ''), 25)}
-                </span>
-                <span className="file-updated-small">{lastUpdated}</span>
-              </div>
-              <div className="tree-item-actions">
-                <span className="progress-percent">{Math.round(progress)}%</span>
 
-                {/* Boton Agregar Sub-archivo */}
-                <button
-                  className="action-btn"
-                  title={t('projectViewer.addSubfile')}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (onCreateSubFile) onCreateSubFile(item);
-                  }}
-                >
-                  <i className="fas fa-plus-circle"></i>
-                </button>
+              {/* Nombre del archivo */}
+              <span className="file-name-simple">
+                {item.name.replace(/\.(txt|canvas)$/i, '')}
+              </span>
 
-                <button
-                  className="action-btn"
-                  title={t('sidebar.rename')}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const base = item.name.replace('.txt', '');
-                    const newName = window.prompt(t('sidebar.rename'), base);
-                    if (newName && newName !== base) {
-                      const final = newName.endsWith('.txt') ? newName : `${newName}.txt`;
-                      if (window.electronAPI && window.electronAPI.renameFile) {
-                        window.electronAPI.renameFile(item.fullPath, final).then(() => {
-                          onRefresh && onRefresh();
-                          notify && notify(t('projectViewer.renamed'), 'success');
-                        }).catch(err => {
-                          console.error(err);
-                          notify && notify(t('projectViewer.errorRenaming'), 'error');
-                        });
-                      }
-                    }
+              {/* Indicador de progreso mini */}
+              <div className="progress-indicator-mini">
+                <div
+                  className="progress-bar-mini"
+                  style={{
+                    width: `${progress}%`,
+                    background: status?.color || 'var(--accent-primary)'
                   }}
-                >
-                  <i className="fas fa-edit"></i>
-                </button>
-
-                <button
-                  className="action-btn danger"
-                  title={t('common.delete')}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (confirm(t('projectViewer.confirmDelete', { name: item.name }))) {
-                      if (window.electronAPI && window.electronAPI.deleteItem) {
-                        window.electronAPI.deleteItem(item.fullPath, false).then(() => {
-                          onRefresh && onRefresh();
-                        }).catch(err => {
-                          console.error(err);
-                          notify && notify(t('projectViewer.errorDeleting'), 'error');
-                        });
-                      }
-                    }
-                  }}
-                >
-                  <i className="fas fa-trash"></i>
-                </button>
+                />
               </div>
             </div>
           </div>
@@ -296,80 +189,40 @@ function ProjectViewer({ project, projectIndex, onOpenFile, onClose, config, onC
         </div>
       );
     });
-  };
+  }, [expandedFolders, toggleFolder, t, config, projectIndex, onOpenFile, onClose, onRefresh, fileIcons]);
+
+  const visibleItems = useMemo(() => {
+    if (!project || !project.items) return [];
+    return project.items.filter(item => item && item.name);
+  }, [project]);
+
+  if (!project) return null;
 
   return (
     <div className="project-viewer-container">
-      {/* Header */}
       <div className="project-viewer-header">
-        {/* Botón volver + Título en el mismo contenedor */}
-        <div className="header-left">
-          <button
-            className="back-btn-project-viewer"
-            onClick={onClose}
-            title={t('common.back')}
-          >
-            <i className="fas fa-arrow-left"></i>
-            <span>{t('common.back')}</span>
-          </button>
-          <h2 className="project-viewer-title">{smartTruncate(project?.name || t('projectViewer.title'), 30)}</h2>
+        <div className="project-viewer-breadcrumb">
+          <span className="breadcrumb-item" onClick={onClose}>{t('sidebar.home')}</span>
+          <span className="breadcrumb-separator"><Icon path={mdiChevronRight} size={0.6} /></span>
+          <span className="breadcrumb-item active">{project.name}</span>
         </div>
-        <div className="header-actions">
-          <button
-            className="btn-project-viewer btn-new-file"
-            onClick={() => {
-              const name = window.prompt(t('projectViewer.newFile'));
-              if (name && name.trim()) {
-                const final = name.endsWith('.txt') ? name : `${name}.txt`;
-                if (onCreateFile) onCreateFile(projectIndex, final, project.path);
-                if (onRefresh) onRefresh();
-              }
-            }}
-            title={t('projectViewer.newFile')}
-          >
-            <i className="fas fa-file-medical"></i>
-            <span>{t('projectViewer.newFile')}</span>
-          </button>
-
-          <button
-            className="btn-project-viewer btn-new-folder"
-            onClick={async () => {
-              const name = window.prompt(t('projectViewer.newFolder'));
-              if (!name || !name.trim()) return;
-              if (window.electronAPI && window.electronAPI.createFolder) {
-                try {
-                  await window.electronAPI.createFolder(project.path, name);
-                  onRefresh && onRefresh();
-                  notify && notify(t('projectViewer.folderCreated'), 'success');
-                } catch (err) {
-                  console.error('Error creando carpeta', err);
-                  notify && notify(t('projectViewer.errorCreating'), 'error');
-                }
-              } else {
-                notify && notify(t('notifications.folderNotSupported'), 'warning');
-              }
-            }}
-            title={t('projectViewer.newFolder')}
-          >
-            <i className="fas fa-folder-plus"></i>
-            <span>{t('projectViewer.newFolder')}</span>
-          </button>
-        </div>
+        <button className="close-viewer-btn" onClick={onClose}>
+          <Icon path={mdiClose} size={0.7} />
+        </button>
       </div>
-
-      {/* Contenido del árbol */}
-      <div className="project-viewer-tree">
-        {project?.items && project.items.length > 0 ? (
-          renderItemTree(project.items)
-        ) : (
-          <div className="empty-state">
-            <i className="fas fa-folder-open"></i>
-            <p>{t('projectViewer.emptyProject')}</p>
-          </div>
-        )}
+      <div className="project-viewer-content">
+        <div className="project-tree">
+          {project.items && project.items.length > 0 ? (
+            renderItemTree(project.items)
+          ) : (
+            <div className="empty-project-message">
+              {t('projectViewer.emptyProject')}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default ProjectViewer;

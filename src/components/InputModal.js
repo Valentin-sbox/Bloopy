@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - INPUTMODAL.JS
+ * INPUTMODAL.JS
  * ============================================================================
  * 
  * COMPONENTE: MODAL DE INPUT
@@ -23,6 +23,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../utils/i18n';
+import Icon from '@mdi/react';
+import { mdiClose } from '@mdi/js';
 
 function InputModal({ title, placeholder, defaultValue = '', onConfirm, onCancel }) {
   const { t } = useTranslation();
@@ -68,7 +70,7 @@ function InputModal({ title, placeholder, defaultValue = '', onConfirm, onCancel
       <div className="modal-content">
         {/* Botón de cerrar */}
         <button className="close-btn" onClick={onCancel}>
-          <i className="fas fa-times"></i>
+          <Icon path={mdiClose} size={0.7} />
         </button>
         
         <div className="modal-body">

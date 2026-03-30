@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - NOTIFICATIONCONTAINER.JS
+ *  NOTIFICATIONCONTAINER.JS
  * ============================================================================
  * 
  * COMPONENTE: CONTENEDOR DE NOTIFICACIONES
@@ -20,21 +20,23 @@
 
 import React from 'react';
 import { escapeHtml } from '../utils/helpers';
+import Icon from '@mdi/react';
+import { mdiCheckCircle, mdiAlertCircle, mdiInformation } from '@mdi/js';
 
 function NotificationContainer({ notifications }) {
   /**
-   * Obtiene el icono Font Awesome según el tipo de notificación.
+   * Obtiene el icono MDI según el tipo de notificación.
    * @param {string} type - Tipo de notificación
-   * @returns {string} Clase del icono
+   * @returns {string} Ruta del icono
    */
   const getIcon = (type) => {
     switch (type) {
       case 'success':
-        return 'fa-check-circle';
+        return mdiCheckCircle;
       case 'error':
-        return 'fa-exclamation-circle';
+        return mdiAlertCircle;
       default:
-        return 'fa-info-circle';
+        return mdiInformation;
     }
   };
   
@@ -45,7 +47,7 @@ function NotificationContainer({ notifications }) {
           key={notification.id} 
           className={`notification ${notification.type}`}
         >
-          <i className={`fas ${getIcon(notification.type)}`}></i>
+          <Icon path={getIcon(notification.type)} size={0.7} />
           {/* escapeHtml previene XSS en mensajes de usuario */}
           <span>{escapeHtml(notification.message)}</span>
         </div>

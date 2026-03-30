@@ -1,99 +1,117 @@
 /* ============================================================================
-   EDITOR SIDEBAR - Sidebar lateral derecha del editor
+   EDITOR SIDEBAR - Botones laterales del editor
    ============================================================================ */
 
 .editor-sidebar {
-  position: absolute; /* absoluto relativo al contenedor del editor */
-  right: 0;
-  top: 0; /* alineado arriba del contenedor */
-  width: 60px;
-  height: 100%; /* ocupar toda la altura del contenedor padre */
-  background: var(--bg-secondary);
-  border-left: 1px solid var(--border-color);
+  width: 44px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 12px 6px;
-  z-index: 100;
+  padding: 12px 0;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: var(--z-sidebar);
 }
 
 .editor-sidebar-btn {
   width: 44px;
   height: 44px;
-  border: none;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
-  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
   position: relative;
 }
 
 .editor-sidebar-btn:hover {
-  background: var(--accent-color);
-  color: white;
-  transform: scale(1.05);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
-.editor-sidebar-btn:active {
-  transform: scale(0.95);
+.editor-sidebar-btn.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
 }
 
 .editor-sidebar-btn .badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  background: var(--accent-color);
+  top: -4px;
+  right: -4px;
+  background: var(--accent-orange);
   color: white;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 11px;
-  font-weight: bold;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Panel de Caracteres Especiales */
-.special-chars-panel {
-  position: fixed; /* mantener visible fuera del flujo */
-  right: 76px; /* desplegar a la izquierda del sidebar */
-  top: calc(var(--header-height) + 20px);
+/* ============================================================================
+   OVERLAY DE PANELES - Absoluto, no afecta el layout
+   ============================================================================ */
+
+.editor-panel-overlay {
+  position: absolute;
+  top: 12px;
+  right: 56px; /* justo a la izquierda del EditorSidebar */
+  bottom: 12px;
   width: 320px;
-  max-height: calc(100vh - var(--header-height) - 80px);
-  background: var(--bg-secondary);
+  z-index: calc(var(--z-sidebar) + 1);
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  animation: panelSlideIn 0.18s ease;
+}
+
+@keyframes panelSlideIn {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.editor-panel-overlay > * {
+  pointer-events: all;
+  flex: 1;
+  min-height: 0;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--bg-secondary);
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  z-index: 110;
-  animation: slideLeftIn 0.18s ease;
+  overflow: hidden;
 }
 
-@keyframes slideLeftIn {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* ============================================================================
+   PANEL DE CARACTERES ESPECIALES
+   ============================================================================ */
+
+.special-chars-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .special-chars-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 16px;
   border-bottom: 1px solid var(--border-color);
   font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  flex-shrink: 0;
 }
 
 .special-chars-header .close-btn {
@@ -101,42 +119,47 @@
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 16px;
-  padding: 0;
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
 }
 
 .special-chars-header .close-btn:hover {
-  color: var(--text-primary);
+  color: var(--accent-red);
+  background: rgba(255, 59, 48, 0.1);
 }
 
 .special-chars-content {
   flex: 1;
   overflow-y: auto;
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .char-category {
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .category-name {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-  padding-left: 4px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
 }
 
 .chars-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
 }
 
 .char-btn {
@@ -144,41 +167,150 @@
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .char-btn:hover {
-  background: var(--accent-color);
-  color: white;
-  border-color: var(--accent-color);
-  transform: scale(1.05);
+  background: var(--bg-hover);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
 }
 
 .char-btn.copied {
-  background: var(--accent-color);
+  background: var(--accent-green);
+  border-color: var(--accent-green);
   color: white;
 }
 
-/* Scrollbars */
-.special-chars-content::-webkit-scrollbar {
-  width: 6px;
+/* Scrollbar */
+.special-chars-content::-webkit-scrollbar { width: 6px; }
+.special-chars-content::-webkit-scrollbar-track { background: transparent; }
+.special-chars-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+.special-chars-content::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+/* ============================================================================
+   OVERRIDES: CommentsSidebar dentro del overlay - sin fixed, sin backdrop
+   ============================================================================ */
+
+.editor-panel-overlay .comments-sidebar,
+.split-panel-overlay .comments-sidebar {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  border-left: none;
+  border-radius: 12px;
+  animation: panelSlideIn 0.18s ease;
+  flex: 1;
+  min-height: 0;
 }
 
-.special-chars-content::-webkit-scrollbar-track {
+.editor-panel-overlay .comments-overlay,
+.split-panel-overlay .comments-overlay {
+  display: none !important;
+}
+
+/* Input de comentario: input single-line + botón icono inline */
+.comment-input-area {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.comment-input-area form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 0 4px 0 10px;
+  height: 34px;
+  transition: border-color var(--transition-fast);
+}
+
+.comment-input-area form:focus-within {
+  border-color: var(--accent-blue);
+}
+
+.comment-input-area input {
+  flex: 1;
   background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  outline: none;
+  font-family: inherit;
+  min-width: 0;
 }
 
-.special-chars-content::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 3px;
+.comment-input-area input::placeholder {
+  color: var(--text-tertiary);
 }
 
-.special-chars-content::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+.comment-input-area .btns {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: var(--accent-blue);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+
+.comment-input-area .btns:hover {
+  background: var(--accent-blue-hover, #0051a3);
+}
+
+/* Header limpio - solo título + X */
+.comments-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.comments-header h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.comments-header .close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.comments-header .close-btn:hover {
+  color: var(--accent-red);
+  background: rgba(255, 59, 48, 0.1);
 }

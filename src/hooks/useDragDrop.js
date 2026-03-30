@@ -104,18 +104,19 @@ export function useDragDrop(projects = [], onUpdateProjects = () => {}, onNotify
         return;
       }
 
+      console.log('[DRAG-DROP] Moviendo archivo:', { sourcePath, targetPath });
+
       // Intentar mover via Electron API
       let movedToPath = null;
       if (window.electronAPI) {
-        // moveFile may return the final dest path
         movedToPath = await window.electronAPI.moveFile(sourcePath, targetPath);
+        console.log('[DRAG-DROP] Archivo movido a:', movedToPath);
       }
 
       // Actualizar estructura local
-      // Actualizar estructura local: remover por fullPath y colocar bajo targetPath
       const updatedProjects = JSON.parse(JSON.stringify(projects));
 
-      // Helper: buscar y remover por fullPath en proyectos
+      // 1. Remover item de su ubicación actual (búsqueda recursiva mejorada)
       let removedItem = null;
       const removeByFullPath = (items) => {
         if (!Array.isArray(items)) return false;
@@ -123,71 +124,97 @@ export function useDragDrop(projects = [], onUpdateProjects = () => {}, onNotify
           const it = items[i];
           if (it.fullPath === sourcePath) {
             removedItem = items.splice(i, 1)[0];
+            console.log('[DRAG-DROP] Item removido:', removedItem.name);
             return true;
           }
-          if (it.items && removeByFullPath(it.items)) return true;
+          // Búsqueda recursiva en items anidados
+          if (it.items && removeByFullPath(it.items)) {
+            return true;
+          }
         }
         return false;
       };
 
+      // Buscar en todos los proyectos
       for (const proj of updatedProjects) {
         if (proj.items && removeByFullPath(proj.items)) break;
       }
 
-      // Determinar destino: si targetPath coincide con project.path -> insertar en root de ese proyecto
-      let inserted = false;
-      if (removedItem) {
-        // if movedToPath provided, compute parent folder
-        const destFull = movedToPath || targetPath;
-        const lastSlash = destFull.lastIndexOf('/');
-        const parentFull = lastSlash >= 0 ? destFull.slice(0, lastSlash) : destFull;
+      if (!removedItem) {
+        console.error('[DRAG-DROP] No se pudo encontrar el item a mover');
+        onNotify('Error: archivo no encontrado', 'error');
+        return;
+      }
 
-        // Buscar proyecto cuyo path coincide con parentFull
+      // 2. Actualizar fullPath del item movido
+      removedItem.fullPath = movedToPath || targetPath;
+
+      // 3. Insertar en nueva ubicación (búsqueda recursiva mejorada)
+      const insertIntoTarget = (items, targetFullPath) => {
+        if (!Array.isArray(items)) return false;
+        for (const item of items) {
+          if (item.fullPath === targetFullPath) {
+            item.items = item.items || [];
+            item.items.push(removedItem);
+            console.log('[DRAG-DROP] Item insertado en:', item.name);
+            return true;
+          }
+          // Búsqueda recursiva en items anidados
+          if (item.items && insertIntoTarget(item.items, targetFullPath)) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      let inserted = false;
+
+      // Intentar insertar en proyecto raíz
+      for (const proj of updatedProjects) {
+        if (proj.path === targetPath) {
+          proj.items = proj.items || [];
+          proj.items.push(removedItem);
+          inserted = true;
+          console.log('[DRAG-DROP] Item insertado en proyecto raíz:', proj.name);
+          break;
+        }
+      }
+
+      // Si no se insertó en raíz, buscar en carpetas anidadas
+      if (!inserted) {
         for (const proj of updatedProjects) {
-          if (proj.path === parentFull) {
-            proj.items = proj.items || [];
-            proj.items.push(removedItem);
+          if (proj.items && insertIntoTarget(proj.items, targetPath)) {
             inserted = true;
             break;
           }
         }
+      }
 
-        if (!inserted) {
-          // Buscar nodo con fullPath == parentFull
-          const findAndInsert = (items) => {
-            if (!Array.isArray(items)) return false;
-            for (const it of items) {
-              if (it.fullPath === parentFull) {
-                it.items = it.items || [];
-                it.items.push(removedItem);
-                return true;
-              }
-              if (it.items && findAndInsert(it.items)) return true;
-            }
-            return false;
-          };
+      // Fallback: si no se insertó, añadir al primer proyecto
+      if (!inserted && updatedProjects.length > 0) {
+        console.warn('[DRAG-DROP] Fallback: insertando en primer proyecto');
+        updatedProjects[0].items = updatedProjects[0].items || [];
+        updatedProjects[0].items.push(removedItem);
+      }
 
-          for (const proj of updatedProjects) {
-            if (proj.items && findAndInsert(proj.items)) { inserted = true; break; }
-          }
-        }
-
-        // Fallback: si no se insertó, añadir al primer proyecto
-        if (!inserted && updatedProjects.length > 0) {
-          updatedProjects[0].items = updatedProjects[0].items || [];
-          updatedProjects[0].items.push(removedItem);
-        }
+      // 4. Actualizar referencias en openTabs si el archivo está abierto
+      if (window.updateOpenTabsPath) {
+        window.updateOpenTabsPath(sourcePath, movedToPath || targetPath);
       }
 
       onUpdateProjects(updatedProjects);
       onNotify('Archivo movido correctamente', 'success');
 
       // Notificar al main/App para persistir actualizaciones locales
-      onLocalUpdate && onLocalUpdate({ type: 'move', oldPath: sourcePath, newPath: movedToPath || targetPath, destParent: movedToPath || targetPath });
+      onLocalUpdate && onLocalUpdate({ 
+        type: 'move', 
+        oldPath: sourcePath, 
+        newPath: movedToPath || targetPath 
+      });
 
     } catch (error) {
-      console.error('Error in drop:', error);
-      onNotify('Error al mover el archivo', 'error');
+      console.error('[DRAG-DROP] Error:', error);
+      onNotify('Error al mover el archivo: ' + error.message, 'error');
     } finally {
       setDragState({
         isDragging: false,
@@ -197,7 +224,7 @@ export function useDragDrop(projects = [], onUpdateProjects = () => {}, onNotify
         dragOverId: null
       });
     }
-  }, [projects, onUpdateProjects, onNotify]);
+  }, [projects, onUpdateProjects, onNotify, onLocalUpdate]);
 
   return {
     dragState,

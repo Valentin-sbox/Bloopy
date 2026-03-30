@@ -1,12 +1,12 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - INDEX.CSS
+ * BLOOPY v4.0.0 - INDEX.CSS
  * ============================================================================
  * 
  * HOJA DE ESTILOS PRINCIPAL DE LA APLICACIÓN
  * 
  * Este archivo contiene todas las variables CSS, estilos base y componentes
- * principales de la interfaz de Block Guard.
+ * principales de la interfaz de Bloopy.
  * 
  * ESTRUCTURA:
  * 1. Variables CSS (Custom Properties) - Sistema de temas
@@ -32,6 +32,27 @@
  * - src/utils/themes.js: Define valores para diferentes temas
  * ============================================================================
  */
+
+/* Importar estilos de Lexical Editor
+
+ * 10. Modales (configuración, confirmaciones, etc.)
+ * 11. Notificaciones
+ * 12. Responsive (adaptación a móviles)
+ * 
+ * SISTEMA DE TEMAS:
+ * Las variables CSS permiten cambiar todo el esquema de colores
+ * modificando solo los valores de las custom properties.
+ * 
+ * RELACIONADO CON:
+ * - public/index.html: Carga esta hoja de estilos
+ * - src/App.js: Aplica clases y usa variables CSS
+ * - src/utils/themes.js: Define valores para diferentes temas
+ * ============================================================================
+ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+@import './lexical-editor.css';
+@import './canvas-note.css';
+/* drag-handles.css removido al deshabilitar grips */
 
 /* =============================================================================
    SECCIÓN 1: VARIABLES CSS (CUSTOM PROPERTIES)
@@ -62,10 +83,10 @@
   /* Fondo secundario (sidebar, paneles) */
   --bg-tertiary: #1d1d1d;
   /* Fondo terciario (elementos elevados) */
-  --bg-hover: rgba(255, 255, 255, 0.05);
-  /* Efecto hover sutil */
-  --bg-active: rgba(0, 113, 227, 0.1);
-  /* Elemento activo/seleccionado */
+  --bg-hover: #252525;
+  /* Efecto hover sutil - SIN transparencia */
+  --bg-active: #1a3a52;
+  /* Elemento activo/seleccionado - SIN transparencia */
 
   /* --------------------------------------------------------------------------
      PALETA DE COLORES - TEXTO
@@ -96,10 +117,10 @@
   /* --------------------------------------------------------------------------
      BORDES Y SEPARADORES
      -------------------------------------------------------------------------- */
-  --border-color: rgba(255, 255, 255, 0.08);
-  /* Borde estándar sutil */
-  --border-hover: rgba(255, 255, 255, 0.15);
-  /* Borde al hacer hover */
+  --border-color: #2a2a2a;
+  /* Borde estándar sutil - SIN transparencia */
+  --border-hover: #3a3a3a;
+  /* Borde al hacer hover - SIN transparencia */
 
   /* --------------------------------------------------------------------------
      SOMBRAS (efectos de profundidad)
@@ -126,14 +147,84 @@
   /* --------------------------------------------------------------------------
      DIMENSIONES FIJAS
      -------------------------------------------------------------------------- */
-  --sidebar-width: 280px;
-  /* Ancho de la barra lateral expandida */
-  --sidebar-collapsed: 60px;
-  /* Ancho de la barra lateral colapsada */
-  --header-height: 50px;
-  /* Altura de la barra superior */
-  --footer-height: 45px;
-  /* Altura del footer del editor */
+  --sidebar-width: 320px;
+  /* Ancho de la barra lateral expandida - más espacioso */
+  --sidebar-collapsed: 70px;
+  /* Ancho de la barra lateral colapsada - más cómodo */
+  --titlebar-height: 38px;
+  /* Altura de la barra de título - más espacio */
+  --header-height: 60px;
+  /* Altura de la barra superior - más respiratorio */
+  --footer-height: 52px;
+  /* Altura del footer del editor - más cómodo */
+
+  /* --------------------------------------------------------------------------
+     SISTEMA DE FUENTES (jerarquía tipográfica mejorada)
+     -------------------------------------------------------------------------- */
+  --font-family-primary: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  /* Fuente principal para títulos y elementos importantes */
+  --font-family-secondary: 'SF Pro Text', 'Inter', 'Roboto', -apple-system, sans-serif;
+  /* Fuente secundaria para texto general */
+  --font-family-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+  /* Fuente monoespaciada para código */
+
+  /* --------------------------------------------------------------------------
+     ESCALA TIPOGRÁFICA (sistema de tamaños consistente)
+     -------------------------------------------------------------------------- */
+  --font-size-xs: 12px;
+  /* Texto muy pequeño (etiquetas, metadata) */
+  --font-size-sm: 14px;
+  /* Texto pequeño (descripciones, hints) */
+  --font-size-base: 16px;
+  /* Texto base (párrafos, contenido general) */
+  --font-size-lg: 18px;
+  /* Texto grande (subtítulos, énfasis) */
+  --font-size-xl: 20px;
+  /* Texto extra grande (títulos secundarios) */
+  --font-size-2xl: 24px;
+  /* Títulos grandes */
+  --font-size-3xl: 30px;
+  /* Títulos extra grandes */
+  --font-size-4xl: 36px;
+  /* Títulos enormes */
+
+  /* --------------------------------------------------------------------------
+     INTERLINEADO Y ESPACIADO DE TEXTO
+     -------------------------------------------------------------------------- */
+  --line-height-tight: 1.25;
+  /* Para títulos y texto denso */
+  --line-height-normal: 1.5;
+  /* Para párrafos y lectura cómoda */
+  --line-height-relaxed: 1.75;
+  /* Para texto largo y mejor legibilidad */
+  --letter-spacing-tight: -0.02em;
+  /* Para títulos */
+  --letter-spacing-normal: 0;
+  /* Para texto general */
+  --letter-spacing-wide: 0.02em;
+  /* Para texto que necesita más aire */
+
+  /* --------------------------------------------------------------------------
+     Z-INDEX HIERARCHY (jerarquía de apilamiento)
+     -------------------------------------------------------------------------- */
+  --z-base: 1;
+  /* Elementos base */
+  --z-dropdown: 10;
+  /* Dropdowns y tooltips pequeños */
+  --z-sidebar: 100;
+  /* Sidebar y paneles laterales */
+  --z-header: 1000;
+  /* Headers y barras superiores */
+  --z-toolbar: 5000;
+  /* Toolbars flotantes */
+  --z-modal-backdrop: 8000;
+  /* Fondos de modales */
+  --z-modal: 9000;
+  /* Modales y diálogos */
+  --z-notification: 9500;
+  /* Notificaciones */
+  --z-splash: 9999;
+  /* Splash screen (máxima prioridad) */
 
   /* --------------------------------------------------------------------------
      RADIO DE BORDES (consistencia visual)
@@ -162,9 +253,9 @@
   /* Incluye padding y border en el tamaño total */
 }
 
-/* Tamaño base de fuente (14px = 1rem) */
+/* Tamaño base de fuente (16px = 1rem) - más legible */
 html {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* Estilos base del body */
@@ -173,13 +264,16 @@ body {
   /* Fondo principal */
   color: var(--text-primary);
   /* Color de texto principal */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-family-secondary);
+  /* Usar variable de fuente secundaria */
+  font-size: var(--font-size-base);
+  /* Tamaño base mejorado */
   height: 100vh;
   /* Altura completa de la ventana */
   overflow: hidden;
   /* Sin scroll en el body */
-  line-height: 1.5;
-  /* Interlineado cómodo */
+  line-height: var(--line-height-normal);
+  /* Interlineado cómodo usando variable */
   -webkit-font-smoothing: antialiased;
   /* Mejor renderizado de fuentes en WebKit */
   -moz-osx-font-smoothing: grayscale;
@@ -229,29 +323,43 @@ body {
 /* =============================================================================
    SECCIÓN 3: LAYOUT PRINCIPAL
    =============================================================================
-   Estructura general de la aplicación: contenedor, sidebar y contenido principal
+   Estructura de layout de la aplicación usando Flexbox.
+   
+   JERARQUÍA:
+   app-root (column layout)
+     ├── TitleBar (fixed height 32px)
+     └── app-container (flex: 1, row layout)
+         ├── Sidebar (fixed width)
+         └── Main Content (flex: 1)
    ============================================================================ */
+
+/* Contenedor raíz de toda la aplicación */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
 
 /* Contenedor principal de toda la aplicación */
 .app-container {
   display: flex;
   /* Flexbox para layout horizontal */
-  height: 100vh;
-  /* Altura completa */
-  width: 100vw;
-  /* Ancho completo */
-  background: var(--bg-primary);
+  flex: 1;
+  /* Ocupa todo el espacio disponible después del TitleBar */
+  overflow: hidden;
+  /* El scroll lo manejan los hijos */
 }
 
 /* Contenido principal (área a la derecha del sidebar) */
 .main-content {
   flex: 1;
-  /* Ocupa todo el espacio disponible */
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  /* Apila elementos verticalmente */
   overflow: hidden;
-  /* El scroll lo manejan los hijos */
   transition: margin-left var(--transition-slow);
 }
 
@@ -260,52 +368,334 @@ body {
   margin-left: 0;
 }
 
+/* Contenedor del área del editor / split */
+.main-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ============================================
+   SPELLING CONTEXT MENU (PROFESSIONAL)
+   ============================================ */
+
+.spelling-context-menu {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  min-width: 200px;
+  padding: 6px;
+  animation: contextMenuFade 0.15s ease-out;
+}
+
+@keyframes contextMenuFade {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spelling-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  text-align: left;
+}
+
+.spelling-menu-item:hover:not(.disabled) {
+  background: var(--bg-hover);
+}
+
+.spelling-menu-item.disabled {
+  color: var(--text-secondary);
+  cursor: default;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.spelling-menu-item i {
+  width: 16px;
+  text-align: center;
+  color: var(--accent-blue);
+  font-size: 0.9rem;
+}
+
+.spelling-menu-item.suggestion i {
+  color: var(--accent-green);
+}
+
+.spelling-menu-item .shortcut {
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.spelling-menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 6px 0;
+}
+
+.menu-row {
+  display: flex;
+  gap: 4px;
+  padding: 0 4px;
+}
+
+.spelling-menu-item.half {
+  flex: 1;
+  justify-content: center;
+  padding: 6px 4px;
+  min-width: 0;
+  font-size: 0.75rem;
+}
+
+.spelling-menu-item.suggestion-header {
+  background: var(--bg-active);
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.spelling-menu-item.suggestion-header .arrow-icon {
+  margin-left: auto;
+  font-size: 0.6rem;
+  opacity: 0.5;
+}
+
+/* Submenu "Corrector" */
+.spelling-section {
+  position: relative;
+}
+
+.spelling-submenu {
+  display: none;
+  position: absolute;
+  left: calc(100% + 4px);
+  top: -6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  min-width: 180px;
+  padding: 6px;
+  z-index: 10001;
+}
+
+.spelling-section:hover .spelling-submenu {
+  display: block;
+}
+
+/* Asegurar que si el submenu se sale por la derecha, aparezca a la izquierda */
+.spelling-context-menu[data-side="left"] .spelling-submenu {
+  left: auto;
+  right: calc(100% + 4px);
+}
+
+/* ============================================
+   LINK TOOLTIP
+   ============================================ */
+
+.link-tooltip {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  min-width: 280px;
+  padding: 8px;
+  animation: contextMenuFade 0.15s ease-out;
+}
+
+.link-tooltip-url {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.link-tooltip-url i {
+  color: var(--accent-blue);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.link-tooltip-url span {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.link-tooltip-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+.link-tooltip-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.link-tooltip-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  text-align: left;
+}
+
+.link-tooltip-button:hover {
+  background: var(--bg-hover);
+}
+
+.link-tooltip-button i {
+  width: 16px;
+  text-align: center;
+  color: var(--accent-blue);
+  font-size: 0.9rem;
+}
+
+.link-tooltip-button:last-child i {
+  color: var(--accent-red);
+}
+
 /* =============================================================================
    SECCIÓN 4: PANTALLA DE CARGA (SPLASH SCREEN)
    =============================================================================
    Pantalla inicial que se muestra mientras carga la aplicación.
-   Muestra el logo de Block Guard con animación.
+   Muestra el logo de Bloopy con animación.
    ============================================================================ */
 
 .splash-screen {
   position: fixed;
-  /* Cubre toda la pantalla */
   inset: 0;
-  /* top:0, right:0, bottom:0, left:0 */
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background: #1d1d1d;
+  color: #f5f5f7;
+  z-index: var(--z-splash);
+}
+
+.splash-layout {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  background: #252525;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.splash-image-col {
+  flex: 1;
+  min-width: 0;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.splash-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Crédito del artista sobre la imagen del splash */
+.splash-art-credit {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.splash-art-credit:hover {
+  background: rgba(0, 0, 0, 0.85);
+  border-color: #0078d4;
+  color: #0078d4;
+  transform: translateY(-2px);
+}
+
+.splash-art-credit i {
+  font-size: 1rem;
+}
+
+.splash-content-col {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #2a2a2a;
-  /* Fondo gris como solicitado */
-  color: var(--text-primary);
-  z-index: 99999;
-  /* Por encima de todo */
+  padding: 40px;
+  gap: 16px;
+  border-radius: 0;
 }
 
-/* Contenedor del logo en splash screen */
-.splash-logo {
-  font-size: 6rem;
-  /* Logo grande */
-  color: var(--accent-blue);
-  /* Color azul del logo */
-  margin-bottom: 24px;
+.splash-logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
   animation: splash-pulse 2s ease-in-out infinite;
-  /* Animación de pulso */
 }
 
-/* Nombre de la app en splash */
 .splash-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin: 0;
   letter-spacing: -0.02em;
 }
 
-/* Subtítulo en splash */
 .splash-subtitle {
-  font-size: 1rem;
-  color: var(--text-secondary);
+  font-size: 0.95rem;
+  color: #86868b;
+  margin: 0;
 }
 
 /* Animación de pulso para el logo */
@@ -336,15 +726,14 @@ body {
 .sidebar {
   width: var(--sidebar-width);
   /* Ancho fijo definido en variables */
-  background: var(--bg-secondary);
-  /* Fondo secundario */
-  border-right: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  /* Fondo terciario para consistencia con TopBar y TabBar */
   display: flex;
   flex-direction: column;
   position: relative;
-  z-index: 1000;
-  /* Por encima del contenido */
-  transition: width var(--transition-slow), transform var(--transition-slow);
+  z-index: var(--z-sidebar);
+  /* Jerarquía de sidebar */
+  transition: width var(--transition-slow), transform var(--transition-slow), border-right var(--transition-slow), overflow var(--transition-slow);
   flex-shrink: 0;
   /* No se encoge */
 }
@@ -374,8 +763,8 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 1002;
-  /* Por encima del sidebar */
+  z-index: var(--z-sidebar);
+  /* Mismo nivel que sidebar */
   color: var(--text-secondary);
   transition: var(--transition-fast);
 }
@@ -386,91 +775,197 @@ body {
   border-color: var(--accent-blue);
 }
 
+/* Handle de resize del sidebar */
+.sidebar-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: ew-resize;
+  background: transparent;
+  transition: var(--transition-fast);
+  z-index: calc(var(--z-sidebar) + 1);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.sidebar-resize-handle:hover {
+  background: var(--accent-blue);
+}
+
+.sidebar-resize-handle:active {
+  background: var(--accent-blue);
+  cursor: ew-resize;
+}
+
+/* Prevenir selección de texto durante resize */
+body.resizing-sidebar {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: ew-resize !important;
+}
+
+body.resizing-sidebar * {
+  cursor: ew-resize !important;
+}
+
 /* --------------------------------------------------------------------------
-   HEADER DEL SIDEBAR (perfil de usuario)
+   HEADER DEL SIDEBAR (simplificado - sin perfil ni navegación)
    -------------------------------------------------------------------------- */
 
 .sidebar-header {
   padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  /* Más espaciado para menos compactación */
   border-bottom: 1px solid var(--border-color);
-  gap: 12px;
-}
-
-/* Contenedor del perfil de usuario */
-.user-profile-header {
+  min-height: 56px;
+  /* Más altura para respiración visual */
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 1;
-  min-width: 0;
-  /* Permite truncar texto */
+  justify-content: space-between;
 }
 
-/* Contenedor del avatar */
-.avatar-container {
-  width: 40px;
-  height: 40px;
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--bg-tertiary);
-  border: 2px solid var(--accent-blue);
+/* --------------------------------------------------------------------------
+   ICON BAR (Barra de iconos de acción en el header)
+   Requisitos: 7.1, 7.2, 7.3, 7.4, 7.5
+   -------------------------------------------------------------------------- */
+
+.sidebar-icon-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 8px;
+  /* Espaciado entre iconos */
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 10px;
+  border-radius: 8px;
+  transition: var(--transition-fast);
+  min-width: 40px;
+  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  /* No se encoge */
 }
 
-.avatar-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Cubre todo el espacio */
-}
-
-/* Placeholder cuando no hay avatar */
-.avatar-placeholder {
-  font-size: 1rem;
-  color: var(--text-secondary);
-}
-
-/* Información del usuario (nombre y estado) */
-.user-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  /* Permite truncar */
-}
-
-.user-name {
-  font-size: 0.9rem;
-  font-weight: 600;
+.icon-btn:hover {
+  background: var(--bg-hover);
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  /* Añade "..." si es muy largo */
 }
 
-.user-status {
-  font-size: 0.7rem;
-  color: var(--accent-green);
+.icon-btn:active {
+  background: var(--bg-active);
+  transform: scale(0.95);
+}
+
+/* Dropdown de proyectos */
+.icon-dropdown {
+  position: relative;
+}
+
+.project-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  max-width: 280px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: calc(var(--z-sidebar) + 10);
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dropdown-list {
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+}
+
+.dropdown-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: var(--transition-fast);
+  color: var(--text-primary);
+  font-size: 0.9rem;
 }
 
-/* Indicador visual de estado online */
-.user-status::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  background: var(--accent-green);
-  border-radius: 50%;
+.dropdown-item:hover {
+  background: var(--bg-hover);
+}
+
+.dropdown-item.selected {
+  background: var(--accent-blue-dim);
+  color: var(--accent-blue);
+}
+
+.dropdown-item.empty {
+  cursor: default;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.dropdown-item.empty:hover {
+  background: transparent;
+}
+
+.dropdown-item i:first-child,
+.dropdown-item svg:first-child {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.dropdown-item i.fa-check,
+.dropdown-item svg.icon-check {
+  margin-left: auto;
+  color: var(--accent-blue);
+  font-size: 0.8rem;
+}
+
+.dropdown-item span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* --------------------------------------------------------------------------
@@ -482,12 +977,14 @@ body {
   /* Ocupa todo el espacio restante */
   overflow-y: auto;
   /* Scroll si hay muchos proyectos */
-  padding: 12px 0;
+  padding: 20px 0;
+  /* Más padding vertical */
 }
 
 /* Sección del sidebar (ej: PROYECTOS) */
 .sidebar-section {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+  /* Más espaciado vertical entre secciones */
 }
 
 /* Cabecera de sección con título y botón añadir */
@@ -521,35 +1018,8 @@ body {
   color: var(--text-primary);
 }
 
-/* Botones de navegación del sidebar (Home, Recientes, Tutorial) */
-.sidebar-nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 4px;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  border-radius: var(--border-radius-md);
-  text-align: left;
-  font-size: 0.9rem;
-  transition: var(--transition-fast);
-}
-
-.sidebar-nav-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-  transform: translateX(2px);
-}
-
-.sidebar-nav-btn i {
-  width: 20px;
-  text-align: center;
-  color: var(--accent-blue);
-}
+/* Botones de navegación del sidebar - ELIMINADOS (Requisito 8.1, 8.2, 8.3) */
+/* .sidebar-nav y .nav-btn eliminados según rediseño */
 
 /* Lista de proyectos */
 .project-list {
@@ -562,20 +1032,37 @@ body {
   margin: 2px 8px;
 }
 
+/* Proyecto activo (cuando está siendo visualizado en ProjectViewer) */
+.project-item.viewing {
+  background: var(--bg-active);
+  border-radius: var(--border-radius-md);
+  margin-left: 5px;
+}
+
+.project-item.viewing .project-header {
+  background: var(--bg-active);
+}
+
+.project-item.viewing .project-name {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
 /* Cabecera de un proyecto (nombre + toggle) */
 .project-header {
-  padding: 10px 12px;
   border-radius: var(--border-radius-md);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
   font-size: 0.9rem;
   color: var(--text-secondary);
   transition: var(--transition-fast);
+  min-width: 0;
+  /* Permite truncar texto */
 }
 
-.project-header:hover {
+.project-header:hover:not(:has(.folder-header:hover)):not(:has(.file-item:hover)) {
   background: var(--bg-hover);
   color: var(--text-primary);
 }
@@ -595,7 +1082,7 @@ body {
 }
 
 .folder-icons-wrapper:hover {
-  background: rgba(0, 113, 227, 0.15);
+  background: var(--bg-hover);
 }
 
 /* Icono de flecha para expandir/colapsar */
@@ -718,85 +1205,285 @@ body {
 
 /* Lista de archivos dentro de un proyecto */
 .file-list {
+  display: block;
   list-style: none;
-  padding-left: 20px;
+  padding-left: 0;
   margin-top: 4px;
+  margin-bottom: 0;
 }
 
-/* Item individual de archivo */
+/* ============================================
+   ARCHIVOS - ESTRUCTURA BASE UNIFICADA
+   ============================================ */
+
 .file-item {
-  padding: 6px 10px;
   margin: 1px 0;
   border-radius: 4px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+/* Hover SOLO en el file-item-inner directo */
+.file-item>.file-item-inner:hover {
+  background: var(--bg-hover);
+}
+
+.file-item.active>.file-item-inner {
+  background: var(--bg-active);
+}
+
+.file-item.active>.file-item-inner {
+  background: var(--bg-active);
+}
+
+.file-item.active .file-name {
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+/* Contenedor interno flex - SIEMPRE INLINE */
+.file-item-inner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  cursor: pointer;
+  gap: 8px;
+  padding: 6px 10px;
+  min-height: 32px;
+  border-radius: 4px;
   transition: var(--transition-fast);
 }
 
-.file-item:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+/* Indicador (toggle o progreso) - ancho fijo para alineación */
+.file-indicator {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
 }
 
-/* Archivo actualmente seleccionado/activo */
-.file-item.active {
-  background: var(--bg-active);
+/* ============================================
+   TOGGLE PARA ARCHIVOS CON HIJOS
+   ============================================ */
+
+/* Por defecto: mostrar icono, ocultar toggle */
+.file-item.has-children .file-icon-display {
+  display: flex;
+}
+
+.file-item.has-children .file-toggle-btn {
+  display: none;
+}
+
+/* En hover del inner directo: intercambiar */
+.file-item.has-children>.file-item-inner:hover .file-icon-display {
+  display: none;
+}
+
+.file-item.has-children>.file-item-inner:hover .file-toggle-btn {
+  display: flex;
+}
+
+/* Botón de toggle */
+.file-toggle-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: var(--transition-fast);
+}
+
+.file-toggle-btn:hover {
+  background: var(--bg-tertiary);
   color: var(--accent-blue);
 }
 
-/* Contenedor del indicador de progreso circular */
-.file-progress {
-  flex-shrink: 0;
+.file-item.has-children.expanded .file-toggle-btn {
+  color: var(--accent-blue);
 }
 
-/* SVG de progreso circular */
-.circle-progress {
+/* ============================================
+   CIRCULAR PROGRESS REMOVED
+   Replaced with custom icon system (see CUSTOM FILE ICON DISPLAY section)
+   ============================================ */
+
+/* ============================================
+   CUSTOM FILE ICON DISPLAY
+   ============================================ */
+
+.file-icon-display {
   width: 18px;
   height: 18px;
-  transform: rotate(-90deg);
-  /* Inicia desde arriba */
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--accent-blue);
 }
 
-/* Círculo de fondo (gris) */
-.circle-progress .bg {
-  fill: none;
-  stroke: var(--border-color);
-  stroke-width: 3;
+.file-icon-display i {
+  line-height: 1;
 }
 
-/* Círculo de progreso (coloreado) */
-.circle-progress .fg {
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-  transition: stroke-dashoffset var(--transition-normal);
-}
+/* ============================================
+   INFO DEL ARCHIVO (nombre + meta)
+   ============================================ */
 
-/* Nombre del archivo */
-.file-name {
+.file-info {
   flex: 1;
+  min-width: 0;
+  /* Crucial para text-overflow */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.file-name {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
-/* Contenedor de información del archivo */
-.file-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  gap: 2px;
+.file-type-icon {
+  margin-right: 6px;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
 }
 
-/* Timestamp de última actualización */
-.file-updated {
+.file-item>.file-item-inner:hover .file-type-icon,
+.file-item.active .file-type-icon {
+  color: var(--accent-blue);
+}
+
+.file-item>.file-item-inner:hover .file-name,
+.file-item.active .file-name {
+  color: var(--text-primary);
+}
+
+/* Contador de hijos */
+.children-count {
   font-size: 0.75rem;
   color: var(--text-tertiary);
-  opacity: 0.8;
+  margin-left: 4px;
+  font-weight: normal;
+}
+
+/* Metadata (timestamp) */
+.file-meta {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  line-height: 1;
+}
+
+/* ============================================
+   BOTÓN DE MENÚ
+   ============================================ */
+
+.file-menu-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.file-item>.file-item-inner:hover .file-menu-btn {
+  opacity: 1;
+}
+
+.file-menu-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent-blue);
+}
+
+/* ============================================
+   LISTA DE SUBARCHIVOS
+   ============================================ */
+
+.subfiles-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-left: 19px;
+  /* Alinea con el centro del toggle padre (20px/2 + gap) */
+  margin-top: 2px;
+  margin-bottom: 4px;
+  animation: slideDown 0.2s ease;
+}
+
+.subfiles-list .file-item {
+  margin: 1px 0;
+}
+
+.subfiles-list .file-item-inner {
+  padding: 4px 8px;
+  /* Más compacto para hijos */
+  min-height: 28px;
+}
+
+/* Hover para subarchivos */
+.subfiles-list .file-item>.file-item-inner:hover {
+  background: var(--bg-hover);
+}
+
+.subfiles-list .file-name {
+  font-size: 0.8rem;
+}
+
+.subfiles-list .file-progress {
+  width: 14px;
+  height: 14px;
+}
+
+.subfiles-list .file-icon-display {
+  width: 14px;
+  height: 14px;
+  font-size: 12px;
+}
+
+/* Animación de expansión */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+/* ============================================
+   DRAG & DROP ESTADOS
+   ============================================ */
+
+.file-item.drag-over>.file-item-inner {
+  background: var(--bg-active);
+  border-radius: 4px;
+  outline: 1px dashed var(--accent-blue);
 }
 
 /* Botón para añadir nuevo archivo */
@@ -819,83 +1506,274 @@ body {
   border-color: var(--accent-blue);
 }
 
-/* Elemento de carpeta en el árbol */
+/* ============================================
+   CARPETAS (estructura similar a archivos)
+   ============================================ */
+
 .folder-item {
   margin: 2px 0;
 }
 
-/* Cabecera de carpeta */
 .folder-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  min-height: 32px;
+  min-width: 0;
+  position: relative;
+}
+
+.folder-header:hover:not(:has(.file-item:hover)):not(:has(.folder-header:hover)) {
+  background: var(--bg-hover);
+}
+
+.folder-indicator {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+/* Both icons occupy the same grid cell (stacked) */
+.folder-indicator>* {
+  grid-area: 1 / 1;
+}
+
+.folder-toggle {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
   border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  cursor: pointer;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: opacity 0.15s ease;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  padding: 0;
 }
 
-.folder-header:hover {
-  background: var(--bg-hover);
+.folder-header:hover .folder-toggle {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.folder-icon {
+  color: var(--accent-blue);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  transition: opacity 0.15s ease;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.folder-header:hover .folder-icon {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.folder-name {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.folder-header:hover .folder-name {
   color: var(--text-primary);
 }
 
-/* Contenido de una carpeta (subarchivos) */
-.folder-contents {
-  list-style: none;
-  padding-left: 20px;
-}
-
-/* Estilos para nodos padres que no son carpetas (archivos con hijos) */
-.parent-item {
-  margin: 2px 0;
-}
-
-.parent-header {
-  padding: 8px 12px;
-  border-radius: var(--border-radius-md);
+.folder-menu-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  cursor: pointer;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--transition-fast);
 }
 
-.parent-header:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+.folder-header:hover .folder-menu-btn {
+  opacity: 1;
+  pointer-events: auto;
 }
 
-.parent-file-icon {
-  color: var(--text-secondary);
+.folder-menu-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent-blue);
 }
 
-.folder-contents .drag-over,
-.parent-header.drag-over,
+.folder-contents {
+  list-style: none;
+  padding: 0;
+  padding-left: 16px;
+  margin-left: 19px;
+  border-left: 1px solid var(--border-color);
+  margin-top: 2px;
+}
+
 .folder-header.drag-over {
-  background: rgba(0, 0, 0, 0.12);
-  border-radius: 6px;
+  background: var(--bg-active);
+  border-radius: 4px;
+  outline: 1px dashed var(--accent-blue);
 }
 
 /* --------------------------------------------------------------------------
-   FOOTER DEL SIDEBAR (configuración)
+   WORKSPACE ROOT DROP ZONE
+   -------------------------------------------------------------------------- */
+
+.workspace-root-drop-zone {
+  margin: 12px;
+  padding: 16px;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-md);
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.workspace-root-drop-zone i {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.workspace-root-drop-zone.drag-over {
+  border-color: var(--accent-blue);
+  background: var(--bg-hover);
+  color: var(--accent-blue);
+}
+
+.workspace-root-drop-zone.drag-over i {
+  color: var(--accent-blue);
+}
+
+/* --------------------------------------------------------------------------
+   FOOTER DEL SIDEBAR (perfil de usuario)
    -------------------------------------------------------------------------- */
 
 .sidebar-footer {
-  padding: 12px;
+  padding: 10px;
   border-top: 1px solid var(--border-color);
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+/* Contenedor del perfil de usuario en el footer */
+.user-profile-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-fast);
+}
+
+.user-profile-footer:hover {
+  background: var(--bg-hover);
+}
+
+/* Contenedor del avatar */
+.avatar-container {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-container img,
+.avatar-container .avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Placeholder cuando no hay avatar */
+.avatar-placeholder {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Información del usuario (nombre y estado) */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-status {
+  font-size: 0.75rem;
+  color: var(--accent-green);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Indicador visual de estado online */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  display: inline-block;
 }
 
 /* --------------------------------------------------------------------------
    PROJECT VIEWER (visor de proyecto) - estilos limpios y modernos
    -------------------------------------------------------------------------- */
 .project-viewer-container {
-  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  flex: 1;
+  overflow: hidden;
 }
 
 .project-viewer-header {
@@ -903,13 +1781,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-}
-
-.project-viewer-header .header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
+  width: 100%;
 }
 
 .back-btn-project-viewer {
@@ -931,16 +1803,6 @@ body {
   color: var(--text-primary);
   border-color: var(--accent-blue);
   transform: translateX(-2px);
-}
-
-.project-viewer-title {
-  margin: 0;
-  font-size: 1.2em;
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 
 .header-actions {
@@ -968,7 +1830,7 @@ body {
 .btn-project-viewer:hover {
   background: var(--accent-blue-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+
 }
 
 .btn-project-viewer:active {
@@ -976,21 +1838,21 @@ body {
 }
 
 .btn-new-file {
-  background: #34c759;
+  background: var(--accent-green);
 }
 
 .btn-new-file:hover {
-  background: #2fa550;
-  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
+  background: var(--accent-green);
+  filter: brightness(0.9);
 }
 
 .btn-new-folder {
-  background: #ff9500;
+  background: var(--accent-orange);
 }
 
 .btn-new-folder:hover {
-  background: #e68a00;
-  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);
+  background: var(--accent-orange);
+  filter: brightness(0.9);
 }
 
 .project-viewer-tree {
@@ -1007,14 +1869,48 @@ body {
   border: none;
   background: transparent;
   color: var(--text-secondary);
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.toggle-folder-btn:hover {
+  background: var(--bg-hover);
+  color: var(--accent-blue);
+}
+
+.project-folder-icon svg {
+  color: var(--accent-blue);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.project-view-icon,
+.project-actions {
+  opacity: 0;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.project-header:hover .project-view-icon,
+.project-header:hover .project-actions {
+  opacity: 1;
+  color: var(--accent-blue);
+}
+
+.project-header:hover {
+  background: var(--bg-hover);
 }
 
 .toggle-folder-btn:hover {
@@ -1116,6 +2012,249 @@ body {
    arrastrar la ventana, pero es respetuoso del -webkit-app-region.
    ============================================================================ */
 
+/* ============================================================================
+   TITLE BAR - Barra de título personalizada
+   ============================================================================ */
+
+.title-bar {
+  height: var(--titlebar-height);
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  -webkit-app-region: drag;
+  user-select: none;
+  position: relative;
+  z-index: var(--z-header);
+  /* Jerarquía de header */
+  width: 100%;
+}
+
+.title-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+  margin-left: 8px;
+}
+
+.title-bar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  /* Dejar que se pueda draggear a través del texto del medio */
+}
+
+.title-bar-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.title-bar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.title-bar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  -webkit-app-region: no-drag;
+  justify-content: flex-end;
+}
+
+/* Menu Dropdown Button */
+.title-bar-menu-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.title-bar-menu-btn:hover,
+.title-bar-menu-btn.active {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Action Buttons (Undo/Redo) */
+.title-bar-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 11px;
+  padding: 4px 8px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.title-bar-action-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.title-bar-action-btn i {
+  font-size: 11px;
+}
+
+/* Dropdown Container & Menu */
+.dropdown-container {
+  position: relative;
+}
+
+.title-bar-dropdown {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+
+  width: 240px;
+  padding: 6px;
+  z-index: 10000;
+  animation: slideInDown 0.2s ease;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.dropdown-item i {
+  width: 16px;
+  text-align: center;
+}
+
+.dropdown-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 6px 0;
+}
+
+/* Submenu */
+.dropdown-submenu {
+  position: relative;
+}
+
+.submenu-content {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+
+  width: 200px;
+  padding: 6px;
+  margin-left: 2px;
+}
+
+.dropdown-submenu:hover .submenu-content {
+  display: block;
+}
+
+.submenu-trigger i:last-child {
+  margin-left: auto;
+  font-size: 10px;
+}
+
+.title-bar-btn {
+  width: 46px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+  font-size: 10px;
+}
+
+.title-bar-btn:hover {
+  background: var(--bg-hover);
+}
+
+.title-bar-btn.close-btns:hover {
+  background: var(--accent-red);
+  color: white;
+}
+
+/* Botón de cerrar (X) */
+.close-btns {
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: absolute;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  z-index: 10;
+}
+
+.close-btns:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.title-bar-btn i {
+  font-size: 10px;
+}
+
+/* ============================================================================
+   TOP BAR - Barra superior con breadcrumb y acciones
+   ============================================================================ */
+
 .top-bar {
   height: var(--header-height);
   display: flex;
@@ -1123,7 +2262,7 @@ body {
   align-items: center;
   padding: 0 24px;
   border-bottom: 1px solid var(--border-color);
-  background: var(--bg-primary);
+  background: var(--bg-tertiary);
   flex-shrink: 0;
 
   /* Hacer toda la barra draggable para arrastrar la ventana */
@@ -1148,7 +2287,8 @@ body {
   /* Split layout when viewing a project: left viewer + right editor */
   .project-split {
     display: flex;
-    height: calc(100vh - var(--header-height) - var(--footer-height));
+    flex: 1;
+    overflow: hidden;
   }
 
   .project-viewer-container {
@@ -1243,7 +2383,7 @@ body {
   }
 
   .action-btn.danger:hover {
-    background: rgba(255, 59, 48, 0.08);
+    background: var(--bg-hover);
   }
 
   /* Hacer area arrastrable */
@@ -1295,7 +2435,7 @@ body {
 .breadcrumb-item.clickeable {
   color: var(--accent-blue);
   cursor: pointer;
-  border-bottom: 1px solid transparent;
+
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
@@ -1325,8 +2465,67 @@ body {
 /* Indicador de cambios sin guardar */
 .unsaved-indicator {
   color: var(--accent-orange);
-  margin-left: 4px;
+  margin-left: 6px;
+  font-size: 1.2em;
+  animation: pulse 2s ease-in-out infinite;
 }
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Indicador de borrador local */
+.draft-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-tertiary);
+  color: var(--accent-orange);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--accent-orange);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.draft-indicator i {
+  font-size: 0.7rem;
+}
+
+/* Indicador de guardando */
+.saving-indicator {
+  color: var(--accent-blue);
+  margin-left: 6px;
+  font-size: 0.9em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.saving-indicator i {
+  font-size: 0.85em;
+}
+
+/* Botón de guardar cuando está guardando */
+.btn-primary-small.saving {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-primary-small:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 
 /* Contenedor de botones de acción */
 .editor-actions {
@@ -1339,24 +2538,22 @@ body {
   -webkit-app-region: no-drag;
 }
 
-/* Botón primario pequeño (Guardar) */
-.btn-primary-small {
+/* Botón primario */
+.btn-primary {
   background: var(--accent-blue);
   color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.8rem;
+  padding: 14px 24px;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
   font-weight: 500;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
   transition: var(--transition-fast);
+  min-height: 48px;
   white-space: nowrap;
 }
 
-.btn-primary-small:hover {
+.btn-primary:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
 }
@@ -1417,6 +2614,530 @@ body {
   color: white;
 }
 
+/* Contenedor del dropdown de exportación */
+.export-dropdown-container {
+  position: relative;
+}
+
+/* Dropdown menu de exportación */
+.export-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+
+  min-width: 240px;
+  padding: 8px;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Opción individual del dropdown */
+.export-option {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+/* =============================================================================
+   SECCIÓN: COMENTARIOS (SIDEBAR DERECHO)
+   ============================================================================= */
+.comments-sidebar {
+  width: 320px;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  right: 0;
+  top: var(--header-height);
+  bottom: 0;
+  z-index: var(--z-sidebar);
+  box-shadow: var(--shadow-lg);
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.comments-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.comments-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comments-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comment-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  transition: var(--transition-fast);
+}
+
+.comment-card:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.comment-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.comment-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comment-avatar {
+  width: 28px;
+  height: 28px;
+  background: var(--accent-blue);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.comment-meta-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-author-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.comment-timestamp {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+.comment-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+}
+
+.comment-action-btn.delete:hover {
+  color: var(--accent-red);
+  background: var(--bg-hover);
+}
+
+.comment-card-body {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.comment-input-area {
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-color);
+}
+
+.comment-input-area textarea {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  padding: 10px;
+  resize: none;
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+
+.comment-input-area textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+/* =============================================================================
+   SECCIÓN: ANALÍTICAS DE TEXTO (MODAL)
+   ============================================================================= */
+.modern-analytics .analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.analytics-stat-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all var(--transition-fast);
+}
+
+.analytics-stat-card:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-hover);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.char-icon {
+  background: var(--bg-tertiary);
+  color: var(--accent-blue);
+}
+
+.word-icon {
+  background: var(--bg-tertiary);
+  color: var(--accent-green);
+}
+
+.sentence-icon {
+  background: var(--bg-tertiary);
+  color: var(--accent-purple);
+}
+
+.paragraph-icon {
+  background: var(--bg-tertiary);
+  color: var(--accent-orange);
+}
+
+.time-icon {
+  background: var(--bg-tertiary);
+  color: var(--accent-pink);
+}
+
+.avg-icon {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.stat-data {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.stat-value small {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* =============================================================================
+   SECCIÓN: COMPONENTE FILESELECTOR (MODAL / SPLIT VIEW)
+   ============================================================================= */
+.file-selector-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  margin: 2px 0;
+}
+
+.file-selector-item:hover {
+  background: var(--bg-hover);
+}
+
+.file-selector-item.active {
+  background: var(--bg-active);
+}
+
+.file-selector-item .name {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.file-selector-item:hover .name {
+  color: var(--text-primary);
+}
+
+.file-selector-item .folder-icon {
+  color: var(--accent-blue);
+}
+
+.file-selector-children {
+  margin-left: 10px;
+  border-left: 1px solid var(--border-color);
+  padding-left: 4px;
+}
+
+/* =============================================================================
+   SECCIÓN: CORRECTOR ORTOGRÁFICO (MODAL)
+   ============================================================================= */
+.spellcheck-header.modern-header {
+  padding: 24px;
+  background: linear-gradient(to bottom, var(--bg-tertiary), var(--bg-secondary));
+  border-bottom: 1px solid var(--border-color);
+}
+
+.spellcheck-title-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.spellcheck-icon-large {
+  width: 56px;
+  height: 56px;
+  background: var(--bg-tertiary);
+  color: var(--accent-blue);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+}
+
+.spellcheck-title-text h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.spellcheck-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.spellcheck-grid.modern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  padding: 20px;
+}
+
+.spell-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all var(--transition-fast);
+}
+
+.spell-card:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.spell-card.active {
+  border-color: var(--accent-green);
+  background: var(--bg-tertiary);
+}
+
+.spell-card-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.spell-card-index {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.spell-card-details span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.btn-spell-action {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+}
+
+.btn-spell-action:hover {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+.btn-spell-action.success {
+  background: var(--accent-green);
+  color: white;
+  border-color: var(--accent-green);
+}
+
+/* Menús Contextuales */
+.context-menu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 180px;
+  padding: 6px;
+  z-index: 10000;
+  animation: contextMenuFade 0.15s ease-out;
+}
+
+.context-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+.context-item:hover {
+  background: var(--bg-hover);
+}
+
+.context-item i {
+  width: 16px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.context-item:hover i {
+  color: var(--accent-blue);
+}
+
+.context-item.danger {
+  color: var(--text-primary);
+}
+
+.context-item.danger:hover {
+  background: var(--bg-hover);
+}
+
+.context-item.danger i {
+  color: var(--accent-red);
+}
+
+.context-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 6px 0;
+}
+
+@keyframes contextMenuFade {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
 /* Controles de ventana (Custom Title Bar) */
 .window-controls {
   display: flex;
@@ -1444,7 +3165,7 @@ body {
 }
 
 .window-control-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-hover);
   color: var(--text-primary);
 }
 
@@ -1456,7 +3177,7 @@ body {
 
 /* Estado activo (maximized button) */
 .window-control-btn:active {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
 }
 
 
@@ -1746,6 +3467,321 @@ body {
 }
 
 /* =============================================================================
+   NUEVO DISEÑO WELCOME SCREEN
+   ============================================================================ */
+
+.welcome-content-new {
+  max-width: 1200px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Layout de 2 columnas: Saludo | Recientes */
+.welcome-two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 32px;
+  align-items: start;
+}
+
+/* Columna izquierda: Saludo */
+.welcome-greeting-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.welcome-greeting-column h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.welcome-subtitle-new {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Columna derecha: Archivos recientes */
+.recent-files-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-files-column h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.recent-files-column h2 i {
+  color: var(--accent-blue);
+}
+
+/* Header con saludo (legacy - mantener para compatibilidad) */
+.welcome-header-section {
+  margin-bottom: 32px;
+}
+
+.welcome-greeting {
+  width: 100%;
+}
+
+.welcome-greeting h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+/* Sección principal: Nota (izquierda) y Recientes (derecha) */
+.welcome-main-section {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+  align-items: flex-start;
+}
+
+/* Sección de nota rápida (izquierda) */
+.welcome-note-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.welcome-quick-note {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.welcome-quick-note label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.welcome-quick-note label i {
+  color: var(--accent-orange);
+}
+
+.quick-note-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: var(--transition-fast);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.quick-note-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  background: var(--bg-tertiary);
+}
+
+.char-count {
+  align-self: flex-end;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Sección de archivos recientes (derecha) */
+.recent-files-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.recent-files-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.recent-files-section h2 i {
+  color: var(--accent-blue);
+}
+
+/* Lista de archivos recientes */
+.recent-files-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.recent-file-item:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+  transform: translateX(4px);
+}
+
+.recent-file-item .file-icon {
+  color: var(--accent-blue);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.recent-file-item .file-name {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-files-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.recent-files-section h2 i {
+  color: var(--accent-blue);
+}
+
+/* Estado vacío */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.empty-state p {
+  margin: 8px 0;
+}
+
+.empty-hint {
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+}
+
+/* Footer con workspace info */
+.welcome-footer-section {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.workspace-info-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  transition: var(--transition-fast);
+}
+
+.workspace-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.workspace-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.workspace-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.workspace-label {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.workspace-path {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-path i {
+  color: var(--accent-blue);
+  flex-shrink: 0;
+}
+
+.btn-change-workspace {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 10px 16px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.btn-change-workspace:hover {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+/* =============================================================================
    SECCIÓN 8: EDITOR (ÁREA DE EDICIÓN DE TEXTO)
    =============================================================================
    Componente principal donde el usuario escribe y edita contenido.
@@ -1755,12 +3791,85 @@ body {
 /* Contenedor del editor */
 .editor-wrapper {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  padding: 40px 60px;
-  scroll-behavior: smooth;
+  padding: 0;
+  margin-right: 0;
+  background: var(--bg-primary);
+}
+
+.editor-layout {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.editor-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Banner de borrador restaurable */
+.draft-banner {
+  background: linear-gradient(90deg, var(--accent-orange), var(--accent-orange));
+  filter: brightness(1.1);
+  color: white;
+  padding: 10px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-modal-backdrop);
+  /* Jerarquía de modal backdrop */
+}
+
+.draft-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.draft-actions button {
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.draft-actions button:hover {
+  background: white;
+  color: var(--accent-orange);
+}
+
+.draft-actions .btn-restore {
+  background: white;
+  color: var(--accent-orange);
+  border-color: white;
+}
+
+.draft-actions .btn-restore:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-1px);
 }
 
 /* Contenedor interno del editor */
@@ -1769,30 +3878,27 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
+  padding: 60px 40px;
+  /* Padding movido aquí */
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  /* permitir que hijos con overflow se reduzcan correctamente */
+  min-height: 100%;
+  overflow-x: hidden;
+  /* NUEVO: Evita scroll horizontal en contenedor */
 }
 
 /* Contenedor principal que agrupa editor y su sidebar interno */
 .editor-main {
   display: flex;
+  flex-direction: column;
+  /* Cambiado a column para que sub-archivos estén debajo del body */
   width: 100%;
   gap: 16px;
   align-items: stretch;
-  /* estirar para que la sidebar ocupe toda la altura */
-  height: 100%;
-}
-
-.editor-body {
-  flex: 1;
-  /* el cuerpo del editor ocupa el espacio restante */
-  /* Permitir que el texto largo no se salga del contenedor */
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: anywhere;
+  height: auto;
+  /* Permitir que crezca con el contenido */
+  min-height: 100%;
 }
 
 /* Metadatos del archivo (icono + título) */
@@ -1801,10 +3907,15 @@ body {
   padding-bottom: 20px;
   margin-bottom: 30px;
   display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
+  gap: 12px;
   align-self: stretch;
   width: 100%;
+}
+
+.file-header-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 /* Icono grande del archivo */
@@ -1813,11 +3924,34 @@ body {
   color: var(--accent-blue);
 }
 
+/* Botón de icono clickable */
+.file-icon-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-icon-button:hover {
+  background-color: var(--hover-bg);
+  transform: scale(1.05);
+}
+
+.file-icon-button:active {
+  transform: scale(0.95);
+}
+
 /* Cabecera del archivo activo */
 .active-file-header {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
+  flex: 1;
 }
 
 /* Título del archivo */
@@ -1828,74 +3962,161 @@ body {
   margin: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
 }
 
-/* Cuerpo editable del editor */
-.editor-body {
-  width: 100%;
-  min-height: 60vh;
-  outline: none;
-  font-size: 1.1rem;
-  line-height: 1.8;
+.active-file-title:hover {
+  background: var(--bg-hover);
+}
+
+/* Input para editar título */
+.active-file-title-input {
+  font-size: 2rem;
+  font-weight: 700;
   color: var(--text-primary);
-  text-align: left;
-  padding-bottom: 200px;
-  word-wrap: break-word;
-  white-space: normal;
-  overflow-wrap: break-word;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--accent-blue);
+  border-radius: 4px;
+  padding: 4px 8px;
+  outline: none;
+  width: 100%;
+}
+
+/* Controles de metadata */
+.metadata-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.metadata-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metadata-field label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.metadata-select {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.metadata-select:hover {
+  border-color: var(--accent-blue);
+}
+
+.metadata-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.2);
+}
+
+.metadata-input {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  width: 100px;
+  transition: var(--transition-fast);
+}
+
+.metadata-input:hover {
+  border-color: var(--accent-blue);
+}
+
+.metadata-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.2);
+}
+
+.metadata-unit {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+
+/* =============================================================================
+   EDITOR BODY - LEXICAL
+   =============================================================================
+   NOTA: Los estilos del .editor-body están definidos en lexical-editor.css
+   Este archivo solo contiene estilos complementarios para elementos hijos
+   ============================================================================ */
+
+/* =============================================================================
+   PLACEHOLDERS - DESHABILITADOS (Manejados por Lexical)
+   =============================================================================
+   Los placeholders ahora son manejados por PlaceholderPlugin en LexicalEditor
+   ============================================================================ */
+
+/* Placeholder cuando está vacío - DESHABILITADO */
+.editor-body:empty::before {
+  display: none;
+  /* Manejado por PlaceholderPlugin */
+}
+
+/* Placeholders contextuales - DESHABILITADOS */
+.editor-body p:empty:focus::before,
+.editor-body p:focus:has(br:only-child)::before,
+.editor-body h1:empty:focus::before,
+.editor-body h2:empty:focus::before,
+.editor-body h3:empty:focus::before,
+.editor-body blockquote:empty:focus::before,
+.editor-body pre:empty:focus::before {
+  display: none;
+  /* Manejado por Lexical */
 }
 
 /* Párrafos del editor */
 .editor-body p {
   position: relative;
-  margin-bottom: 0.8em;
-  min-height: 1.5em;
+  margin-bottom: 1rem;
+  min-height: 1.5rem;
 }
 
 /* Párrafo vacío (placeholder visual) */
 .editor-body p:empty::before {
   content: '\00a0';
-  /* Espacio no rompible */
 }
 
-/* Efecto hover en párrafos */
-.editor-body p:hover {
+/* Asegurar que los bloques vacíos tengan altura mínima */
+.editor-body h1:empty,
+.editor-body h2:empty,
+.editor-body h3:empty,
+.editor-body blockquote:empty,
+.editor-body pre:empty {
+  min-height: 1.5em;
+  position: relative;
+}
+
+/* Efecto hover en párrafos - DESHABILITADO para Lexical */
+/* .editor-body p:hover {
   background: var(--bg-hover);
-}
+} */
 
-/* Botón de comentario en párrafo (hover) - DESHABILITADO */
+/* Botón de comentario en párrafo - DESHABILITADO */
 .paragraph-comment-btn {
   display: none;
 }
 
-/* Botón visible cuando se hace hover al párrafo - DESHABILITADO */
 .editor-body p:hover .paragraph-comment-btn {
   display: none;
-}
-
-.paragraph-comment-btn:hover {
-  transform: translateY(-50%) scale(1.15);
-  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.5);
-  background: var(--accent-blue-dark, #0056b3);
-}
-
-/* Contador de comentarios en botón */
-.paragraph-comment-btn .comment-count {
-  position: absolute;
-  background: var(--accent-red, #ff4444);
-  color: white;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6rem;
-  font-weight: 700;
-  top: -4px;
-  right: -4px;
-  min-width: 16px;
-  padding: 0 2px;
 }
 
 /* Quitar hover cuando el editor tiene foco */
@@ -1962,13 +4183,12 @@ body {
 
 /* Citas */
 .editor-body blockquote {
-  border-left: 3px solid var(--accent-blue);
+  border-left: 4px solid var(--accent-blue);
   padding-left: 16px;
   margin: 1em 0;
 }
 
 .editor-body.enable-blockquote-style blockquote {
-  color: var(--text-secondary);
   font-style: italic;
 }
 
@@ -1983,20 +4203,13 @@ body {
   margin: 0.3em 0;
 }
 
-/* Placeholder cuando está vacío */
-[contenteditable]:empty::before {
-  content: attr(placeholder);
-  color: var(--text-tertiary);
-  pointer-events: none;
-}
-
 /* --------------------------------------------------------------------------
    BARRA DE HERRAMIENTAS DE FORMATO (flotante)
    -------------------------------------------------------------------------- */
 
 .formatting-toolbar {
   position: fixed;
-  z-index: 5000;
+  z-index: var(--z-toolbar);
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-lg);
@@ -2004,7 +4217,10 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  box-shadow: var(--shadow-float);
+  box-shadow: var(--shadow-md);
+  /* Añadido para profundidad */
+  opacity: 1;
+  transition: opacity var(--transition-normal);
 }
 
 /* Grupo de botones relacionados */
@@ -2062,30 +4278,151 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  /* Añadido para profundidad */
   padding: 8px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  box-shadow: var(--shadow-float);
-  z-index: 5001;
-  min-width: 100px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  z-index: var(--z-toolbar);
+  /* Jerarquía de toolbar */
+  min-width: 120px;
 }
 
-/* Opción de color individual */
-.color-option {
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
+.highlight-picker button,
+.text-color-picker button {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid var(--border-color);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.highlight-picker button:hover,
+.text-color-picker button:hover {
+  transform: scale(1.15);
+
+  border-color: var(--accent-blue);
+  z-index: 1;
+}
+
+.highlight-picker button:active,
+.text-color-picker button:active {
+  transform: scale(1.05);
+}
+
+/* Botón de remover highlight */
+.remove-highlight {
+  background: var(--bg-tertiary) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.remove-highlight:hover {
+  background: var(--accent-red) !important;
+  color: white;
+}
+
+/* --------------------------------------------------------------------------
+   MENÚ CONTEXTUAL DE CORRECCIÓN ORTOGRÁFICA
+   -------------------------------------------------------------------------- */
+
+.spell-menu {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+
+  min-width: 200px;
+  max-width: 300px;
+  overflow: hidden;
+  animation: fadeInScale 0.15s ease-out;
+}
+
+.spell-menu-header {
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.spell-menu-header i {
+  color: var(--accent-red);
+  font-size: 0.85rem;
+}
+
+.spell-menu-header span {
+  color: var(--accent-red);
+  font-style: italic;
+}
+
+.spell-menu-section {
+  padding: 8px 0;
+}
+
+.spell-menu-label {
+  padding: 8px 16px 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spell-menu-item {
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
   cursor: pointer;
   transition: var(--transition-fast);
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
 }
 
-.color-option:hover {
-  transform: scale(1.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+.spell-menu-item:hover:not(.disabled) {
+  background: var(--bg-active);
+  color: var(--accent-blue);
+}
+
+.spell-menu-item.suggestion {
+  font-weight: 500;
+  padding-left: 24px;
+}
+
+.spell-menu-item.suggestion:hover {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.spell-menu-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spell-menu-item i {
+  font-size: 0.85rem;
+  width: 16px;
+  text-align: center;
+}
+
+.spell-menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
 }
 
 
@@ -2102,10 +4439,151 @@ body {
   align-items: center;
   padding: 0 24px;
   background: var(--bg-secondary);
-  border-top: 1px solid var(--border-color);
   flex-shrink: 0;
   gap: 20px;
 }
+
+/* =============================================================================
+   SUB-FILES FOOTER - Sección de sub-archivos en el footer del editor
+   ============================================================================ */
+
+.subfiles-footer {
+  position: static;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-color);
+  padding: 16px 24px;
+  max-height: none;
+  overflow: visible;
+  z-index: auto;
+  box-shadow: none;
+  margin-left: 0;
+  transition: none;
+}
+
+.subfiles-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.subfiles-header h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.subfiles-header h4 i {
+  color: var(--accent-blue);
+  font-size: 0.85rem;
+}
+
+.btn-add-subfile {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-add-subfile:hover {
+  background: var(--accent-blue-hover);
+  transform: translateY(-1px);
+}
+
+.btn-add-subfile i {
+  font-size: 0.75rem;
+}
+
+.subfiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.subfile-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.subfile-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+
+}
+
+.subfile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.subfile-card-header i {
+  color: var(--accent-blue);
+  font-size: 0.9rem;
+}
+
+.subfile-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subfile-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.subfile-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-primary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.subfile-progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.subfile-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.subfile-progress-percent {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* =============================================================================
+   FIN SUB-FILES FOOTER
+   ============================================================================ */
 
 /* Estadísticas (líneas, palabras, caracteres) */
 .stats {
@@ -2178,7 +4656,7 @@ body {
 /* Badge de estado del archivo */
 .status-badge {
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: 6px;
   font-size: 0.7rem;
   font-weight: 600;
   color: white;
@@ -2212,6 +4690,107 @@ body {
 .btn-upgrade-footer:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Botón Check X/Y en el footer */
+.btn-checklist-footer {
+  background: transparent;
+  border: 1px solid;
+  padding: 5px 10px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.btn-checklist-footer:hover {
+  opacity: 1;
+  background: var(--bg-hover);
+}
+
+.btn-checklist-footer.all-done {
+  opacity: 1;
+}
+
+/* Wrapper del dropdown de checklist */
+.checklist-dropdown-wrapper {
+  position: relative;
+}
+
+/* Dropdown hacia arriba — sin overlay */
+.checklist-dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  min-width: 260px;
+  max-width: 340px;
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-toolbar);
+  overflow: hidden;
+}
+
+.checklist-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.checklist-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  transition: var(--transition-fast);
+}
+
+.checklist-modal-close:hover {
+  color: var(--accent-red);
+}
+
+.checklist-dropdown-body {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.checklist-modal-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.checklist-modal-item input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+  flex-shrink: 0;
+}
+
+.checklist-modal-item span.done {
+  text-decoration: line-through;
+  color: var(--text-secondary);
 }
 
 /* Contenedor de meta de caracteres */
@@ -2278,7 +4857,7 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  opacity: 0.95;
   /* Efecto de desenfoque */
   z-index: 10000;
   display: none;
@@ -2303,7 +4882,7 @@ body {
   max-height: 90vh;
   overflow: hidden;
   position: relative;
-  box-shadow: var(--shadow-lg);
+
   animation: modal-appear 0.3s ease;
 }
 
@@ -2586,9 +5165,10 @@ body {
   color: var(--text-secondary);
 
   overflow-wrap: anywhere;
-   word-break: break-word;
+  word-break: break-word;
 
 }
+
 /* Acciones del avatar */
 .avatar-actions {
   display: flex;
@@ -2675,7 +5255,7 @@ body {
 .setting-input:focus {
   outline: none;
   border-color: var(--accent-blue);
-  box-shadow: 0 0 8px rgba(0, 113, 227, 0.2);
+
 }
 
 /* Grid de colores */
@@ -2715,7 +5295,7 @@ body {
 
 .color-picker:hover {
   border-color: var(--accent-blue);
-  box-shadow: 0 0 12px rgba(0, 113, 227, 0.2);
+
 }
 
 .color-value {
@@ -2750,9 +5330,9 @@ body {
 }
 
 .btn-primary:hover {
-  background: rgba(0, 113, 227, 0.8);
+  background: var(--accent-blue);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+
 }
 
 .btn-sub {
@@ -2780,11 +5360,17 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
 /* Item de estado individual */
 .state-config-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  grid-template-areas: 
+    "reorder color fields count delete";
   align-items: center;
   gap: 12px;
   padding: 12px;
@@ -2792,8 +5378,83 @@ body {
   border-radius: var(--border-radius-md);
 }
 
+/* Estado base — sin reorder, sin delete, sin select */
+.state-config-item.state-base {
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas: "color dot fields";
+  opacity: 0.9;
+}
+
+.state-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.state-base-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.state-base-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Estado custom — con checklist */
+.state-config-item.state-custom {
+  grid-template-columns: auto auto 1fr auto;
+  grid-template-areas: "reorder color fields delete";
+  align-items: flex-start;
+}
+
+/* Editor de checklist dentro de un estado custom */
+.checklist-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.checklist-editor-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checklist-editor-item input {
+  flex: 1;
+  font-size: 0.82rem;
+  padding: 5px 8px;
+}
+
+.btn-sub-small {
+  background: transparent;
+  border: 1px dashed var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition-fast);
+  width: fit-content;
+}
+
+.btn-sub-small:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
 /* Botones de reordenar estados */
 .state-reorder {
+  grid-area: reorder;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -2835,25 +5496,40 @@ body {
   padding: 2px !important;
 }
 
+/* Color picker en su área */
+.state-config-item > .color-picker-small {
+  grid-area: color;
+}
+
 /* Campos de estado */
 .state-fields {
-  flex: 1;
+  grid-area: fields;
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0; /* Permite que los inputs se encojan */
 }
 
 .state-fields input {
-  flex: 1;
+  width: 100%;
+  min-width: 0;
 }
 
 /* Select de tipo de conteo */
 .state-config-item select {
+  grid-area: count;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-sm);
   padding: 8px 12px;
   color: var(--text-primary);
   font-size: 0.85rem;
+  min-width: 120px;
+}
+
+/* Botón eliminar en su área */
+.state-config-item > .btn-icon-small.danger {
+  grid-area: delete;
 }
 
 /* Badge de estado por defecto */
@@ -3105,19 +5781,6 @@ body {
   cursor: pointer;
 }
 
-/* Estilo para blockquotes dentro del cuerpo del editor */
-.editor-body blockquote {
-  border-left: 4px solid var(--accent-blue);
-  margin: 1em 0;
-  padding: 0.5em 1em;
-  background: transparent;
-}
-
-.editor-body.enable-blockquote-style blockquote {
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
 /* Inputs de página */
 .page-inputs {
   flex: 1;
@@ -3222,10 +5885,18 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  /* Añadido para profundidad */
   padding: 6px;
   min-width: 180px;
-  box-shadow: var(--shadow-float);
-  z-index: 10000;
+  z-index: 10050;
+}
+
+.file-menu-btn,
+.folder-menu-btn,
+.project-actions {
+  position: relative;
+  z-index: 3;
 }
 
 /* Item del menú contextual */
@@ -3251,7 +5922,164 @@ body {
 }
 
 .context-item.danger:hover {
-  background: rgba(255, 59, 48, 0.1);
+  background: var(--bg-hover);
+}
+
+.find-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.find-overlay-match {
+  position: absolute;
+  background: rgba(255, 214, 0, 0.25);
+  border-radius: 2px;
+}
+
+.find-overlay-current {
+  position: absolute;
+  background: rgba(0, 113, 227, 0.28);
+  outline: 1px solid rgba(0, 113, 227, 0.65);
+  border-radius: 2px;
+}
+
+/* =============================================================================
+   SPELLING CONTEXT MENU
+   =============================================================================
+   Menú contextual para sugerencias ortográficas.
+   ============================================================================ */
+
+.spelling-context-menu {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  min-width: 220px;
+  max-width: 300px;
+  z-index: 10000;
+}
+
+.spelling-menu-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
+}
+
+.misspelled-word {
+  font-weight: 600;
+  color: var(--accent-red);
+  font-size: 0.95rem;
+}
+
+.spelling-menu-label {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.spelling-suggestions {
+  margin-bottom: 4px;
+}
+
+.spelling-suggestion-item {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: var(--transition-fast);
+}
+
+.spelling-suggestion-item:hover {
+  background: var(--bg-hover);
+  color: var(--accent-blue);
+}
+
+.spelling-suggestion-item i {
+  font-size: 0.8rem;
+  color: var(--accent-green);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.spelling-suggestion-item:hover i {
+  opacity: 1;
+}
+
+.spelling-no-suggestions {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.spelling-menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 0;
+}
+
+.spelling-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spelling-action-item {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: var(--transition-fast);
+}
+
+.spelling-action-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.spelling-action-item i {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+
+.spelling-action-item:hover i {
+  color: var(--accent-blue);
+}
+
+/* Marcado de palabras mal escritas en el editor */
+.misspelled-text {
+  text-decoration: underline wavy var(--accent-red);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.misspelled-text:hover {
+  background: var(--bg-hover);
+  border-radius: 2px;
 }
 
 /* =============================================================================
@@ -3266,7 +6094,7 @@ body {
   bottom: 40px;
   /* Más alejado del borde */
   right: 24px;
-  z-index: 10001;
+  z-index: var(--z-notification);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -3281,7 +6109,7 @@ body {
   gap: 12px;
   font-size: 0.9rem;
   animation: notification-slide-in 0.3s ease;
-  box-shadow: var(--shadow-md);
+
   min-width: 280px;
 }
 
@@ -3327,9 +6155,10 @@ body {
 .comments-sidebar {
   position: fixed;
   right: 0;
-  top: 0;
-  bottom: 0;
-  width: 350px;
+  top: 32px;
+  height: calc(100vh - 32px);
+  width: 400px;
+  max-width: 90vw;
   background: var(--bg-secondary);
   border-left: 1px solid var(--border-color);
   z-index: 1000;
@@ -3346,6 +6175,28 @@ body {
 
   to {
     transform: translateX(0);
+  }
+}
+
+/* Overlay oscuro detrás del sidebar */
+.comments-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 
@@ -3493,14 +6344,16 @@ body {
 /* Contenedor del onboarding */
 .onboarding-container {
   position: fixed;
-  inset: 0;
+  top: var(--titlebar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: var(--bg-primary);
-  z-index: 20000;
+  z-index: var(--z-modal);
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  padding: 40px;
+  padding: 0;
 }
 
 /* Contenido del onboarding */
@@ -3508,6 +6361,19 @@ body {
   max-width: 500px;
   width: 100%;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+/* Contenido del onboarding - Paso 0 (layout especial) */
+.onboarding-content:has(.language-step-container) {
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  padding: 0;
 }
 
 /* Logo del onboarding */
@@ -3691,8 +6557,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.9);
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -3710,7 +6575,7 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-lg);
+
   animation: modal-appear 0.3s ease;
 }
 
@@ -3721,6 +6586,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+  /* Base para el botón absoluto */
 }
 
 .modal-header h2 {
@@ -3737,6 +6604,10 @@ body {
 }
 
 .modal-close-btn {
+  position: absolute;
+  /* Posicionamiento absoluto solicitado */
+  top: 16px;
+  right: 16px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -3749,6 +6620,7 @@ body {
   justify-content: center;
   border-radius: var(--border-radius-md);
   transition: var(--transition-fast);
+  z-index: 10;
 }
 
 .modal-close-btn:hover {
@@ -3866,22 +6738,14 @@ body {
    Se muestra como elemento del contenido principal (no modal).
    ============================================================================ */
 
-/* Wrapper del editor para posicionamiento del sidebar */
-.editor-wrapper {
-  position: relative;
-  height: 100%;
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
+/* Contenedor interno del editor */
 .editor-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
   position: relative;
-  overflow: hidden;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 40px;
+  flex: 1;
 }
 
 .project-viewer-container {
@@ -3911,19 +6775,6 @@ body {
   align-items: center;
   background: var(--bg-secondary);
   flex-shrink: 0;
-}
-
-.project-viewer-header .header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.project-viewer-header h2 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: var(--text-primary);
-  font-weight: 500;
 }
 
 .project-viewer-header .back-btn {
@@ -4189,7 +7040,7 @@ body {
 
 .shortcut-item.conflict {
   border-color: var(--accent-red, #ff4444);
-  background: rgba(255, 68, 68, 0.1);
+  background: var(--bg-tertiary);
 }
 
 .shortcut-info {
@@ -4242,7 +7093,7 @@ body {
   background: var(--accent-blue);
   color: white;
   border-color: var(--accent-blue);
-  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.2);
+
 }
 
 /* Input para editar shortcuts */
@@ -4263,7 +7114,7 @@ body {
 
 .shortcut-edit-input:focus {
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
+
   background: var(--bg-active);
 }
 
@@ -4271,7 +7122,7 @@ body {
 .shortcut-item.editing {
   background: var(--bg-active);
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.1);
+
 }
 
 /* Botón para resetear atajo */
@@ -4313,7 +7164,7 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: var(--shadow-md);
+
   animation: slideDownIn 0.15s ease;
   max-width: 900px;
   width: calc(100% - 80px);
@@ -4371,7 +7222,7 @@ body {
 .find-replace-input:focus {
   outline: none;
   border-color: var(--accent-blue);
-  box-shadow: 0 0 8px rgba(0, 113, 227, 0.2);
+
 }
 
 /* Contador de coincidencias */
@@ -4478,19 +7329,19 @@ body {
 }
 
 .shortcut-message-warning {
-  background: rgba(255, 193, 7, 0.1);
+  background: var(--bg-tertiary);
   border-color: var(--accent-yellow);
   color: #f57f17;
 }
 
 .shortcut-message-success {
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--bg-tertiary);
   border-color: var(--accent-green);
   color: #2e7d32;
 }
 
 .shortcut-message-error {
-  background: rgba(244, 67, 54, 0.1);
+  background: var(--bg-tertiary);
   border-color: var(--accent-red);
   color: #c62828;
 }
@@ -4538,7 +7389,7 @@ body {
 }
 
 .find-replace-btn.replace-btn:hover:not(:disabled) {
-  background: rgba(52, 199, 89, 0.8);
+  background: var(--accent-green);
   border-color: var(--accent-green);
 }
 
@@ -4549,7 +7400,7 @@ body {
 }
 
 .find-replace-btn.replace-all-btn:hover:not(:disabled) {
-  background: rgba(175, 82, 222, 0.8);
+  background: var(--accent-purple);
   border-color: var(--accent-purple);
 }
 
@@ -4560,6 +7411,163 @@ body {
 .find-replace-btn.close-btn:hover {
   color: var(--accent-red);
   border-color: var(--accent-red);
+}
+
+/* =============================================================================
+   SECCIÓN: ICON SELECTOR (SELECTOR DE ICONOS)
+   =============================================================================
+   Modal para seleccionar iconos personalizados para archivos.
+   Organizado por categorías con tabs y grid de iconos.
+   ============================================================================ */
+
+.icon-selector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: modal-appear 0.2s ease;
+}
+
+.icon-selector-modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.icon-selector-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icon-selector-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.icon-selector-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-fast);
+}
+
+.icon-selector-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.icon-selector-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  overflow-x: auto;
+}
+
+.icon-selector-tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-md);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.icon-selector-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.icon-selector-tab.active {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.icon-selector-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  align-content: start;
+}
+
+.icon-selector-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  min-height: 90px;
+}
+
+.icon-selector-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+.icon-selector-item i {
+  font-size: 1.8rem;
+  color: var(--accent-blue);
+  transition: var(--transition-fast);
+}
+
+.icon-selector-item:hover i {
+  color: var(--accent-blue-hover);
+  transform: scale(1.1);
+}
+
+.icon-selector-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  --webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.icon-selector-item:hover .icon-selector-label {
+  color: var(--text-primary);
 }
 
 /* =============================================================================
@@ -4631,21 +7639,52 @@ body {
 
 
 /* ============================================
+   ICON SELECTOR MINIMALIST (Dropdown version)
+   ============================================ */
+.icon-selector-dropdown.minimalist {
+  width: 280px !important;
+  max-height: 250px !important;
+  border-radius: var(--border-radius-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.icon-selector-grid-simple {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 8px;
+  padding: 12px;
+  overflow-y: auto;
+  max-height: 250px;
+}
+
+.icon-selector-item-simple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.1rem;
+}
+
+.icon-selector-item-simple:hover {
+  background: var(--bg-hover);
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  transform: scale(1.1);
+}
+
+/* ============================================
    CORRECCIONES - BLOCKQUOTE CONDICIONAL
    ============================================ */
-
-/* Blockquote base (siempre aplicado) */
-.editor-body blockquote {
-  border-left: 3px solid var(--accent-blue);
-  padding-left: 16px;
-  margin: 1em 0;
-}
-
-/* Blockquote con estilo (solo si está habilitado) */
-.editor-body.enable-blockquote-style blockquote {
-  color: var(--text-secondary);
-  font-style: italic;
-}
 
 /* ============================================
    CORRECCIONES - LAYOUT PROJECT VIEWER
@@ -4653,17 +7692,38 @@ body {
 
 /* Layout dividido para ProjectViewer + Editor */
 .project-split {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 0;
-  height: calc(100vh - var(--header-height) - var(--footer-height));
-  transition: grid-template-columns 0.3s ease;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  flex: 1;
+  overflow: hidden;
 }
 
 .project-split-right {
-  overflow-y: auto;
-  border-left: 1px solid var(--border-color);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
   background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Overlay absoluto del ProjectViewer - no afecta el layout */
+.project-viewer-overlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  bottom: 12px;
+  z-index: var(--z-sidebar);
+  display: flex;
+  pointer-events: none;
+}
+
+.project-viewer-overlay .project-viewer-container {
+  pointer-events: all;
+  box-shadow: var(--shadow-lg);
 }
 
 /* Mensaje cuando no hay archivo abierto en split view */
@@ -4699,6 +7759,7 @@ body {
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -4747,7 +7808,7 @@ body {
 
 .shortcut-item.editing {
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.1);
+
 }
 
 .shortcut-info {
@@ -4825,19 +7886,19 @@ body {
 }
 
 .shortcut-message-success {
-  background: rgba(52, 199, 89, 0.1);
+  background: var(--bg-tertiary);
   border: 1px solid var(--accent-green);
   color: var(--accent-green);
 }
 
 .shortcut-message-warning {
-  background: rgba(255, 149, 0, 0.1);
+  background: var(--bg-tertiary);
   border: 1px solid var(--accent-orange);
   color: var(--accent-orange);
 }
 
 .shortcut-message-error {
-  background: rgba(255, 59, 48, 0.1);
+  background: var(--bg-tertiary);
   border: 1px solid var(--accent-red);
   color: var(--accent-red);
 }
@@ -4847,6 +7908,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -4879,7 +7941,7 @@ body {
 .setting-select:focus {
   outline: none;
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+
 }
 
 .setting-select option {
@@ -4928,7 +7990,7 @@ body {
   background: var(--bg-tertiary);
   border-color: var(--accent-blue);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+
 }
 
 .language-option:active {
@@ -4953,13 +8015,727 @@ body {
     grid-template-columns: 1fr;
     max-width: 300px;
   }
-  
+
   .language-option {
     min-height: 100px;
     padding: 20px;
   }
-  
+
   .language-flag {
     font-size: 40px;
   }
+}
+
+/* ============================================================================
+ * PASO 0 DEL ONBOARDING - LAYOUT DE 2 COLUMNAS CON IMAGEN
+ * ============================================================================ */
+
+/* Contenedor principal del paso de idioma */
+.language-step-container {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-secondary);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+/* Columna Izquierda - Imagen (40%) */
+.language-step-left {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-tertiary);
+  padding: 0;
+  gap: 0;
+  position: relative;
+}
+
+.promo-image-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0;
+  position: relative;
+}
+
+.promo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+/* Botón de crédito del artista - Posicionado sobre la imagen */
+.art-credit-btn {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.art-credit-btn:hover {
+  background: rgba(0, 0, 0, 0.85);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+.art-credit-btn i {
+  font-size: 1rem;
+}
+
+/* Columna Derecha - Selector (60%) */
+.language-step-right {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  text-align: center;
+  overflow-y: auto;
+  border-radius: 0;
+}
+
+/* Ajustes para el logo en el paso 0 */
+.language-step-right .onboarding-logo {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+}
+
+/* Ajustes para el título */
+.language-step-right h1 {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+}
+
+/* Ajustes para el subtítulo */
+.language-step-right p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* Grid de idiomas dentro del paso 0 */
+.language-step-right .language-selector-grid {
+  margin: 24px 0;
+  max-width: 100%;
+}
+
+/* Hint de cambio de idioma */
+.onboarding-hint {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-top: 16px;
+}
+
+/* Responsive para el paso 0 */
+@media (max-width: 768px) {
+  .language-step-container {
+    flex-direction: column;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  .language-step-left {
+    flex: 0 0 auto;
+    padding: 0;
+    max-height: 300px;
+  }
+
+  .language-step-right {
+    flex: 1;
+    padding: 32px 24px;
+  }
+
+  .promo-image-wrapper {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .language-step-left {
+    padding: 0;
+    max-height: 250px;
+  }
+
+  .language-step-right {
+    padding: 24px 20px;
+  }
+
+  .language-step-right .onboarding-logo {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+  }
+
+  .language-step-right h1 {
+    font-size: 1.5rem;
+  }
+  
+  .art-credit-btn {
+    bottom: 12px;
+    left: 12px;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+}
+
+/* ============================================================================
+ * PASOS 1-3 DEL ONBOARDING - LAYOUT DE 2 COLUMNAS CON IMAGEN
+ * ============================================================================ */
+
+/* Contenedor principal para pasos 1-3 (mismo layout que paso 0) */
+.onboarding-step-container {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-secondary);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+/* Columna Izquierda - Imagen (40%) para pasos 1-3 */
+.onboarding-step-left {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-tertiary);
+  padding: 0;
+  gap: 0;
+  position: relative;
+}
+
+/* Columna Derecha - Contenido (60%) para pasos 1-3 */
+.onboarding-step-right {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  text-align: center;
+  overflow-y: auto;
+  border-radius: 0;
+}
+
+/* Ajustar el contenedor de onboarding-content para los nuevos pasos */
+.onboarding-content:has(.onboarding-step-container) {
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  padding: 0;
+}
+
+/* Responsive para pasos 1-3 */
+@media (max-width: 768px) {
+  .onboarding-step-container {
+    flex-direction: column;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  .onboarding-step-left {
+    flex: 0 0 auto;
+    padding: 0;
+    max-height: 300px;
+  }
+
+  .onboarding-step-right {
+    flex: 1;
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .onboarding-step-left {
+    padding: 0;
+    max-height: 250px;
+  }
+
+  .onboarding-step-right {
+    padding: 24px 20px;
+  }
+}
+
+/* ============================================================================
+ * PROJECTVIEWER (VISOR DE PROYECTO) - PANEL INTEGRADO EN LAYOUT
+ * ============================================================================ */
+.project-viewer-container {
+  width: 350px;
+  min-width: 260px;
+  max-width: 380px;
+  height: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  animation: slideInLeft 0.2s ease-out;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.project-viewer-header {
+  padding: 16px;
+  background: transparent;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.project-viewer-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.project-viewer-breadcrumb .breadcrumb-item {
+  cursor: pointer;
+  transition: color 0.2s;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.project-viewer-breadcrumb .breadcrumb-item:hover {
+  color: var(--text-primary);
+}
+
+.project-viewer-breadcrumb .breadcrumb-item.active {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.close-viewer-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-viewer-btn:hover {
+  background: var(--bg-hover);
+  color: var(--accent-red);
+}
+
+.project-viewer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px;
+}
+
+.project-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tree-item {
+  border-radius: var(--border-radius-sm);
+  transition: background 0.15s;
+}
+
+.tree-item-header {
+  display: flex;
+  align-items: center;
+  padding: 7px 8px;
+  gap: 6px;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  min-width: 0;
+}
+
+.tree-item-header:hover {
+  background: var(--bg-hover);
+}
+
+.folder-item .folder-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.file-item {
+  margin-left: 0;
+}
+
+.file-item:hover {
+  background: var(--bg-hover);
+}
+
+.tree-children {
+  margin-left: 18px;
+  border-left: 1px solid var(--border-color);
+  padding-left: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.toggle-folder-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toggle-folder-btn:hover {
+  color: var(--text-primary);
+}
+
+.empty-project-message {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Acciones de archivo restauradas en el visor */
+.file-actions-simple {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-left: auto;
+}
+
+.tree-item-header:hover .file-actions-simple {
+  opacity: 1;
+}
+
+.file-actions-simple .action-btn {
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.file-actions-simple .action-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+}
+
+.file-actions-simple .action-btn.danger:hover {
+  color: var(--accent-red);
+}
+
+/* Re-utilizar y mejorar estilos de archivos simplificados */
+.file-name-simple {
+  flex: 1;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.progress-indicator-mini {
+  width: 36px;
+  height: 3px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Ajustes para el icono del Sidebar */
+.project-view-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 6px;
+  margin-left: auto;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.project-header:hover .project-view-btn {
+  opacity: 1;
+}
+
+.project-view-btn:hover {
+  background: var(--bg-hover);
+  color: var(--accent-primary);
+}
+
+.project-view-icon {
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
+}
+
+/* ============================================
+ * LEXICAL SUBFILES INTEGRATION
+ * ============================================ */
+.lexical-subfile-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  margin: 12px 0;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  max-width: 400px;
+}
+
+.lexical-subfile-card:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-hover);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.lexical-subfile-card.in-editor {
+  margin: 1.5rem 0;
+  max-width: 100%;
+  border-left: 4px solid var(--accent-primary);
+}
+
+.lexical-subfile-node-container {
+  user-select: none;
+  margin: 1em 0;
+}
+
+.lexical-subfile-icon {
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+}
+
+.lexical-subfile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lexical-subfile-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.lexical-subfile-meta {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.lexical-subfile-drag-handle {
+  color: var(--text-tertiary);
+  cursor: grab;
+  padding: 4px;
+}
+
+.lexical-subfile-drag-handle:active {
+  cursor: grabbing;
+}
+
+.lexical-add-subfile-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: transparent;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  max-width: 400px;
+  margin: 12px 0;
+  font-size: 0.85rem;
+}
+
+.lexical-add-subfile-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.editor-integrated-subfiles {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* =============================================================================
+   OPTIMIZACIONES PARA ARCHIVOS GRANDES - Editor.js v4.1.0
+   ============================================================================= */
+
+/* Overlay de carga para archivos grandes */
+.editor-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0.95;
+}
+
+.editor-loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  background: var(--bg-tertiary, #1d1d1d);
+  border-radius: 12px;
+
+}
+
+.editor-loading-spinner i {
+  font-size: 48px;
+  color: var(--accent-blue, #0071e3);
+}
+
+.editor-loading-spinner span {
+  color: var(--text-primary, #f5f5f7);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Placeholders para párrafos virtualizados */
+.paragraph-placeholder {
+  background: transparent;
+  border: none;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Optimización: reducir repaints en párrafos fuera del viewport */
+.editor-body [data-paragraph-id] {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* Optimización: GPU acceleration para toolbar flotante */
+.formatting-toolbar {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+
+/* =============================================================================
+   TOP BAR CON TABS INTEGRADOS
+   ============================================================================= */
+
+.top-bar {
+  height: var(--header-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.top-bar-tabs {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 8px;
+  overflow: hidden;
+  -webkit-app-region: no-drag;
+}
+
+.home-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border-radius: 6px 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  border: 1px solid var(--border-color);
+  border-bottom-color: var(--bg-primary);
+}
+
+.home-tab i {
+  color: var(--accent-blue);
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 16px;
+  -webkit-app-region: no-drag;
+}
+
+/* SubFiles Footer cuando sidebar está colapsado */
+.sidebar.collapsed~.main-content .subfiles-footer,
+.main-content.sidebar-collapsed .subfiles-footer,
+body:has(.sidebar.collapsed) .subfiles-footer {
+  margin-left: 0;
 }

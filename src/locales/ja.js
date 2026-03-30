@@ -65,7 +65,8 @@ export default {
     fullscreen: '全画面',
     minimize: '最小化',
     maximize: '最大化',
-    restore: '復元'
+    restore: '復元',
+    untitled: '無題'
   },
 
   // =============================================================================
@@ -100,6 +101,12 @@ export default {
     createFirstProject: '最初のプロジェクトを作成',
     filesCount: '{count}ファイル',
     workspaceLocation: 'ワークスペースの場所',
+    currentWorkspace: '現在のワークスペース：',
+    changeWorkspace: 'ワークスペースを変更',
+    goodMorning: 'おはようございます',
+    goodAfternoon: 'こんにちは',
+    goodEvening: 'こんばんは',
+    whatToWriteToday: '今日は何を書きますか？',
     features: {
       organize: 'プロジェクトを整理',
       write: '集中して執筆',
@@ -112,7 +119,7 @@ export default {
   // =============================================================================
   splash: {
     checking: '更新を確認中...',
-    loading: 'Block Guardを読み込み中...',
+    loading: 'Bloopyを読み込み中...',
     initializing: '初期化中...',
     almostReady: 'もうすぐ準備完了...'
   },
@@ -121,20 +128,29 @@ export default {
   // ONBOARDING
   // =============================================================================
   onboarding: {
-    welcome: 'Block Guardへようこそ！',
+    welcome: 'Bloopyへようこそ！',
     step1Title: 'プロジェクトを整理',
     step1Desc: 'あなたの保護された執筆スペース。プロジェクトを整理し、リッチな書式で執筆し、進捗を追跡できます。',
     step2Title: 'あなたのプロフィール',
     step2Desc: '太字、斜体、見出しなどで体験をカスタマイズ',
-    step3Title: '進捗の追跡',
-    step3Desc: '目標を設定し、リアルタイムで進捗を確認',
-    step4Title: 'コメントとメモ',
-    step4Desc: '特定の段落にコメントを追加してリマインダーとして使用',
+    step3Title: 'ワークスペースの場所',
+    step3Desc: 'プロジェクトとファイルを保存する場所を選択',
+    step4Title: '進捗の追跡',
+    step4Desc: '目標を設定し、リアルタイムで進捗を確認',
+    step5Title: 'コメントとメモ',
+    step5Desc: '特定の段落にコメントを追加してリマインダーとして使用',
     getStarted: '始める',
     skip: 'スキップ',
     next: '次へ',
     previous: '前へ',
-    finish: '完了'
+    finish: '完了',
+    invalidImage: '有効な画像を選択してください',
+    imageTooLarge: '画像が大きすぎます（最大5MB）',
+    optional: '任意',
+    selectAvatar: 'アバターを選択',
+    workspaceLocation: 'ワークスペースの場所',
+    changeLocation: '場所を変更',
+    selectLocation: '場所を選択'
   },
 
   // =============================================================================
@@ -142,41 +158,66 @@ export default {
   // =============================================================================
   sidebar: {
     projects: 'プロジェクト',
+    looseFiles: '個別ファイル',
     newProject: '新規プロジェクト',
     newFile: '新規ファイル',
-    newFolder: '新規フォルダ',
+    newFileInRoot: 'ルートに新規ファイル',
+    newFolder: '新規セクション',
     newSubfile: '新規サブファイル',
+    newSubFile: '新規サブファイル',
     rename: '名前を変更',
     delete: '削除',
     viewStructure: '構造を表示',
     information: '情報',
     collapse: '折りたたむ',
+    collapseSidebar: 'サイドバーを折りたたむ',
     expand: '展開',
+    expandCollapse: 'クリックして展開/折りたたみ',
+    changeProject: 'プロジェクトを変更',
+    noProjects: 'プロジェクトがありません',
+    noProjectsToCreateFile: '最初にプロジェクトを作成してください',
+    noWorkspace: '最初にワークスペースを開いてください',
     home: 'ホーム',
     recent: '最近',
     tutorial: 'チュートリアル',
     settings: '設定',
     user: 'ユーザー',
     local: 'ローカル',
+    menu: 'メニュー',
     lastUpdated: '最終更新',
     never: 'なし',
     now: '今',
     minutesAgo: '{minutes}分前',
     hoursAgo: '{hours}時間前',
     daysAgo: '{days}日前',
+    fileNamePlaceholder: 'ファイル名',
+    cannotMoveIntoItself: 'ファイルを自身の中に移動することはできません',
+    fileMovedToWorkspaceRoot: 'ファイルをワークスペースのルートに移動しました',
+    fileMovedToProjectRoot: 'ファイルをプロジェクトのルートに移動しました',
+    fileMovedTo: 'ファイルを{projectName}に移動しました',
+    dragFileToProject: 'ファイルを目的のプロジェクトにドラッグしてください',
+    errorMovingFile: 'ファイルの移動エラー',
+    folderInfo: 'フォルダ：{folderName}',
+    fileLabel: 'ファイル',
+    openSettings: '設定を開く',
+    userLabel: 'ユーザー',
     contextMenu: {
       newFile: '新規ファイル',
       newSubfile: '新規サブファイル',
-      newFileInFolder: 'フォルダに新規ファイル',
+      newSubFile: '新規サブファイル',
+      newFileInFolder: 'セクションに新規ファイル',
+      newFolder: '新規フォルダを作成',
+      createNewFile: '新規ファイルを作成',
       renameProject: 'プロジェクト名を変更',
       renameFile: 'ファイル名を変更',
-      renameFolder: 'フォルダ名を変更',
+      renameFolder: 'セクション名を変更',
       deleteProject: 'プロジェクトを削除',
       deleteFile: 'ファイルを削除',
-      deleteFolder: 'フォルダを削除',
+      deleteFolder: 'セクションを削除',
+      moveToProject: 'プロジェクトに移動',
       openEdit: '開く/編集',
       projectInfo: 'プロジェクト情報',
-      folderInfo: 'フォルダ情報'
+      folderInfo: 'セクション情報'
     }
   },
 
@@ -189,15 +230,37 @@ export default {
     charCount: '文字数',
     readingTime: '読了時間',
     minutes: '分',
+    subFiles: 'サブファイル',
+    newSubFile: '新規サブファイル',
+    loading: 'コンテンツを読み込み中...',
+    dragToReorder: 'ドラッグして並べ替え',
+    specialChars: '特殊文字',
+    specialCharsTooltip: '特殊文字',
+    openComments: 'コメントを開く',
+    spellCheckTooltip: 'スペルチェック（Ctrl+K）',
+    closePanel: '閉じる',
+    detailedAnalytics: '詳細なテキスト分析',
+    charCategories: {
+      quotes: '引用符',
+      punctuation: '句読点',
+      math: '数学',
+      arrows: '矢印',
+      symbols: '記号',
+      others: 'その他'
+    },
     formatting: {
       bold: '太字',
+      boldShortcut: '太字（Ctrl+B）',
       italic: '斜体',
+      italicShortcut: '斜体（Ctrl+I）',
       underline: '下線',
+      underlineShortcut: '下線（Ctrl+U）',
       strikethrough: '取り消し線',
       heading1: '見出し1',
       heading2: '見出し2',
       heading3: '見出し3',
       bulletList: '箇条書きリスト',
+      listShortcut: 'リスト',
       numberedList: '番号付きリスト',
       blockquote: '引用',
       code: 'コード',
@@ -242,8 +305,25 @@ export default {
     comments: 'コメント',
     analytics: '分析',
     export: 'エクスポート',
+    exportDocument: 'ドキュメントをエクスポート',
+    exportMarkdown: 'Markdownとしてエクスポート',
+    exportHTML: 'HTMLとしてエクスポート',
+    exportPlainText: 'プレーンテキストとしてエクスポート',
+    exportDOCX: 'DOCXとしてエクスポート',
     import: 'インポート',
-    settings: '設定'
+    settings: '設定',
+    restoreSplitView: '分割ビューを復元（30秒）',
+    exportFormatNotRecognized: 'エクスポート形式が認識されません'
+  },
+
+  // =============================================================================
+  // TABBAR
+  // =============================================================================
+  tabBar: {
+    closeLeftFile: '左のファイルを閉じる',
+    closeRightFile: '右のファイルを閉じる',
+    closeSplitView: '分割ビューを閉じる',
+    splitHorizontally: '水平に分割'
   },
 
   // =============================================================================
@@ -320,7 +400,8 @@ export default {
     mostUsedWords: '最も使用された単語',
     wordFrequency: '単語の頻度',
     close: '閉じる',
-    noText: '分析するテキストがありません'
+    noText: '分析するテキストがありません',
+    summary: 'テキストには<strong>{words}単語</strong>と<strong>{paragraphs}段落</strong>が含まれています。読むのに約<strong>{minutes}分</strong>かかります。'
   },
 
   // =============================================================================
@@ -339,8 +420,30 @@ export default {
     previousSection: '前のセクション',
     nextSection: '次のセクション',
     close: '閉じる',
-    noText: '確認するテキストがありません'
+    noText: '確認するテキストがありません',
+    managePages: 'スペルチェックページを管理',
+    back: '戻る',
+    setDefault: 'デフォルトとして設定',
+    namePlaceholder: '名前',
+    urlPlaceholder: 'https://...',
+    defaultBadge: 'デフォルト',
+    deleteButton: '削除',
+    errorCopying: 'クリップボードへのコピーエラー',
+    minOnePage: '少なくとも1つのページが必要です',
+    newPage: '新規ページ'
+  },
 
+  // =============================================================================
+  // SPELLING CONTEXT MENU
+  // =============================================================================
+  spelling: {
+    suggestions: '候補：',
+    noSuggestions: '候補がありません',
+    addToDictionary: '辞書に追加',
+    ignoreWord: '単語を無視',
+    replaceWith: '置換先',
+    wordAdded: '単語を辞書に追加しました',
+    wordIgnored: '単語を無視しました'
   },
 
   // =============================================================================
@@ -350,20 +453,22 @@ export default {
     title: 'プロジェクト構造',
     back: '戻る',
     newFile: '新規ファイル',
-    newFolder: '新規フォルダ',
+    newFolder: '新規セクション',
     emptyProject: 'このプロジェクトにはまだファイルがありません',
     filesCount: '{count}ファイル',
     rename: '名前を変更',
     delete: '削除',
     addSubfile: 'サブファイルを追加',
     confirmDelete: '「{name}」を削除しますか？',
-    folderCreated: 'フォルダが作成されました',
+    folderCreated: 'セクションが作成されました',
     fileCreated: 'ファイルが作成されました',
     renamed: '名前を変更しました',
     deleted: '削除しました',
     errorCreating: '作成エラー',
     errorRenaming: '名前変更エラー',
-    errorDeleting: '削除エラー'
+    errorDeleting: '削除エラー',
+    collapseFolder: 'フォルダを折りたたむ',
+    expandFolder: 'フォルダを展開'
   },
 
   // =============================================================================
@@ -399,22 +504,28 @@ export default {
       repository: 'プロジェクトリポジトリ',
       repositoryDesc: 'バグ報告や貢献のためにGitHubリポジトリを訪問',
       viewOnGitHub: 'GitHubで見る',
-      about: 'Block Guardについて',
+      about: 'Bloopyについて',
       currentVersion: '現在のバージョン：{version}',
       checkUpdates: '更新を確認',
       updateAvailable: '新しいバージョンが利用可能です！バックグラウンドでダウンロード中...',
-      upToDate: 'Block Guardは最新です',
-      updateError: '更新確認エラー',
-      updateNotAvailable: 'この環境では更新確認は利用できません',
+      upToDate: 'Bloopyは最新です。',
+      updateError: '更新確認エラー。',
+      updateNotAvailable: 'この環境では更新確認は利用できません。',
       defaultGoal: 'デフォルト目標',
       defaultGoalDesc: '新規ファイルの単語/文字数目標',
-      words: '単語'
+      defaultGoalLabel: 'デフォルト文字数目標',
+      defaultGoalLabelDesc: '新規ファイルの初期目標。',
+      words: '単語',
+      invalidImage: '有効な画像を選択してください',
+      imageTooLarge: '画像が大きすぎます（最大5MB）'
     },
 
     // Appearance
     appearance: {
       theme: 'テーマ',
       themeDesc: 'アプリケーションのカラーテーマを選択',
+      themeLabel: 'カラーテーマ',
+      themeLabelDesc: '外観をカスタマイズするために定義済みテーマを選択。',
       themes: {
         dark: 'ダーク',
         light: 'ライト',
@@ -426,6 +537,8 @@ export default {
       },
       customTheme: 'カスタムテーマ',
       customThemeDesc: '独自のカラーテーマを作成',
+      customColors: 'カスタムカラー',
+      customColorsDesc: 'インターフェースのメインカラーをカスタマイズ。',
       themeName: 'テーマ名',
       themeNamePlaceholder: 'マイカスタムテーマ',
       colors: {
@@ -459,28 +572,37 @@ export default {
     states: {
       title: '執筆状態',
       description: 'ファイルの進捗状態を設定',
+      label: 'プロジェクト状態',
+      labelDesc: 'ファイルの進捗レベルを定義。',
       addState: '状態を追加',
       stateName: '状態名',
+      stateNamePlaceholder: '状態名',
       stateColor: 'カラー',
       stateGoal: '目標',
+      stateGoalPlaceholder: '目標',
       countType: 'カウントタイプ',
       countTypes: {
-        absolute: '絶対（総単語数）',
-        edited: '編集（変更された単語）',
-        delta: 'デルタ（新しい単語）'
+        absolute: '合計をカウント',
+        edited: '編集をカウント',
+        delta: '新規をカウント'
       },
       deleteState: '状態を削除',
       confirmDelete: '状態「{name}」を削除しますか？',
       stateAdded: '状態が追加されました',
       stateDeleted: '状態が削除されました',
-      stateUpdated: '状態が更新されました'
+      stateUpdated: '状態が更新されました',
+      minOneState: '少なくとも1つの状態が必要です'
     },
 
     // Shortcuts
     shortcuts: {
       title: 'キーボードショートカット',
       description: 'ショートカットをクリックして編集します。任意のキーの組み合わせを押してください。',
+      label: 'キーボードショートカット',
+      labelDesc: 'ショートカットをクリックして編集します。任意のキーの組み合わせを押してください。',
       resetDefault: 'デフォルトに戻す',
+      resetTooltip: 'デフォルト値に戻す',
+      editTooltip: 'クリックして編集',
       categories: {
         file: 'ファイル',
         edit: '編集',
@@ -515,18 +637,27 @@ export default {
         deleteProject: 'プロジェクトを削除'
       },
       conflictWarning: 'このショートカットはすでに使用されています：{action}',
+      conflictAlert: 'ショートカットに競合があります。保存する前に解決してください。',
       shortcutUpdated: 'ショートカットが更新されました：{shortcut}',
       shortcutReset: 'ショートカットがデフォルトに戻されました',
       pressKeys: 'キーを押してください...',
+      pressCombination: '組み合わせを押してください...',
+      pressAnyKey: '任意のキーを押してください...',
+      listening: 'リスニング中...',
       ctrl: 'Ctrl',
       shift: 'Shift',
       alt: 'Alt',
-      meta: 'Cmd'
+      meta: 'Cmd',
+      invalidFile: '✗ 無効なファイル：ショートカット設定が含まれていません',
+      invalidJSON: '✗ ファイル読み込みエラー：無効なJSON形式',
+      invalidKeyCombination: '✗ 無効なキーの組み合わせ'
     },
 
     // Data
     data: {
       title: 'データ管理',
+      label: 'データ管理',
+      labelDesc: '設定とデータをエクスポートまたはインポート。',
       export: 'データをエクスポート',
       exportDesc: '設定、プロジェクト、ファイルをエクスポート',
       exportButton: 'エクスポート',
@@ -543,7 +674,9 @@ export default {
       createBackup: 'バックアップを作成',
       restoreBackup: 'バックアップから復元',
       backupCreated: 'バックアップが作成されました',
-      backupRestored: 'バックアップが復元されました'
+      backupRestored: 'バックアップが復元されました',
+      shortcutProfiles: 'ショートカットプロファイル',
+      shortcutProfilesDesc: 'カスタムショートカット設定をエクスポートおよびインポート。'
     },
 
     // Buttons
@@ -562,31 +695,42 @@ export default {
     workspaceCreated: '新しいワークスペースが作成されました',
     workspaceSelected: 'ワークスペースが選択されました',
     workspaceError: 'ワークスペースの読み込みエラー',
+    workspaceErrorWithMessage: 'ワークスペースの読み込みエラー：{message}',
     projectCreated: 'プロジェクト「{name}」が作成されました',
     projectError: 'プロジェクトの作成エラー',
+    projectNotFound: 'プロジェクトが見つかりません',
     fileCreated: 'ファイル「{name}」が作成されました',
     fileError: 'ファイルの作成エラー',
     subfileCreated: 'サブファイル「{name}」が作成されました',
     subfileError: 'サブファイルの作成エラー',
     fileSaved: 'ファイルが保存されました',
     fileSaveError: 'ファイルの保存エラー',
+    fileSaveErrorWithMessage: 'ファイルの保存エラー：{message}',
     fileRenamed: 'ファイル名が変更されました',
     fileRenameError: '名前変更エラー',
+    fileRenameErrorWithMessage: 'ファイル名の変更エラー：{message}',
     projectRenamed: 'プロジェクト名が変更されました',
     projectRenameError: 'プロジェクト名の変更エラー',
-    folderRenamed: 'フォルダ名が変更されました',
-    folderRenameError: 'フォルダ名の変更エラー',
+    folderRenamed: 'セクション名が変更されました',
+    folderRenameError: 'セクション名の変更エラー',
     itemDeleted: '項目が削除されました',
     deleteError: '削除エラー',
-    folderCreated: 'フォルダが作成されました',
-    folderError: 'フォルダの作成エラー',
-    folderNotSupported: 'この環境ではフォルダの作成はサポートされていません',
+    deleteErrorWithMessage: '項目の削除エラー：{message}',
+    folderCreated: 'セクションが作成されました',
+    folderError: 'セクションの作成エラー',
+    folderNotSupported: 'この環境ではセクションの作成はサポートされていません',
     fileMoved: 'ファイルが移動されました',
+    fileMovedCorrectly: 'ファイルが正常に移動されました',
     fileMoveError: 'ファイルの移動エラー',
+    fileMoveErrorWithMessage: 'ファイルの移動エラー：{message}',
     cannotDragSelf: '同じ項目にドラッグすることはできません',
+    cannotMoveIntoItself: 'ファイルを自身の中に移動することはできません',
     updateAvailable: '更新が利用可能です',
     selectProjectFirst: '最初にプロジェクトを選択してください',
+    selectProjectAlert: '最初にフォルダを接続するか、プロジェクトを作成する必要があります。',
+    openFileFirst: 'サブファイルを作成するには、ファイルを開いておく必要があります。',
     noTextToCheck: '確認するテキストがありません',
+    noFileOpen: 'ファイルが開いていません',
     textCopied: 'テキストがクリップボードにコピーされました',
     commentAdded: 'コメントが追加されました',
     commentDeleted: 'コメントが削除されました',
@@ -594,7 +738,31 @@ export default {
     stateReset: '状態がリセットされました：{state}',
     stateUpdated: '状態が更新されました：{state}',
     initError: 'アプリケーションの初期化エラー',
-    subfilesOnlyInFolders: 'サブファイルはフォルダ内でのみ作成できます'
+    initErrorWithMessage: 'アプリケーションの初期化エラー：{message}',
+    subfilesOnlyInFolders: 'サブファイルはセクション内でのみ作成できます',
+    errorPreparingData: '保存データの準備エラー',
+    savingLargeFile: '大きなファイルを保存中...',
+    loadingLargeFile: '大きなファイルを読み込み中...',
+    fileLoadedCorrectly: 'ファイルが正常に読み込まれました',
+    fileOpenError: 'ファイルのオープンエラー',
+    safetyDraftsRestored: '安全ドラフトが復元されました',
+    noSplitToRestore: '復元する分割ビューがありません',
+    splitExpired: '分割ビューの有効期限が切れました（30秒）',
+    tabsNoLongerExist: '1つまたは両方のタブが存在しなくなりました',
+    splitRestored: '分割ビューが復元されました',
+    splitViewActivated: '分割ビューが有効になりました',
+    needActiveFileForSplit: '分割ビューで開くにはアクティブなファイルが必要です',
+    cannotOpenSameFileInBothPanels: '両方のパネルで同じファイルを開くことはできません',
+    dataExported: 'データが正常にエクスポートされました',
+    dataExportError: 'データのエクスポートエラー',
+    dataImported: 'データが正常にインポートされました',
+    dataImportError: 'データのインポートエラー',
+    welcomeToBloopy: 'Bloopyへようこそ！',
+    invalidCharacters: '名前に無効な文字が含まれています',
+    iconUpdated: 'アイコンが更新されました',
+    iconUpdateError: 'アイコンの更新エラー',
+    iconUpdateErrorWithMessage: 'アイコンの更新エラー：{message}',
+    settingsSaved: '設定が正常に保存されました'
   },
 
   // =============================================================================
@@ -607,17 +775,26 @@ export default {
       yes: 'はい',
       no: 'いいえ',
       delete: '削除',
-      cancel: 'キャンセル'
+      cancel: 'キャンセル',
+      saveChanges: '変更を保存しますか？',
+      unsavedChanges: 'ファイル「{name}」に未保存の変更があります。'
     },
     input: {
       title: '入力',
       placeholder: 'ここに入力...',
       submit: 'OK',
-      cancel: 'キャンセル'
+      cancel: 'キャンセル',
+      projectName: 'プロジェクト名：',
+      defaultProjectName: 'マイプロジェクト',
+      fileName: 'ファイル名を入力：',
+      projectIndex: 'プロジェクトインデックスを入力（0から{max}）：',
+      linkUrl: 'リンクURL：',
+      newFile: '新規ファイル',
+      selectProject: 'プロジェクトを選択'
     },
     update: {
       title: '更新が利用可能',
-      message: 'Block Guardの新しいバージョンが利用可能です',
+      message: 'Bloopyの新しいバージョンが利用可能です',
       currentVersion: '現在のバージョン',
       newVersion: '新しいバージョン',
       download: 'ダウンロード',
@@ -626,8 +803,71 @@ export default {
       installing: 'インストール中...',
       readyToInstall: 'インストール準備完了',
       installNow: '今すぐインストール',
-      installOnQuit: '終了時にインストール'
+      installOnQuit: '終了時にインストール',
+      checking: '更新を確認中...',
+      connectingGithub: 'GitHubリリースに接続中',
+      upToDate: 'Bloopyは最新です',
+      latestVersion: '最新バージョンを使用しています。',
+      downloadingVersion: 'Bloopy {version}をダウンロード中',
+      doNotClose: 'ダウンロード中はアプリケーションを閉じないでください',
+      willClose: 'Bloopyは更新を適用するために閉じます',
+      saveWork: '続行する前に作業を保存してください',
+      openManually: 'インストール後に手動でBloopyを開いてください',
+      preparing: 'インストールを準備中...',
+      willCloseShortly: 'アプリケーションはまもなく閉じます',
+      errorTitle: '更新エラー',
+      unknownError: '不明なエラーが発生しました',
+      downloadError: '更新のダウンロードエラー',
+      installError: '更新のインストールエラー',
+      selectUpdate: '更新を選択',
+      stableVersion: '安定したテスト済みバージョン、すべてのユーザーにおすすめ',
+      snapshotVersion: '最新の開発バージョン、バグがある可能性があります',
+      preStableVersion: 'ほぼ安定したバージョン、最終テスト段階',
+      versionAvailable: '利用可能なバージョン'
     }
+  },
+
+  // =============================================================================
+  // CANVAS NOTES
+  // =============================================================================
+  canvas: {
+    newNote: '新規ノート',
+    note: 'ノート',
+    errors: {
+      loadFailed: 'キャンバスノートの読み込みに失敗しました',
+      saveFailed: 'キャンバスノートの保存に失敗しました',
+      invalidFile: '無効なファイル',
+      invalidJSON: 'ファイルに無効なJSONが含まれています',
+      invalidStructure: 'キャンバスの構造が無効です',
+      createNew: '新しいキャンバスを作成しますか？',
+      createNewPrompt: '新しいキャンバスを作成しますか？破損したコンテンツは失われます。'
+    },
+    success: {
+      created: 'キャンバスノートが作成されました',
+      renamed: 'キャンバスノートの名前が変更されました',
+      deleted: 'キャンバスノートが削除されました',
+      saved: 'キャンバスノートが保存されました'
+    },
+    confirmClose: {
+      title: '未保存の変更',
+      message: '変更を保存しますか？',
+      saveAndClose: '保存して閉じる',
+      closeWithoutSave: '保存せずに閉じる',
+      cancel: 'キャンセル'
+    }
+  },
+
+  // =============================================================================
+  // TITLEBAR
+  // =============================================================================
+  titlebar: {
+    minimize: '最小化',
+    maximize: '最大化',
+    close: '閉じる',
+    connectWorkspace: 'フォルダを接続',
+    checkUpdates: '更新を確認',
+    devTools: 'DevTools（コンソール）',
+    renameCurrentFile: '現在のファイル名を変更'
   },
 
   // =============================================================================
@@ -636,7 +876,7 @@ export default {
   errors: {
     generic: 'エラーが発生しました',
     fileNotFound: 'ファイルが見つかりません',
-    folderNotFound: 'フォルダが見つかりません',
+    folderNotFound: 'セクションが見つかりません',
     projectNotFound: 'プロジェクトが見つかりません',
     workspaceNotFound: 'ワークスペースが見つかりません',
     permissionDenied: 'アクセスが拒否されました',

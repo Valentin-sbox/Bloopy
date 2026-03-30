@@ -1,17 +1,16 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - WELCOMESCREEN.JS
+ *  WELCOMESCREEN.JS
  * ============================================================================
  * 
  * COMPONENTE: PANTALLA DE BIENVENIDA
  * 
  * Muestra la pantalla inicial cuando no hay ningún archivo abierto.
- * Incluye acciones principales, proyectos recientes y archivos recientes.
+ * Incluye saludo personalizado según hora, notas rápidas y archivos recientes.
  * 
  * FUNCIONALIDADES:
- * - Mostrar logo y mensaje de bienvenida personalizado
- * - Botones para crear o abrir workspace
- * - Grid de proyectos disponibles
+ * - Saludo personalizado según hora del día
+ * - Input de notas rápidas (150 caracteres)
  * - Lista de archivos recientes
  * - Información del workspace actual
  * 
@@ -30,9 +29,21 @@
  * ============================================================================
  */
 
-import React from 'react';
-import { smartTruncate } from '../utils/helpers';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../utils/i18n';
+import { getIconById, DEFAULT_FILE_ICON } from '../utils/iconLibrary';
+import Icon from '@mdi/react';
+import { 
+  mdiPlusCircle, 
+  mdiFolderOpen, 
+  mdiSitemap, 
+  mdiPenPlus, 
+  mdiChartLine, 
+  mdiHistory, 
+  mdiInbox, 
+  mdiFolder, 
+  mdiSwapHorizontal 
+} from '@mdi/js';
 
 function WelcomeScreen({ 
   workspacePath, 
@@ -41,10 +52,23 @@ function WelcomeScreen({
   onCreateWorkspace, 
   onSelectWorkspace, 
   onOpenFile,
+  onCreateProject,
   hasWorkspace,
   showSection = 'all' // 'all' | 'recent'
 }) {
   const { t } = useTranslation();
+
+  // Obtener saludo según hora del día
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      return t('welcome.goodMorning');
+    } else if (hour >= 12 && hour < 20) {
+      return t('welcome.goodAfternoon');
+    } else {
+      return t('welcome.goodEvening');
+    }
+  };
 
   /**
    * Obtiene los archivos más recientes de todos los proyectos.
@@ -97,17 +121,17 @@ function WelcomeScreen({
       <div className="welcome-screen">
         <div className="welcome-content">
           <div className="welcome-logo">
-            <i className="fas fa-shield-halved"></i>
+            <img src="assets/icon.png" alt="Bloopy" style={{ width: '120px', height: '120px' }} />
           </div>
-          <h1>Block Guard</h1>
+          <h1>Bloopy</h1>
           <p className="welcome-subtitle">{t('welcome.subtitle')}</p>
           
           <div className="welcome-actions">
             <button className="btn-primary btn-large" onClick={onCreateWorkspace}>
-              <i className="fas fa-plus-circle"></i> {t('welcome.createWorkspace')}
+              <Icon path={mdiPlusCircle} size={0.8} /> {t('welcome.createWorkspace')}
             </button>
             <button className="btn-sub btn-large" onClick={onSelectWorkspace}>
-              <i className="fas fa-folder-open"></i> {t('welcome.openWorkspace')}
+              <Icon path={mdiFolderOpen} size={0.8} /> {t('welcome.openWorkspace')}
             </button>
           </div>
           
@@ -117,15 +141,15 @@ function WelcomeScreen({
           
           <div className="welcome-features">
             <div className="feature-item">
-              <i className="fas fa-folder-tree"></i>
+              <Icon path={mdiSitemap} size={0.8} />
               <span>{t('welcome.features.organize')}</span>
             </div>
             <div className="feature-item">
-              <i className="fas fa-pen-fancy"></i>
+              <Icon path={mdiPenPlus} size={0.8} />
               <span>{t('welcome.features.write')}</span>
             </div>
             <div className="feature-item">
-              <i className="fas fa-chart-line"></i>
+              <Icon path={mdiChartLine} size={0.8} />
               <span>{t('welcome.features.track')}</span>
             </div>
           </div>
@@ -134,107 +158,78 @@ function WelcomeScreen({
     );
   }
   
-  // Renderizar contenido según seccion solicitada
-  const renderProjectsSection = () => (
-    projects.length > 0 ? (
-      <div className="projects-grid">
-        <h3>{t('welcome.yourProjects')}</h3>
-        <div className="projects-list">
-          {projects.map((project, index) => (
-            <div 
-              key={index} 
-              className="project-card"
-            >
-              <i className="fas fa-folder"></i>
-              <span className="project-name">{smartTruncate(project.name, 20)}</span>
-              <span className="project-count">
-                {t('welcome.filesCount', { count: countFiles(project.items) })}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    ) : (
-      <div className="empty-projects">
-        <i className="fas fa-folder-open"></i>
-        <p>{t('welcome.noProjects')}</p>
-        <button className="btn-primary">
-          <i className="fas fa-plus"></i> {t('welcome.createFirstProject')}
-        </button>
-      </div>
-    )
-  );
-
-  const renderRecentSection = () => (
-    recentFiles.length > 0 ? (
-      <div className="recent-files">
-        <h3>{t('welcome.recentFiles')}</h3>
-        <div className="recent-files-list">
-          {recentFiles.map((file, index) => (
-            <div 
-              key={index}
-              className="recent-file-item"
-              onClick={() => onOpenFile(file.projectIndex, file)}
-            >
-              <i className="fas fa-file-alt"></i>
-              <div className="file-info">
-                <span className="file-name">
-                  {smartTruncate(file.name.replace('.txt', ''), 25)}
-                </span>
-                <span className="file-project">{file.projectName}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    ) : (
-      <div className="empty-projects">
-        <p>{t('welcome.noRecentFiles')}</p>
-      </div>
-    )
-  );
-
+  // =============================================================================
+  // VISTA: Con workspace configurado
+  // =============================================================================
   return (
     <div className="welcome-screen">
-      <div className="welcome-content">
-        <div className="welcome-logo">
-          <i className="fas fa-shield-halved"></i>
+      <div className="welcome-content-new">
+        {/* Header principal con saludo y recientes en 2 columnas */}
+        <div className="welcome-two-column-layout">
+          {/* Columna izquierda: Saludo */}
+          <div className="welcome-greeting-column">
+            <h1>{getGreeting()}, {userName}</h1>
+            <p className="welcome-subtitle-new">{t('welcome.whatToWriteToday')}</p>
+          </div>
+
+          {/* Columna derecha: Archivos recientes */}
+          <div className="recent-files-column">
+            <h2>
+              <Icon path={mdiHistory} size={0.8} /> {t('welcome.recentFiles')}
+            </h2>
+            {recentFiles.length > 0 ? (
+              <ul className="recent-files-list">
+                {recentFiles.map((file, index) => {
+                  // Get custom icon
+                  const customIconId = file.customIcon;
+                  const iconData = customIconId ? getIconById(customIconId) : DEFAULT_FILE_ICON;
+                  const iconPath = iconData?.icon || DEFAULT_FILE_ICON.icon;
+                  
+                  return (
+                    <li 
+                      key={index}
+                      className="recent-file-item"
+                      onClick={() => onOpenFile(file.projectIndex, file)}
+                    >
+                      <Icon path={iconPath} size={0.7} className="file-icon" />
+                      <span className="file-name">{file.name.replace(/\.(txt|canvas)$/i, '')}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <div className="empty-state">
+                <Icon path={mdiInbox} size={1.2} />
+                <p>{t('welcome.noRecentFiles')}</p>
+              </div>
+            )}
+          </div>
         </div>
-        <h1>{t('welcome.greetingWithName', { name: userName })}</h1>
-        <p className="welcome-subtitle">{t('welcome.selectToStart')}</p>
 
-        {showSection === 'all' && renderProjectsSection()}
-        { (showSection === 'all' || showSection === 'recent') && renderRecentSection() }
-
-        {/* Información del workspace */}
-        <div className="workspace-info">
-          <i className="fas fa-folder"></i>
-          <span>{workspacePath}</span>
+        {/* Footer con workspace info */}
+        <div className="welcome-footer-section">
+          <div className="workspace-info-card">
+            <div className="workspace-icon">
+              <img src="assets/icon.png" alt="Bloopy" />
+            </div>
+            <div className="workspace-details">
+              <span className="workspace-label">{t('welcome.currentWorkspace')}</span>
+              <span className="workspace-path" title={workspacePath}>
+                <Icon path={mdiFolder} size={0.7} /> {workspacePath}
+              </span>
+            </div>
+            <button 
+              className="btn-change-workspace"
+              onClick={onSelectWorkspace}
+              title={t('welcome.changeWorkspace')}
+            >
+              <Icon path={mdiSwapHorizontal} size={0.7} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
-}
-
-/**
- * Cuenta recursivamente el número de archivos en un proyecto.
- * @param {Array} items - Items del proyecto
- * @returns {number} Cantidad de archivos
- */
-function countFiles(items) {
-  if (!items) return 0;
-  let count = 0;
-  
-  items.forEach(item => {
-    if (item.type === 'file') {
-      count++;
-    }
-    if (item.items) {
-      count += countFiles(item.items);
-    }
-  });
-  
-  return count;
 }
 
 export default WelcomeScreen;

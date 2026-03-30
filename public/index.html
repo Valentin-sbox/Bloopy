@@ -1,6 +1,6 @@
 <!--
   ============================================================================
-  BLOCK GUARD v4.0.0 - INDEX.HTML
+   INDEX.HTML
   ============================================================================
   
   Archivo HTML principal de la aplicación.
@@ -10,7 +10,7 @@
   - head: Metadatos, fuentes, iconos y estilos base
   - body: Contenedor #root donde React renderiza la aplicación
   
-  FUENTES CARGADAS:
+  FUENTES CARGADAS (vía CSS):
   - Inter: Fuente principal para texto (UI y contenido)
   - JetBrains Mono: Fuente monoespaciada para código y elementos técnicos
   
@@ -29,21 +29,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="description" content="Block Guard - Editor de texto nativo para escritores">
+  <meta name="description" content="Bloopy - Editor de texto nativo para escritores">
   <meta name="theme-color" content="#0a0a0a">
   
   <!-- Título de la ventana -->
-  <title>Block Guard</title>
+  <title>Bloopy</title>
   
-  <!-- Preconexión a dominios externos para mejor rendimiento -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  
-  <!-- Fuentes de Google: Inter (principal) y JetBrains Mono (monoespaciada) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  
-  <!-- Font Awesome: Iconos vectoriales -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Material Design Icons: Iconos vectoriales via node_modules -->
+  <!-- Se manejan a través de @mdi/react y @mdi/js en los componentes -->
 </head>
 <body>
   <!-- 

@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - ELECTRON.JS (PROCESO PRINCIPAL)
+ *  ELECTRON.JS (PROCESO PRINCIPAL)
  * ============================================================================
  * 
  * PROCESO PRINCIPAL DE ELECTRON (Main Process)
@@ -37,50 +37,165 @@ const fs = require('fs-extra');         // Operaciones de archivo mejoradas
 const { autoUpdater } = require('electron-updater');  // Auto-actualización
 
 // =============================================================================
+// IMPORTAR NUEVO SISTEMA DE METADATOS
+// =============================================================================
+// CRÍTICO: Path que funciona en desarrollo, producción y GitHub Codespaces
+// En desarrollo: electron.js en public/, src/main en raíz
+// En producción empaquetada: electron.js en build/, src/main en build/src/main
+// Fallback: app.getAppPath() cuando __dirname varía según empaquetado
+const isDev = !app.isPackaged;
+const log = isDev ? console.log : () => {};
+const logWarn = isDev ? console.warn : () => {};
+
+function findMetadataPath() {
+  const appPath = app.getAppPath();
+  const unpackedPath = appPath.replace(/app\.asar$/, 'app.asar.unpacked');
+  const candidates = [
+    path.join(__dirname, '..', 'src', 'main', 'index'),           // dev: public/ -> raíz
+    path.join(__dirname, 'src', 'main', 'index'),                 // prod: build/electron.js
+    path.join(unpackedPath, 'build', 'src', 'main', 'index'),     // asar.unpacked
+    path.join(appPath, 'build', 'src', 'main', 'index'),
+    path.join(appPath, 'src', 'main', 'index'),
+  ];
+  for (const p of candidates) {
+    const modPath = p + '.js';
+    if (fs.existsSync(modPath)) return p;
+  }
+  return path.join(isDev ? path.join(__dirname, '..') : __dirname, 'src', 'main', 'index');
+}
+
+const metadataPath = findMetadataPath();
+log('[ELECTRON] Modo:', isDev ? 'DESARROLLO' : 'PRODUCCIÓN');
+log('[ELECTRON] __dirname:', __dirname);
+log('[ELECTRON] Cargando metadata desde:', metadataPath);
+log('[ELECTRON] app.isPackaged:', app.isPackaged);
+
+let metadata;
+let metadataWriter;
+try {
+  metadata = require(metadataPath);
+  // Importar metadataWriter para move-file-between-projects
+  const metadataWriterPath = metadataPath.replace('index', 'metadataWriter');
+  metadataWriter = require(metadataWriterPath);
+} catch (err) {
+  console.error('[ELECTRON] ERROR crítico cargando metadata:', err.message);
+  throw err;
+}
+
+/**
+ * Convierte un archivo con metadata al formato legacy esperado por App.js
+ * @param {object} file - Archivo con metadata
+ * @returns {object} - Archivo en formato legacy
+ */
+function formatForFrontend(file) {
+  // Determinar el tipo correcto
+  const fileType = file.metadata?.type || file.type || 'file';
+  const fileName = file.name || file.metadata?.name || path.basename(file.path, path.extname(file.path));
+  
+  return {
+    name: fileName,
+    fullPath: file.path,
+    type: fileType, // Respetar el tipo (file o folder)
+    content: file.content || '', // Se carga bajo demanda, pero incluir si está disponible
+    status: file.status || 'draft',
+    goal: file.goal || 30000,
+    lastCharCount: file.lastCharCount || 0,
+    initialCharCount: file.initialCharCount || 0,
+    comments: file.comments || [],
+    items: file.children && file.children.length > 0 ? formatTreeForFrontend(file.children) : undefined,
+    // Metadata adicional
+    id: file.id,
+    parentId: file.parentId,
+    projectId: file.projectId !== undefined ? file.projectId : null, // null for root files, uuid for project files
+    order: file.order,
+    createdAt: file.createdAt,
+    updatedAt: file.updatedAt,
+    customIcon: file.customIcon || null
+  };
+}
+
+/**
+ * Convierte un árbol de archivos con metadata al formato legacy para el frontend
+ * @param {Array<object>} tree - Árbol de archivos
+ * @returns {Array<object>} - Árbol en formato legacy
+ */
+function formatTreeForFrontend(tree) {
+  return tree.map(node => {
+    const legacyNode = formatForFrontend(node);
+    return legacyNode;
+  });
+}
+
+// =============================================================================
 // ALMACENAMIENTO PERSISTENTE SIMPLE
 // =============================================================================
 
 class SimpleStore {
   constructor(name = 'config') {
     this.storePath = path.join(app.getPath('userData'), `${name}.json`);
+    log('[STORE] Inicializando store:', this.storePath);
     this.data = this.load();
   }
 
   load() {
     try {
       if (fs.existsSync(this.storePath)) {
-        return JSON.parse(fs.readFileSync(this.storePath, 'utf8'));
+        const content = fs.readFileSync(this.storePath, 'utf8');
+        log('[STORE] Archivo cargado, tamaño:', content.length);
+        return JSON.parse(content);
+      } else {
+        log('[STORE] Archivo no existe, usando datos vacíos');
       }
     } catch (error) {
-      console.error('Error loading store:', error);
+      console.error('[STORE] Error loading store:', error);
     }
     return {};
   }
 
   save() {
     try {
-      fs.ensureDirSync(path.dirname(this.storePath));
-      fs.writeFileSync(this.storePath, JSON.stringify(this.data, null, 2), 'utf8');
+      const dir = path.dirname(this.storePath);
+      log('[STORE] Asegurando directorio:', dir);
+      fs.ensureDirSync(dir);
+
+      const content = JSON.stringify(this.data, null, 2);
+      log('[STORE] Guardando archivo, tamaño:', content.length);
+      fs.writeFileSync(this.storePath, content, 'utf8');
+      log('[STORE] Archivo guardado exitosamente');
+
+      // Verificar que se guardó correctamente
+      if (fs.existsSync(this.storePath)) {
+        const stats = fs.statSync(this.storePath);
+        log('[STORE] Verificación - Archivo existe, tamaño:', stats.size);
+      } else {
+        console.error('[STORE] ERROR: El archivo no existe después de guardar!');
+      }
     } catch (error) {
-      console.error('Error saving store:', error);
+      console.error('[STORE] Error saving store:', error);
+      throw error; // Re-lanzar el error para que se pueda manejar arriba
     }
   }
 
   get(key, defaultValue = null) {
-    return this.data[key] !== undefined ? this.data[key] : defaultValue;
+    const value = this.data[key] !== undefined ? this.data[key] : defaultValue;
+    log(`[STORE] GET '${key}':`, value ? 'FOUND' : 'NOT FOUND (usando default)');
+    return value;
   }
 
   set(key, value) {
+    log(`[STORE] SET '${key}'`);
     this.data[key] = value;
     this.save();
   }
 
   delete(key) {
+    log(`[STORE] DELETE '${key}'`);
     delete this.data[key];
     this.save();
   }
 
   clear() {
+    log('[STORE] CLEAR - Eliminando todos los datos');
     this.data = {};
     this.save();
   }
@@ -115,39 +230,6 @@ ipcMain.handle('wait-pending-ops', async (event, timeoutMs = 3000) => {
 // CONFIGURACIÓN DE AUTO-UPDATER
 // =============================================================================
 
-// Configurar electron-updater con logger simple
-const simpleLogger = {
-  info: (msg) => console.log('[AUTO-UPDATE]', msg),
-  warn: (msg) => console.warn('[AUTO-UPDATE]', msg),
-  error: (msg) => console.error('[AUTO-UPDATE]', msg),
-  debug: (msg) => console.debug('[AUTO-UPDATE]', msg),
-  transports: {
-    file: { level: 'info' }
-  }
-};
-
-autoUpdater.logger = simpleLogger;
-
-// Configurar feed URL para GitHub releases (usar token si existe para aumentar rate limit)
-const gh_token = process.env.GH_TOKEN || '';
-const feedUrl = gh_token
-  ? `https://${gh_token}@github.com/Valentin-sbox/Blockguard/releases/download/v\${version}/BlockGuard-Setup-\${version}.exe`
-  : 'https://github.com/Valentin-sbox/Blockguard/releases/download/v${version}/BlockGuard-Setup-${version}.exe';
-
-try {
-  autoUpdater.setFeedURL({
-    provider: 'github',
-    owner: 'Valentin-sbox',
-    repo: 'Blockguard',
-    token: gh_token || undefined
-  });
-  console.log('[AUTO-UPDATE] Feed URL configurado');
-} catch (e) {
-  console.warn('[AUTO-UPDATE] Error configurando feed:', e.message);
-}
-
-// No llamar checkForUpdatesAndNotify aquí - hacerlo bajo demanda en initializeApp
-
 // Variable global para almacenar el estado de actualización
 let updateState = {
   updateAvailable: false,
@@ -158,66 +240,185 @@ let updateState = {
   downloadedSize: 0
 };
 
-// Listeners de autoUpdater
-autoUpdater.on('checking-for-update', () => {
-  console.log('Verificando actualizaciones...');
-  if (mainWindow) {
-    mainWindow.webContents.send('update-checking');
+/**
+ * Compara dos versiones semver.
+ * @param {string} v1 - Primera versión (ej: "1.26.31")
+ * @param {string} v2 - Segunda versión (ej: "1.26.30")
+ * @returns {number} 1 si v1 > v2, -1 si v1 < v2, 0 si v1 === v2
+ */
+function compareVersions(v1, v2) {
+  const parts1 = v1.split(/[-.]/).map(p => parseInt(p) || 0);
+  const parts2 = v2.split(/[-.]/).map(p => parseInt(p) || 0);
+  
+  const maxLength = Math.max(parts1.length, parts2.length);
+  
+  for (let i = 0; i < maxLength; i++) {
+    const p1 = parts1[i] || 0;
+    const p2 = parts2[i] || 0;
+    
+    if (p1 > p2) return 1;
+    if (p1 < p2) return -1;
   }
-});
+  
+  return 0;
+}
 
-autoUpdater.on('update-available', (info) => {
-  console.log('Actualización disponible:', info.version);
-  updateState.updateAvailable = true;
-  updateState.updateInfo = info;
-  if (mainWindow) {
-    mainWindow.webContents.send('update-available', {
-      version: info.version,
-      releaseDate: info.releaseDate,
-      releaseNotes: info.releaseNotes
+/**
+ * Verificación silenciosa de actualizaciones (solo notificación)
+ */
+function checkForUpdatesSilently() {
+  try {
+    log('[AUTO-UPDATE] Verificación silenciosa iniciada');
+
+    // Deshabilitar descarga automática
+    autoUpdater.autoDownload = false;
+
+    // Verificar actualizaciones
+    autoUpdater.checkForUpdates().catch(err => {
+      console.error('[AUTO-UPDATE] Error en verificación silenciosa:', err);
     });
+  } catch (error) {
+    console.error('[AUTO-UPDATE] Error en checkForUpdatesSilently:', error);
   }
-});
+}
 
-autoUpdater.on('update-not-available', () => {
-  console.log('No hay actualizaciones disponibles');
-  if (mainWindow) {
-    mainWindow.webContents.send('update-not-available');
-  }
-});
+/**
+ * Inicializa el sistema de auto-actualización
+ * DEBE llamarse DESPUÉS de que app esté ready
+ */
+function initializeAutoUpdater() {
+  log('[AUTO-UPDATE] Inicializando sistema de actualizaciones...');
 
-autoUpdater.on('error', (error) => {
-  console.error('Error en auto-updater:', error);
-  if (mainWindow) {
-    mainWindow.webContents.send('update-error', error.message);
-  }
-});
+  // Configurar electron-updater con logger simple
+  const simpleLogger = {
+    info: (msg) => log('[AUTO-UPDATE]', msg),
+    warn: (msg) => logWarn('[AUTO-UPDATE]', msg),
+    error: (msg) => console.error('[AUTO-UPDATE]', msg),
+    debug: (msg) => console.debug('[AUTO-UPDATE]', msg),
+    transports: {
+      file: { level: 'info' }
+    }
+  };
 
-autoUpdater.on('download-progress', (progressObj) => {
-  updateState.currentProgress = progressObj.percent;
-  updateState.downloadedSize = progressObj.transferred;
-  updateState.totalSize = progressObj.total;
-  if (mainWindow) {
-    mainWindow.webContents.send('update-download-progress', {
-      percent: progressObj.percent,
-      bytesPerSecond: progressObj.bytesPerSecond,
-      transferred: progressObj.transferred,
-      total: progressObj.total
+  autoUpdater.logger = simpleLogger;
+
+  // Configurar auto-updater para GitHub releases
+  autoUpdater.autoDownload = false; // No descargar automáticamente
+  autoUpdater.autoInstallOnAppQuit = false; // No instalar automáticamente al cerrar
+  autoUpdater.allowDowngrade = false; // No permitir downgrade
+  autoUpdater.allowPrerelease = false; // No permitir prereleases por defecto
+
+  try {
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'Valentin-sbox',
+      repo: 'Bloopy',
+      private: false,
+      token: process.env.GH_TOKEN || undefined
     });
+    log('[AUTO-UPDATE] Feed URL configurado para GitHub releases');
+    log('[AUTO-UPDATE] Repositorio: Valentin-sbox/Bloopy');
+  } catch (e) {
+    logWarn('[AUTO-UPDATE] Error configurando feed:', e.message);
   }
-});
 
-autoUpdater.on('update-downloaded', (info) => {
-  console.log('Actualización descargada. Se aplicará al reiniciar.');
-  updateState.updateDownloaded = true;
-  if (mainWindow) {
-    mainWindow.webContents.send('update-downloaded');
-  }
-});
+  // Listeners de autoUpdater
+  autoUpdater.on('checking-for-update', () => {
+    log('[AUTO-UPDATE] Verificando actualizaciones...');
+    log('[AUTO-UPDATE] Versión actual:', app.getVersion());
+    log('[AUTO-UPDATE] Repositorio: Valentin-sbox/Bloopy');
+    if (mainWindow) {
+      mainWindow.webContents.send('update-checking');
+    }
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    log('[AUTO-UPDATE] ¡Actualización disponible!');
+    log('[AUTO-UPDATE] Nueva versión:', info.version);
+    log('[AUTO-UPDATE] Versión actual:', app.getVersion());
+    log('[AUTO-UPDATE] Fecha de lanzamiento:', info.releaseDate);
+    log('[AUTO-UPDATE] Archivos:', info.files?.map(f => f.url).join(', '));
+    
+    // Validación adicional: comparar versiones manualmente para asegurar que es mayor
+    const currentVersion = app.getVersion();
+    const newVersion = info.version;
+    
+    if (compareVersions(newVersion, currentVersion) <= 0) {
+      logWarn('[AUTO-UPDATE] ADVERTENCIA: La versión remota no es mayor que la actual');
+      logWarn('[AUTO-UPDATE] Versión actual:', currentVersion);
+      logWarn('[AUTO-UPDATE] Versión remota:', newVersion);
+      logWarn('[AUTO-UPDATE] Ignorando actualización inválida');
+      return;
+    }
+    
+    log('[AUTO-UPDATE] Validación de versión: OK (remota > actual)');
+    updateState.updateAvailable = true;
+    updateState.updateInfo = info;
+    if (mainWindow) {
+      mainWindow.webContents.send('update-available', {
+        version: info.version,
+        releaseDate: info.releaseDate,
+        releaseNotes: info.releaseNotes
+      });
+    }
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    log('[AUTO-UPDATE] No hay actualizaciones disponibles');
+    log('[AUTO-UPDATE] La aplicación está actualizada (v' + app.getVersion() + ')');
+    if (mainWindow) {
+      mainWindow.webContents.send('update-not-available');
+    }
+  });
+
+  autoUpdater.on('error', (error) => {
+    console.error('[AUTO-UPDATE] Error en auto-updater:', error.message);
+    console.error('[AUTO-UPDATE] Detalles del error:', error);
+    console.error('[AUTO-UPDATE] Stack trace:', error.stack);
+    if (mainWindow) {
+      mainWindow.webContents.send('update-error', error.message);
+    }
+  });
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    const percentComplete = Math.round(progressObj.percent);
+    const downloadedMB = (progressObj.transferred / 1024 / 1024).toFixed(2);
+    const totalMB = (progressObj.total / 1024 / 1024).toFixed(2);
+    const speedMBps = (progressObj.bytesPerSecond / 1024 / 1024).toFixed(2);
+
+    log(`[AUTO-UPDATE] Descargando: ${percentComplete}% (${downloadedMB}MB / ${totalMB}MB) - ${speedMBps} MB/s`);
+
+    updateState.currentProgress = progressObj.percent;
+    updateState.downloadedSize = progressObj.transferred;
+    updateState.totalSize = progressObj.total;
+    if (mainWindow) {
+      mainWindow.webContents.send('update-download-progress', {
+        percent: progressObj.percent,
+        bytesPerSecond: progressObj.bytesPerSecond,
+        transferred: progressObj.transferred,
+        total: progressObj.total
+      });
+    }
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    log('[AUTO-UPDATE] ¡Actualización descargada exitosamente!');
+    log('[AUTO-UPDATE] Versión descargada:', info.version);
+    log('[AUTO-UPDATE] La actualización se aplicará al reiniciar la aplicación');
+    updateState.updateDownloaded = true;
+    if (mainWindow) {
+      mainWindow.webContents.send('update-downloaded');
+    }
+  });
+
+  log('[AUTO-UPDATE] Sistema de actualizaciones inicializado correctamente');
+}
 
 // =============================================================================
 // VARIABLES GLOBALES
 // =============================================================================
+
+let mainWindow = null;
 
 // =============================================================================
 // ERROR HANDLERS GLOBALES
@@ -271,11 +472,13 @@ function createWindow() {
    * - webPreferences: Configuración de seguridad y funcionalidad
    */
   mainWindow = new BrowserWindow({
-    width: 1400,           // Ancho inicial en píxeles
-    height: 900,           // Alto inicial en píxeles
+    width: 800,            // Ancho inicial para splash (se ajustará después)
+    height: 600,           // Alto inicial para splash (se ajustará después)
     minWidth: 900,         // Ancho mínimo permitido
     minHeight: 600,        // Alto mínimo permitido
-    title: 'Block Guard',  // Título de la ventana
+    title: 'Bloopy',       // Título de la ventana
+    center: true,          // Centrar ventana al inicio
+    show: false,           // No mostrar hasta que esté lista (evita parpadeo)
 
     // Icono de la aplicación (múltiples tamaños en .ico)
     icon: iconPath || undefined,
@@ -310,6 +513,91 @@ function createWindow() {
   // CARGAR LA APLICACIÓN
   // =============================================================================
 
+  // =============================================================================
+  // CONFIGURACIÓN DE SPELLCHECKER NATIVO
+  // =============================================================================
+  // Configurar spell checker nativo usando el idioma del sistema operativo
+  const localeToSpell = (locale) => {
+    const fullLocale = (locale || app.getLocale() || 'en-US').replace('_', '-');
+    
+    // Mapeo extendido de códigos de idioma a formatos de Chromium
+    const languageMap = {
+      'es': 'es-ES', 'es-ES': 'es-ES', 'es-MX': 'es-ES', 'es-AR': 'es-ES',
+      'en': 'en-US', 'en-US': 'en-US', 'en-GB': 'en-GB', 'en-CA': 'en-US', 'en-AU': 'en-AU',
+      'fr': 'fr-FR', 'fr-FR': 'fr-FR', 'fr-CA': 'fr-FR',
+      'de': 'de-DE', 'de-DE': 'de-DE', 'de-AT': 'de-DE', 'de-CH': 'de-DE',
+      'it': 'it-IT', 'it-IT': 'it-IT',
+      'pt': 'pt-PT', 'pt-PT': 'pt-PT', 'pt-BR': 'pt-BR',
+      'ja': 'ja-JP', 'ja-JP': 'ja-JP', 'jp': 'ja-JP',
+      'zh': 'zh-CN', 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW',
+      'ko': 'ko-KR', 'ko-KR': 'ko-KR',
+      'ru': 'ru-RU', 'ru-RU': 'ru-RU',
+      'nl': 'nl-NL', 'nl-NL': 'nl-NL',
+      'pl': 'pl-PL', 'pl-PL': 'pl-PL',
+      'sv': 'sv-SE', 'sv-SE': 'sv-SE',
+      'da': 'da-DK', 'da-DK': 'da-DK',
+      'no': 'nb-NO', 'nb': 'nb-NO', 'nb-NO': 'nb-NO',
+      'fi': 'fi-FI', 'fi-FI': 'fi-FI',
+      'tr': 'tr-TR', 'tr-TR': 'tr-TR',
+      'ar': 'ar', 'he': 'he', 'hi': 'hi-IN'
+    };
+    
+    // Try full locale first (e.g., "en-US"), then language code (e.g., "en")
+    if (languageMap[fullLocale]) {
+      return languageMap[fullLocale];
+    }
+    
+    const langCode = fullLocale.split('-')[0].toLowerCase();
+    return languageMap[langCode] || 'en-US';
+  };
+  
+  // Get system locale and set up spell checker
+  const systemLocale = app.getLocale();
+  const primaryLanguage = localeToSpell(systemLocale);
+  
+  const languages = [primaryLanguage];
+  if (primaryLanguage !== 'en-US') languages.push('en-US');
+  
+  try {
+    mainWindow.webContents.session.setSpellCheckerLanguages(languages);
+    mainWindow.webContents.session.setSpellCheckerEnabled(true);
+    log('[SPELLCHECK] Sistema locale:', systemLocale);
+    log('[SPELLCHECK] Idioma principal:', primaryLanguage);
+    log('[SPELLCHECK] Idiomas configurados:', languages);
+  } catch (err) {
+    console.error('[SPELLCHECK] Error configurando idiomas:', err.message);
+    try {
+      // Fallback to just English and Spanish
+      mainWindow.webContents.session.setSpellCheckerLanguages(['en-US', 'es-ES']);
+      mainWindow.webContents.session.setSpellCheckerEnabled(true);
+      log('[SPELLCHECK] Idiomas (fallback): en-US, es-ES');
+    } catch (e) {
+      logWarn('[SPELLCHECK] No se pudo configurar spell checker:', e.message);
+    }
+  }
+
+  /**
+   * Menú contextual: siempre mostrar nuestro menú custom (con Copiar/Cortar/Pegar y sugerencias si hay misspelling).
+   */
+  mainWindow.webContents.on('context-menu', (event, params) => {
+    const { x, y, misspelledWord, dictionarySuggestions } = params;
+    event.preventDefault();
+    if (misspelledWord) {
+      mainWindow.webContents.send('spell-check-context', {
+        word: misspelledWord,
+        suggestions: Array.isArray(dictionarySuggestions) ? dictionarySuggestions.slice(0, 8) : [],
+        x,
+        y
+      });
+    } else {
+      mainWindow.webContents.send('context-menu-edit', { x, y });
+    }
+  });
+
+  // =============================================================================
+  // CARGAR LA APLICACIÓN
+  // =============================================================================
+
   /**
    * Determina qué URL cargar según el entorno:
    * - Desarrollo: http://localhost:3000 (servidor de React)
@@ -318,26 +606,51 @@ function createWindow() {
 
   if (process.env.ELECTRON_START_URL) {
     // Modo desarrollo: servidor local de React
-    console.log('Modo DESARROLLO - Cargando desde:', process.env.ELECTRON_START_URL);
+    log('Modo DESARROLLO - Cargando desde:', process.env.ELECTRON_START_URL);
     mainWindow.loadURL(process.env.ELECTRON_START_URL).catch(err => {
       console.error('Error loading development URL:', err);
     });
   } else {
-    // Modo producción: usar path.join para obtener ruta correcta
-    // __dirname = /resources/app.asar/public
-    // Por lo tanto: __dirname/../build/index.html = /resources/app.asar/build/index.html
-    const indexPath = path.join(__dirname, '../build/index.html');
+    // Modo producción: determinar ruta según si está empaquetado
+    let indexPath;
 
-    console.log('Modo PRODUCCIÓN - Cargando desde:', indexPath);
+    if (app.isPackaged) {
+      // Producción empaquetada: index.html está en el mismo directorio que electron.js
+      indexPath = path.join(__dirname, 'index.html');
+      log('Modo PRODUCCIÓN EMPAQUETADA');
+      log('__dirname:', __dirname);
+      log('Intentando cargar:', indexPath);
+      log('Archivo existe:', fs.existsSync(indexPath));
 
-    if (fs.existsSync(indexPath)) {
-      mainWindow.loadFile(indexPath).catch(err => {
-        console.error('Error loading production file:', err);
-        mainWindow.loadURL('data:text/html,<h2>Error: No se pudo cargar la aplicación</h2>');
-      });
+      if (fs.existsSync(indexPath)) {
+        log('✓ Cargando index.html desde:', indexPath);
+        // Usar loadURL con file:// protocol para mejor resolución de rutas
+        mainWindow.loadURL(`file://${indexPath}`).catch(err => {
+          console.error('✗ Error loading file:', err);
+          mainWindow.loadURL('data:text/html,<h2>Error al cargar</h2><p>' + err.message + '</p>');
+        });
+      } else {
+        console.error('✗ index.html NO ENCONTRADO en:', indexPath);
+        mainWindow.loadURL('data:text/html,<h2>Error: index.html no encontrado</h2><p>Ruta: ' + indexPath + '</p>');
+      }
     } else {
-      console.error('Error: index.html no encontrado en', indexPath);
-      mainWindow.loadURL('data:text/html,<h2>Error: index.html no encontrado</h2>');
+      // Desarrollo sin servidor: buscar en build/
+      indexPath = path.join(__dirname, '..', 'build', 'index.html');
+      log('Modo DESARROLLO SIN SERVIDOR');
+      log('__dirname:', __dirname);
+      log('Intentando cargar:', indexPath);
+      log('Archivo existe:', fs.existsSync(indexPath));
+
+      if (fs.existsSync(indexPath)) {
+        log('✓ Cargando index.html desde:', indexPath);
+        mainWindow.loadFile(indexPath).catch(err => {
+          console.error('✗ Error loading file:', err);
+          mainWindow.loadURL('data:text/html,<h2>Error al cargar</h2><p>' + err.message + '</p>');
+        });
+      } else {
+        console.error('✗ index.html NO ENCONTRADO en:', indexPath);
+        mainWindow.loadURL('data:text/html,<h2>Error: index.html no encontrado</h2><p>Ruta: ' + indexPath + '</p>');
+      }
     }
   }
 
@@ -349,18 +662,11 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
 
-    // En desarrollo, abrir DevTools automáticamente
-    if (process.env.ELECTRON_START_URL) {
-      mainWindow.webContents.openDevTools();
-    }
-
-    // Verificar actualizaciones después de mostrar la ventana (con delay para que todo esté listo)
+    // Verificar actualizaciones después de mostrar la ventana (solo notificación, sin auto-descarga)
     setTimeout(() => {
-      console.log('[AUTO-UPDATE] Iniciando verificación automática...');
-      autoUpdater.checkForUpdatesAndNotify().catch(err => {
-        console.error('[AUTO-UPDATE] Error en checkForUpdatesAndNotify:', err);
-      });
-    }, 2000);
+      log('[AUTO-UPDATE] Iniciando verificación silenciosa...');
+      checkForUpdatesSilently();
+    }, 3000);
   });
 
   // Manejo de errores al cargar la página
@@ -370,11 +676,11 @@ function createWindow() {
   });
 
   mainWindow.webContents.on('unresponsive', () => {
-    console.warn('ADVERTENCIA: La aplicación no responde');
+    logWarn('ADVERTENCIA: La aplicación no responde');
   });
 
   mainWindow.on('unresponsive', () => {
-    console.warn('ADVERTENCIA: La ventana no responde');
+    logWarn('ADVERTENCIA: La ventana no responde');
   });
 
   // Manejo de errores en la precarga
@@ -382,9 +688,72 @@ function createWindow() {
     console.error(`ERROR en preload (${preloadPath}):`, error);
   });
 
+  // Prevenir cierre con cambios sin guardar
+  mainWindow.on('close', async (e) => {
+    try {
+      // Preguntar al renderer si hay archivos sin guardar
+      const unsavedFiles = await mainWindow.webContents.executeJavaScript(
+        'typeof window.__getUnsavedFiles === "function" ? window.__getUnsavedFiles() : []'
+      );
+
+      if (unsavedFiles && unsavedFiles.length > 0) {
+        e.preventDefault();
+
+        // Formatear la lista de archivos para mostrar en el diálogo
+        const fileList = unsavedFiles.map(name => `• ${name}`).join('\n');
+
+        const { dialog } = require('electron');
+        const choice = await dialog.showMessageBox(mainWindow, {
+          type: 'question',
+          buttons: ['Guardar y cerrar', 'Cerrar sin guardar', 'Cancelar'],
+          defaultId: 0,
+          cancelId: 2,
+          title: 'Cambios sin guardar',
+          message: 'Tienes cambios sin guardar',
+          detail: `Los siguientes archivos tienen modificaciones sin guardar:\n\n${fileList}\n\n¿Qué deseas hacer?`
+        });
+
+        if (choice.response === 0) {
+          // Usuario elige "Guardar y cerrar"
+          log('[WINDOW] Usuario eligió guardar y cerrar. Notificando al renderer...');
+
+          // Prevenir cierre repetido mientras se procesa
+          mainWindow.removeAllListeners('close');
+
+          // Enviar señal al renderer para que guarde, el renderer cerrará la app cuando termine
+          mainWindow.webContents.send('save-before-close');
+        } else if (choice.response === 1) {
+          // Usuario elige "Cerrar sin guardar"
+          log('[WINDOW] Usuario eligió cerrar descartando cambios.');
+          // Remover el listener para permitir el cierre
+          mainWindow.removeAllListeners('close');
+          mainWindow.close();
+        }
+        // Si choice.response === 2 (Cancelar), no hacemos nada y el cierre sigue prevenido
+      }
+      // Si unsavedFiles.length === 0, no hay cambios sin guardar, el cierre continúa normalmente
+    } catch (error) {
+      console.error('Error checking unsaved changes:', error);
+      // Si hay error, permitir cerrar
+    }
+  });
+
   // Limpiar referencia cuando se cierra la ventana
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  // Emitir eventos de cambio de estado de maximizado
+  mainWindow.on('maximize', () => {
+    if (mainWindow) {
+      mainWindow.webContents.send('window-maximized-change', true);
+    }
+  });
+
+  mainWindow.on('unmaximize', () => {
+    if (mainWindow) {
+      mainWindow.webContents.send('window-maximized-change', false);
+    }
   });
 }
 
@@ -397,6 +766,21 @@ function createWindow() {
  * Se dispara cuando Electron ha terminado de inicializarse.
  * Aquí es seguro crear ventanas y usar APIs del sistema.
  */
+
+// =============================================================================
+// FLAGS CHROMIUM/V8 — Fix 5
+// Deben configurarse ANTES de app.whenReady()
+// =============================================================================
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512');
+app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
+app.commandLine.appendSwitch('disable-background-networking');
+app.commandLine.appendSwitch('disable-default-apps');
+app.commandLine.appendSwitch('disable-extensions');
+app.commandLine.appendSwitch('disable-sync');
+app.commandLine.appendSwitch('metrics-recording-only');
+app.commandLine.appendSwitch('no-first-run');
+app.commandLine.appendSwitch('safebrowsing-disable-auto-update');
+
 app.whenReady().then(createWindow);
 
 /**
@@ -438,39 +822,88 @@ app.on('activate', () => {
  */
 ipcMain.handle('check-for-updates', async () => {
   try {
-    console.log('[AUTO-UPDATE] Iniciando verificación manual...');
+    log('[AUTO-UPDATE] Iniciando verificación manual...');
+    log('[AUTO-UPDATE] Versión actual:', app.getVersion());
+    log('[AUTO-UPDATE] Repositorio: Valentin-sbox/Bloopy');
 
     // Limpiar estado anterior
     updateState.updateAvailable = false;
     updateState.updateInfo = null;
 
-    // Llamar checkForUpdates y esperar el resultado
-    const result = await autoUpdater.checkForUpdates();
+    // Crear Promise con timeout de 15 segundos
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout: verificación tardó más de 15 segundos')), 15000)
+    );
 
-    console.log('[AUTO-UPDATE] Resultado checkForUpdates:', {
-      updateAvailable: result?.updateInfo ? true : false,
+    // Competir entre checkForUpdates y timeout
+    const result = await Promise.race([
+      autoUpdater.checkForUpdates(),
+      timeoutPromise
+    ]);
+
+    log('[AUTO-UPDATE] Resultado checkForUpdates:', {
+      hasResult: !!result,
+      hasUpdateInfo: !!result?.updateInfo,
       version: result?.updateInfo?.version,
-      currentVersion: app.getVersion()
+      currentVersion: app.getVersion(),
+      files: result?.updateInfo?.files?.map(f => f.url)
     });
 
-    // Esperar un poco a que los listeners procesen (max 2 segundos)
-    await new Promise(r => setTimeout(r, 500));
+    // Esperar a que listeners procesen (máximo 2 segundos)
+    const start = Date.now();
+    while (!updateState.updateAvailable && (Date.now() - start) < 2000) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+
+    log('[AUTO-UPDATE] Estado final:', {
+      updateAvailable: updateState.updateAvailable,
+      updateInfo: updateState.updateInfo
+    });
+
+    // Detectar tipos de versión si hay actualización
+    let availableVersions = {};
+    if (updateState.updateAvailable && updateState.updateInfo) {
+      availableVersions = detectVersionTypes(updateState.updateInfo);
+    }
 
     return {
       success: true,
       hasUpdate: updateState.updateAvailable,
       updateInfo: updateState.updateInfo,
-      currentVersion: app.getVersion()
+      availableVersions: availableVersions,
+      currentVersion: app.getVersion(),
+      latestVersion: result?.updateInfo?.version || null
     };
   } catch (error) {
     console.error('[AUTO-UPDATE] Error en check-for-updates:', error);
+    console.error('[AUTO-UPDATE] Stack:', error.stack);
     return {
       success: false,
       error: error.message,
-      currentVersion: app.getVersion()
+      currentVersion: app.getVersion(),
+      details: error.toString()
     };
   }
 });
+
+/**
+ * Función para detectar tipos de versión
+ * Parsea el tag de versión para determinar si es stable, snapshot o pre-stable
+ */
+function detectVersionTypes(updateInfo) {
+  const version = updateInfo.version;
+  const types = {};
+  
+  if (version.includes('-beta') || version.includes('-alpha')) {
+    types.snapshot = updateInfo;
+  } else if (version.includes('-rc')) {
+    types['pre-stable'] = updateInfo;
+  } else {
+    types.stable = updateInfo;
+  }
+  
+  return types;
+}
 
 /**
  * IPC Handler: download-update
@@ -479,6 +912,8 @@ ipcMain.handle('check-for-updates', async () => {
 ipcMain.handle('download-update', async () => {
   try {
     if (updateState.updateAvailable && !updateState.updateDownloaded) {
+      log('[AUTO-UPDATE] Iniciando descarga...');
+      updateState.downloading = true;
       await autoUpdater.downloadUpdate();
       return {
         success: true,
@@ -490,6 +925,8 @@ ipcMain.handle('download-update', async () => {
       message: 'No hay actualización disponible para descargar'
     };
   } catch (error) {
+    console.error('[AUTO-UPDATE] Error en descarga:', error);
+    updateState.downloading = false;
     return {
       success: false,
       error: error.message
@@ -501,21 +938,50 @@ ipcMain.handle('download-update', async () => {
  * IPC Handler: install-update
  * Instala la actualización descargada y reinicia la aplicación
  */
-ipcMain.handle('install-update', () => {
+ipcMain.handle('install-update', async () => {
   try {
-    if (updateState.updateDownloaded) {
-      // Forzar que se instale la actualización al reiniciar
-      autoUpdater.quitAndInstall();
+    if (!updateState.updateDownloaded) {
       return {
-        success: true,
-        message: 'Instalando actualización e iniciando reinicio...'
+        success: false,
+        error: 'No hay actualización descargada'
       };
     }
+
+    log('[AUTO-UPDATE] Instalando actualización...');
+    log('[AUTO-UPDATE] Versión actual:', app.getVersion());
+    log('[AUTO-UPDATE] Nueva versión:', updateState.updateInfo?.version);
+
+    // Esperar a que pendingOps esté vacío (máximo 3 segundos)
+    log('[AUTO-UPDATE] Esperando operaciones pendientes...');
+    const start = Date.now();
+    while (pendingOps.size > 0 && (Date.now() - start) < 3000) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+    
+    if (pendingOps.size > 0) {
+      logWarn('[AUTO-UPDATE] Hay operaciones pendientes, instalando de todos modos');
+    }
+
+    // Usar setImmediate para asegurar que el IPC response se envíe antes de cerrar
+    setImmediate(() => {
+      log('[AUTO-UPDATE] Cerrando aplicación e instalando...');
+      try {
+        autoUpdater.quitAndInstall(false, true);
+        // false = no forzar cierre inmediato
+        // true = reiniciar después de instalar
+      } catch (error) {
+        console.error('[AUTO-UPDATE] Error en quitAndInstall:', error);
+        // Fallback: cerrar la aplicación manualmente
+        app.quit();
+      }
+    });
+
     return {
-      success: false,
-      message: 'No hay actualización descargada para instalar'
+      success: true,
+      message: 'Instalación iniciada, la app se cerrará en breve'
     };
   } catch (error) {
+    console.error('[AUTO-UPDATE] Error en instalación:', error);
     return {
       success: false,
       error: error.message
@@ -574,6 +1040,11 @@ ipcMain.handle('window-maximize', () => {
 
 /**
  * IPC Handler: window-close
+ * Cierra la ventana principal
+ */
+
+/**
+ * IPC Handler: window-close
  * Cierra la ventana principal (termina la aplicación)
  */
 ipcMain.handle('window-close', () => {
@@ -591,6 +1062,30 @@ ipcMain.handle('window-is-maximized', () => {
     return mainWindow.isMaximized();
   }
   return false;
+});
+
+/**
+ * IPC Handler: resize-window
+ * Redimensiona la ventana principal a las dimensiones especificadas
+ * @param {number} width - Ancho deseado
+ * @param {number} height - Alto deseado
+ */
+ipcMain.handle('resize-window', (event, width, height) => {
+  if (mainWindow) {
+    // Validar dimensiones (mínimo 400x300, máximo tamaño de pantalla)
+    const { screen } = require('electron');
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    
+    const validWidth = Math.max(400, Math.min(width, screenWidth));
+    const validHeight = Math.max(300, Math.min(height, screenHeight));
+    
+    mainWindow.setSize(validWidth, validHeight);
+    mainWindow.center();
+    
+    return { width: validWidth, height: validHeight };
+  }
+  return null;
 });
 
 /**
@@ -612,6 +1107,16 @@ ipcMain.handle('window-toggle-title-bar', () => {
     return newFrame;
   }
   return false;
+});
+
+/**
+ * IPC Handler: window-open-devtools
+ * Abre las herramientas de desarrollo
+ */
+ipcMain.handle('window-open-devtools', () => {
+  if (mainWindow) {
+    mainWindow.webContents.openDevTools();
+  }
 });
 
 // -----------------------------------------------------------------------------
@@ -697,41 +1202,166 @@ ipcMain.handle('create-workspace', async () => {
 });
 
 /**
+ * Lee una carpeta recursivamente y retorna su estructura
+ * @param {string} folderPath - Ruta de la carpeta
+ * @returns {Promise<object>} - Estructura de la carpeta
+ */
+async function readFolderRecursive(folderPath) {
+  try {
+    const folderName = path.basename(folderPath);
+    const entries = await fs.readdir(folderPath, { withFileTypes: true });
+    const children = [];
+
+    for (const entry of entries) {
+      if (entry.name.startsWith('.')) continue; // Skip hidden files
+
+      const entryPath = path.join(folderPath, entry.name);
+
+      if (entry.isDirectory()) {
+        // Recursively read subdirectory
+        const subFolder = await readFolderRecursive(entryPath);
+        if (subFolder) {
+          children.push(subFolder);
+        }
+      } else if (entry.isFile() && (entry.name.endsWith('.txt') || entry.name.endsWith('.canvas'))) {
+        // Read file
+        try {
+          const { metadata: fileMeta, content } = await metadata.parseFile(entryPath);
+          children.push({
+            path: entryPath,
+            metadata: fileMeta,
+            content: entry.name.endsWith('.canvas') ? content : undefined,
+            name: entry.name.replace(/\.(txt|canvas)$/i, ''),
+            type: 'file'
+          });
+        } catch (error) {
+          logWarn(`[WORKSPACE] Error parsing file ${entry.name}:`, error.message);
+        }
+      }
+    }
+
+    return {
+      path: folderPath,
+      name: folderName,
+      type: 'folder',
+      metadata: {
+        name: folderName,
+        type: 'folder',
+        projectId: null
+      },
+      children: children
+    };
+  } catch (error) {
+    console.error(`[WORKSPACE] Error reading folder ${folderPath}:`, error);
+    return null;
+  }
+}
+
+/**
  * IPC Handler: read-workspace
  * Lee todos los proyectos y archivos del workspace.
  * Escanea recursivamente la estructura de carpetas.
+ * NUEVO: También escanea archivos .txt en el root del workspace (con projectId=null)
+ * y los mezcla con los proyectos en un array unificado.
  * 
  * @param {Event} event - Evento IPC
  * @param {string} workspacePath - Ruta del workspace a leer
- * @returns {Array} Lista de proyectos con sus archivos
+ * @returns {Array} Lista unificada de proyectos y archivos root mezclados
  */
 ipcMain.handle('read-workspace', async (event, workspacePath) => {
   try {
-    const projects = [];
+    log('[WORKSPACE] Leyendo workspace con nuevo sistema de metadatos:', workspacePath);
 
-    // Leer contenido del workspace
+    // Run projectId migration for all files (lazy migration on workspace load)
+    try {
+      if (metadata.migrateWorkspaceProjectIds) {
+        log('[WORKSPACE] Running projectId migration...');
+        const migrationStats = await metadata.migrateWorkspaceProjectIds(workspacePath);
+        log('[WORKSPACE] ProjectId migration complete:', migrationStats);
+      }
+    } catch (migErr) {
+      logWarn('[WORKSPACE] Error during projectId migration:', migErr);
+    }
+
+    // Leer el directorio del workspace
     const entries = await fs.readdir(workspacePath, { withFileTypes: true });
+    const projects = [];
+    const rootFilesList = [];
 
-    // Procesar cada entrada (solo carpetas, ignorar archivos sueltos)
+    // First pass: scan all entries
     for (const entry of entries) {
       if (entry.isDirectory() && !entry.name.startsWith('.')) {
         const projectPath = path.join(workspacePath, entry.name);
 
-        // Escanear recursivamente el contenido del proyecto
-        const items = await scanDirectory(projectPath);
+        // Verificar si necesita migración y migrar si es necesario
+        try {
+          if (metadata.needsMigration && await metadata.needsMigration(projectPath)) {
+            log(`[WORKSPACE] Migrando proyecto: ${entry.name}`);
+            await metadata.migrateProject(projectPath);
+          }
+        } catch (migErr) {
+          logWarn(`[WORKSPACE] Error verificando migración para ${entry.name}:`, migErr);
+        }
+
+        // Cargar árbol de archivos usando el nuevo sistema
+        let tree = [];
+        if (metadata.loadProjectTree) {
+          tree = await metadata.loadProjectTree(projectPath);
+        } else {
+          console.error('[WORKSPACE] No se encontró loadProjectTree en metadata');
+        }
+
+        // Convertir al formato legacy para el frontend
+        const items = formatTreeForFrontend(tree);
 
         projects.push({
           name: entry.name,
           path: projectPath,
           items: items,
-          open: false  // Estado inicial del proyecto (colapsado)
+          open: false
         });
+      } else if (entry.isFile() && (entry.name.endsWith('.txt') || entry.name.endsWith('.canvas')) && !entry.name.startsWith('.')) {
+        // Collect all root .txt and .canvas files for tree building
+        const filePath = path.join(workspacePath, entry.name);
+
+        try {
+          const { metadata: fileMeta, content } = await metadata.parseFile(filePath);
+
+          // Only include files with projectId=null (root files)
+          if (fileMeta.projectId === undefined || fileMeta.projectId === null) {
+            rootFilesList.push({ 
+              path: filePath, 
+              metadata: fileMeta,
+              content: entry.name.endsWith('.canvas') ? content : undefined // Include content for .canvas files
+            });
+          }
+        } catch (error) {
+          logWarn(`[WORKSPACE] Error parsing root file ${entry.name}:`, error.message);
+        }
       }
     }
 
-    return projects;
+    log('[WORKSPACE] Proyectos cargados:', projects.length);
+    log('[WORKSPACE] Archivos root encontrados:', rootFilesList.length);
+
+    // Build tree from root files (handles padre/hijo/nieto/bisnieto hierarchy)
+    let rootFilesTree = [];
+    if (rootFilesList.length > 0) {
+      rootFilesTree = metadata.buildTree(rootFilesList);
+      log('[WORKSPACE] Árbol de archivos root construido, nodos raíz:', rootFilesTree.length);
+    }
+
+    // Convert root files tree to frontend format
+    const formattedRootFiles = formatTreeForFrontend(rootFilesTree);
+
+    // Merge root files with projects into unified array
+    // Root files first, then projects (maintains clean sidebar without sections)
+    const unifiedList = [...formattedRootFiles, ...projects];
+
+    log('[WORKSPACE] Lista unificada total:', unifiedList.length);
+    return unifiedList;
   } catch (error) {
-    console.error('Error reading workspace:', error);
+    console.error('[WORKSPACE] Error reading workspace:', error);
     throw error;
   }
 });
@@ -739,145 +1369,8 @@ ipcMain.handle('read-workspace', async (event, workspacePath) => {
 // -----------------------------------------------------------------------------
 // SECCIÓN: OPERACIONES CON ARCHIVOS
 // -----------------------------------------------------------------------------
-
-/**
- * Escanea un directorio recursivamente buscando archivos .txt
- * y subcarpetas.
- * 
- * @param {string} dirPath - Ruta del directorio a escanear
- * @param {string} parentPath - Ruta relativa para construir jerarquía
- * @returns {Array} Lista de archivos y carpetas con metadatos
- */
-async function scanDirectory(dirPath, parentPath = '') {
-  const items = [];
-  const entries = await fs.readdir(dirPath, { withFileTypes: true });
-
-  // Ordenar: primero archivos, luego carpetas; ambos alfabéticamente
-  const sortedEntries = entries.sort((a, b) => {
-    if (a.isDirectory() === b.isDirectory()) {
-      return a.name.localeCompare(b.name);
-    }
-    return a.isDirectory() ? 1 : -1;
-  });
-
-  for (const entry of sortedEntries) {
-    // Ignorar archivos ocultos (que empiezan con .)
-    if (entry.name.startsWith('.')) continue;
-
-    const fullPath = path.join(dirPath, entry.name);
-    const relativePath = parentPath ? path.join(parentPath, entry.name) : entry.name;
-
-    if (entry.isDirectory()) {
-      // Es una carpeta - escanear recursivamente
-      const subItems = await scanDirectory(fullPath, relativePath);
-
-      // Solo agregar carpetas que tengan contenido
-      if (subItems.length > 0) {
-        items.push({
-          name: entry.name,
-          path: relativePath,
-          fullPath: fullPath,
-          type: 'folder',
-          items: subItems
-        });
-      }
-    } else if (entry.name.endsWith('.txt')) {
-      // Es un archivo de texto - leer contenido y metadatos
-      const content = await readFileWithMetadata(fullPath);
-
-      // Buscar si existe una carpeta asociada con subarchivos: <file>.d/
-      const assocDir = fullPath + '.d';
-      let childItems = [];
-      if (await fs.pathExists(assocDir)) {
-        // Scanear la carpeta asociada pero sin pasar parentPath extra (lo hacemos abajo)
-        const assocScan = await scanDirectory(assocDir, path.join(parentPath, entry.name + '.d'));
-        // assocScan devuelve items con paths relativos dentro la carpeta; adaptarlos
-        childItems = assocScan;
-      }
-
-      const fileItem = {
-        name: entry.name,
-        path: relativePath,
-        fullPath: fullPath,
-        type: 'file',
-        ...content
-      };
-
-      if (childItems.length > 0) {
-        fileItem.items = childItems;
-      }
-
-      items.push(fileItem);
-    }
-  }
-
-  return items;
-}
-
-/**
- * Lee un archivo .txt y extrae su contenido HTML y metadatos.
- * Los metadatos están embebidos en un comentario HTML al inicio.
- * 
- * Formato del archivo:
- * <!--METADATA
- * { "status": "draft", "goal": 30000, ... }
- * -->
- * 
- * <p>Contenido HTML...</p>
- * 
- * @param {string} filePath - Ruta del archivo a leer
- * @returns {Object} Contenido HTML y metadatos parseados
- */
-async function readFileWithMetadata(filePath) {
-  try {
-    // Leer contenido completo del archivo
-    const content = await fs.readFile(filePath, 'utf-8');
-
-    // Buscar bloque de metadatos con regex
-    // Busca: <!--METADATA\n{...}\n-->
-    const metadataMatch = content.match(/<!--METADATA\n([\s\S]*?)\n-->/);
-
-    let metadata = {};
-    let htmlContent = content;
-
-    if (metadataMatch) {
-      try {
-        // Parsear JSON de metadatos
-        metadata = JSON.parse(metadataMatch[1]);
-
-        // Extraer solo el contenido HTML (después del bloque de metadatos)
-        htmlContent = content.replace(metadataMatch[0], '').trim();
-      } catch (e) {
-        console.warn('Error parsing metadata:', e);
-        // Si falla el parseo, usar todo el contenido como HTML
-      }
-    }
-
-    return {
-      content: htmlContent,
-      status: metadata.status || 'draft',
-      goal: metadata.goal || 30000,
-      lastCharCount: metadata.lastCharCount || 0,
-      initialCharCount: metadata.initialCharCount || 0,
-      comments: metadata.comments || [],
-      lastUpdated: metadata.lastUpdated || Date.now()
-    };
-  } catch (error) {
-    console.error('Error reading file:', error);
-
-    // Valores por defecto si hay error
-    return {
-      content: '<p><br></p>',
-      status: 'draft',
-      goal: 30000,
-      lastCharCount: 0,
-      initialCharCount: 0,
-      comments: [],
-      lastUpdated: Date.now()
-    };
-  }
-}
-
+// (Funciones de escaneo de directorio y lectura con metadatos eliminadas
+//  al migrar al nuevo sistema de metadatos en src/main)
 /**
  * IPC Handler: save-file
  * Guarda el contenido HTML y metadatos de un archivo.
@@ -888,77 +1381,7 @@ async function readFileWithMetadata(filePath) {
  * @param {Object} metadata - Metadatos a guardar
  * @returns {boolean} true si se guardó correctamente
  */
-ipcMain.handle('save-file', async (event, filePath, htmlContent, metadata) => {
-  const op = beginOp();
-  try {
-    // Registro para depuración: tipo de metadata y resumen de comments
-    try {
-      console.log('[SAVE-FILE] Guardando:', filePath);
-      console.log('[SAVE-FILE] metadata keys:', metadata ? Object.keys(metadata) : 'null');
-      const commentsSummary = Array.isArray(metadata?.comments) ? metadata.comments.map(c => ({ id: c.id, paragraphId: c.paragraphId })) : [];
-      console.log('[SAVE-FILE] comments count:', commentsSummary.length);
-    } catch (logErr) {
-      console.warn('[SAVE-FILE] Error al registrar metadata:', logErr);
-    }
 
-    // Validar que el destino no sea una carpeta
-    try {
-      if (await fs.pathExists(filePath)) {
-        const stat = await fs.stat(filePath);
-        if (stat.isDirectory()) {
-          throw new Error('save-file: target path is a directory');
-        }
-      }
-    } catch (statErr) {
-      console.error('[SAVE-FILE] Error comprobando destino:', statErr);
-      throw statErr;
-    }
-
-    // Sanitizar metadatos: normalizar la lista de comments a objetos planos
-    let safeMetadata = { ...metadata };
-    try {
-      if (Array.isArray(metadata?.comments)) {
-        safeMetadata.comments = metadata.comments.map(c => ({
-          id: c?.id || null,
-          paragraphId: c?.paragraphId || null,
-          text: c?.text || '',
-          timestamp: c?.timestamp || Date.now(),
-          author: c?.author || null
-        }));
-      } else {
-        safeMetadata.comments = [];
-      }
-    } catch (e) {
-      console.warn('[SAVE-FILE] Error normalizando comments, se limpia la lista', e);
-      safeMetadata.comments = [];
-    }
-
-    // Construir contenido completo con metadatos embebidos
-    const fullContent = `<!--METADATA\n${JSON.stringify(safeMetadata, null, 2)}\n-->\n\n${htmlContent}`;
-
-    // Escritura atómica: escribir en archivo temporal y mover
-    const tmpPath = filePath + '.tmp-' + Date.now();
-    try {
-      await fs.writeFile(tmpPath, fullContent, 'utf-8');
-      await fs.move(tmpPath, filePath, { overwrite: true });
-    } catch (fsErr) {
-      console.error('[SAVE-FILE] Error escribiendo o moviendo fichero:', fsErr);
-      // Intentar limpiar el tmp si existe
-      try { if (await fs.pathExists(tmpPath)) await fs.remove(tmpPath); } catch (cleanupErr) { /* ignore */ }
-      throw fsErr;
-    }
-
-    // Emitir evento para que el renderer refresque si es necesario
-    if (mainWindow) mainWindow.webContents.send('file-saved', filePath);
-    if (mainWindow) mainWindow.webContents.send('workspace-changed');
-    return true;
-  } catch (error) {
-    console.error('Error saving file:', error);
-    throw error;
-  } finally {
-    endOp(op);
-  }
-});
 
 /**
  * IPC Handler: create-project
@@ -983,60 +1406,182 @@ ipcMain.handle('create-project', async (event, workspacePath, projectName) => {
 
 /**
  * IPC Handler: create-file
- * Crea un nuevo archivo .txt en un proyecto.
+ * Crea un nuevo archivo .txt en un proyecto o como sub-archivo.
+ * 
+ * NUEVO SISTEMA: Los sub-archivos se guardan en metadata del padre, no en carpetas .d
  * 
  * @param {Event} event - Evento IPC
- * @param {string} projectPath - Ruta del proyecto donde crear el archivo
+ * @param {string} projectPath - Ruta del proyecto o archivo padre
  * @param {string} fileName - Nombre del archivo (se añade .txt si no lo tiene)
- * @returns {string} Ruta del archivo creado
+ * @param {string} parentPath - (Opcional) Ruta del archivo padre si es sub-archivo
+ * @returns {string} Ruta o ID del archivo creado
+ */
+/**
+ * IPC Handler: read-file
+ * Lee el contenido de un archivo usando el nuevo sistema.
+ * Si el archivo no tiene metadata YAML, la inyecta automáticamente.
+ */
+ipcMain.handle('read-file', async (event, filePath) => {
+  try {
+    log('[READ-FILE] Reading file:', filePath);
+
+    // Read raw file content to check for YAML frontmatter
+    const rawContent = await fs.readFile(filePath, 'utf-8');
+    const hasYamlFrontmatter = rawContent.startsWith('---');
+
+    // Parse file (will generate default metadata if missing)
+    const { metadata: fileMetadata, content } = await metadata.parseFile(filePath);
+
+    // If file doesn't have YAML frontmatter, inject it
+    if (!hasYamlFrontmatter) {
+      log('[READ-FILE] File missing YAML frontmatter, injecting default metadata');
+
+      // Generate default metadata with filename
+      const fileName = path.basename(filePath, '.txt');
+      const defaultMetadata = {
+        ...fileMetadata,
+        name: fileName,
+        status: 'draft',
+        goal: 30000
+      };
+
+      log('[READ-FILE] Injecting metadata:', JSON.stringify(defaultMetadata, null, 2));
+
+      // Write metadata back to file
+      await metadataWriter.writeFile(filePath, defaultMetadata, content);
+
+      log('[READ-FILE] Metadata injected successfully');
+
+      // Notify frontend that workspace changed
+      if (mainWindow) {
+        mainWindow.webContents.send('workspace-changed');
+      }
+    }
+
+    return content;
+  } catch (error) {
+    console.error('[READ-FILE] Error reading file:', error);
+    throw error;
+  }
+});
+
+/**
+ * IPC Handler: save-file
+ * Guarda el archivo usando el nuevo sistema de metadatos.
+ */
+ipcMain.handle('save-file', async (event, filePath, content, legacyMetadata = {}) => {
+  try {
+    log('[SAVE-FILE] Guardando archivo:', filePath);
+    log('[SAVE-FILE] Tamaño del contenido:', content ? content.length : 0);
+    log('[SAVE-FILE] Metadata recibida:', JSON.stringify(legacyMetadata, null, 2));
+
+    const projectPath = path.dirname(filePath);
+
+    // Detectar si es archivo .canvas
+    const isCanvas = filePath.toLowerCase().endsWith('.canvas');
+
+    // Leer metadata existente
+    let existingMetadata = {};
+    try {
+      const parsed = await metadata.parseFile(filePath);
+      existingMetadata = parsed.metadata || {};
+      log('[SAVE-FILE] Metadata existente:', JSON.stringify(existingMetadata, null, 2));
+    } catch (e) {
+      log('[SAVE-FILE] No hay metadata existente o error al leer:', e.message);
+    }
+
+    // Validar JSON si es archivo .canvas
+    if (isCanvas) {
+      try {
+        JSON.parse(content);
+        log('[SAVE-FILE] JSON válido para archivo .canvas');
+      } catch (parseError) {
+        console.error('[SAVE-FILE] JSON inválido en archivo .canvas:', parseError);
+        throw new Error(`Invalid JSON in canvas file: ${parseError.message}`);
+      }
+    }
+
+    // Calcular conteo de caracteres (solo para archivos .txt)
+    let charCount = 0;
+    if (!isCanvas) {
+      const textContent = content.replace(/<[^>]*>/g, '');
+      charCount = textContent.length;
+    }
+
+    // CRITICAL: Preservar el nombre original de la metadata, NO usar el nombre del archivo físico
+    const updatedMetadata = {
+      ...existingMetadata,
+      // NO sobrescribir name - preservar el nombre original de la metadata
+      lastCharCount: charCount,
+      updatedAt: new Date().toISOString(),
+      status: legacyMetadata.status || existingMetadata.status || 'draft',
+      goal: legacyMetadata.goal || existingMetadata.goal || 30000,
+      initialCharCount: legacyMetadata.initialCharCount || existingMetadata.initialCharCount || 0,
+      comments: legacyMetadata.comments || existingMetadata.comments || [],
+      customIcon: legacyMetadata.customIcon !== undefined ? legacyMetadata.customIcon : existingMetadata.customIcon || null
+    };
+
+    log('[SAVE-FILE] Metadata actualizada:', JSON.stringify(updatedMetadata, null, 2));
+    log('[SAVE-FILE] Escribiendo archivo...');
+
+    await metadata.writeFile(filePath, updatedMetadata, content);
+
+    log('[SAVE-FILE] Archivo escrito exitosamente');
+    log('[SAVE-FILE] Reconstruyendo índice del proyecto...');
+
+    await metadata.rebuildProjectIndex(projectPath);
+
+    log('[SAVE-FILE] Índice reconstruido');
+
+    if (mainWindow) {
+      mainWindow.webContents.send('file-saved', filePath);
+      mainWindow.webContents.send('workspace-changed');
+    }
+
+    log('[SAVE-FILE] Guardado completado exitosamente');
+    return updatedMetadata;  // Retornar metadata actualizada
+  } catch (error) {
+    console.error('[SAVE-FILE] Error al guardar archivo:', error);
+    console.error('[SAVE-FILE] Stack:', error.stack);
+    throw error;
+  }
+});
+
+/**
+ * IPC Handler: create-file
  */
 ipcMain.handle('create-file', async (event, projectPath, fileName, parentPath = null) => {
   const op = beginOp();
   try {
-    // Asegurar extensión .txt
-    const finalName = fileName.endsWith('.txt') ? fileName : fileName + '.txt';
+    log('[CREATE-FILE] Creating:', fileName, 'in', projectPath);
 
-    // Determinar directorio destino. Si projectPath apunta a un archivo .txt,
-    // creamos/usar una carpeta asociada <file>.d para almacenar subarchivos.
-    let targetDir = projectPath;
-    let actualParentPath = parentPath || projectPath;
-    
-    if (projectPath && projectPath.endsWith('.txt')) {
-      const assocDir = projectPath + '.d';
-      await fs.ensureDir(assocDir);
-      targetDir = assocDir;
-      actualParentPath = projectPath;  // El padre es el archivo .txt
-    } else {
-      // Asegurar que el directorio existe
-      await fs.ensureDir(targetDir);
+    // Get workspace path to determine projectId
+    const workspacePath = store.get('workspacePath', null);
+
+    let parentId = null;
+    if (parentPath) {
+      try {
+        const { metadata: parentMeta } = await metadata.parseFile(parentPath);
+        parentId = parentMeta.id;
+      } catch (e) {
+        logWarn('[CREATE-FILE] Failed to parse parent metadata:', e);
+      }
+    } else if (projectPath && projectPath.endsWith('.txt')) {
+      // Legacy fallback: if projectPath is a file, treat it as parent
+      try {
+        const { metadata: parentMeta } = await metadata.parseFile(projectPath);
+        parentId = parentMeta.id;
+        projectPath = path.dirname(projectPath);
+      } catch (e) {
+        logWarn('[CREATE-FILE] Failed to parse project/parent metadata:', e);
+      }
     }
 
-    const filePath = path.join(targetDir, finalName);
-
-    // Metadatos iniciales por defecto con información de jerarquía
-    const metadata = {
-      status: 'draft',
-      goal: 30000,
-      lastCharCount: 0,
-      initialCharCount: 0,
-      comments: [],
-      lastUpdated: Date.now(),
-      createdAt: Date.now(),
-      parentPath: actualParentPath  // Guardar referencia al padre
-    };
-
-    // Contenido inicial vacío con solo un párrafo
-    const content = `<!--METADATA\n${JSON.stringify(metadata, null, 2)}\n-->\n\n<p><br></p>`;
-
-    // Escritura atómica
-    const tmpPath = filePath + '.tmp-' + Date.now();
-    await fs.writeFile(tmpPath, content, 'utf-8');
-    await fs.move(tmpPath, filePath, { overwrite: false });
-
+    const file = await metadata.createFile(projectPath, fileName, parentId, '', workspacePath);
     if (mainWindow) mainWindow.webContents.send('workspace-changed');
-    return filePath;
+    return file.path;
   } catch (error) {
-    console.error('Error creating file:', error);
+    console.error('[CREATE-FILE] Error:', error);
     throw error;
   } finally {
     endOp(op);
@@ -1045,31 +1590,14 @@ ipcMain.handle('create-file', async (event, projectPath, fileName, parentPath = 
 
 /**
  * IPC Handler: create-folder
- * Crea una nueva carpeta en el proyecto.
- * 
- * @param {Event} event - Evento IPC
- * @param {string} projectPath - Ruta del proyecto o directorio padre
- * @param {string} folderName - Nombre de la carpeta a crear
- * @returns {string} Ruta de la carpeta creada
  */
 ipcMain.handle('create-folder', async (event, projectPath, folderName) => {
   const op = beginOp();
   try {
-    // Determinar directorio destino
-    let targetDir = projectPath;
-    if (projectPath && projectPath.endsWith('.txt')) {
-      // Si es un archivo, crear carpeta en el directorio asociado
-      const assocDir = projectPath + '.d';
-      await fs.ensureDir(assocDir);
-      targetDir = assocDir;
-    } else {
-      // Asegurar que el directorio padre existe
-      await fs.ensureDir(targetDir);
-    }
-
+    // New system uses simple folders
+    const targetDir = projectPath;
+    await fs.ensureDir(targetDir);
     const folderPath = path.join(targetDir, folderName);
-
-    // Crear la carpeta
     await fs.ensureDir(folderPath);
 
     if (mainWindow) mainWindow.webContents.send('workspace-changed');
@@ -1084,112 +1612,74 @@ ipcMain.handle('create-folder', async (event, projectPath, folderName) => {
 
 /**
  * IPC Handler: move-file
- * Mueve un archivo de una ubicación a otra, actualizando su metadata.
- * 
- * @param {Event} event - Evento IPC
- * @param {string} sourcePath - Ruta actual del archivo
- * @param {string} destPath - Ruta de destino (carpeta o proyecto)
- * @returns {string} Nueva ruta del archivo
  */
 ipcMain.handle('move-file', async (event, sourcePath, destPath) => {
   const op = beginOp();
   try {
-    // 1. Validar que origen existe
-    if (!await fs.pathExists(sourcePath)) {
-      throw new Error('El archivo origen no existe');
+    log(`[MOVE-FILE] Starting: ${sourcePath} -> ${destPath}`);
+    const workspacePath = store.get('workspacePath', null);
+
+    // Parse source file to get its metadata
+    const { metadata: fileMeta } = await metadata.parseFile(sourcePath);
+    log(`[MOVE-FILE] Source ID: ${fileMeta.id}, Current parent: ${fileMeta.parentId}`);
+
+    let newParentId = null;
+    if (destPath && destPath.endsWith('.txt')) {
+      try {
+        const { metadata: parentMeta } = await metadata.parseFile(destPath);
+        newParentId = parentMeta.id;
+        log(`[MOVE-FILE] Resolved target parent ID: ${newParentId} from ${destPath}`);
+      } catch (e) {
+        logWarn(`[MOVE-FILE] Could not resolve parent ID from ${destPath}, defaulting to null`);
+      }
     }
 
-    // 2. Validar que destino es una carpeta
-    const destStat = await fs.stat(destPath);
-    if (!destStat.isDirectory()) {
-      throw new Error('El destino debe ser una carpeta');
-    }
+    const sourceProjectPath = path.dirname(sourcePath);
+    // IMPORTANTE: metadata.moveFile ahora maneja el movimiento físico
+    await metadata.moveFile(sourceProjectPath, fileMeta.id, newParentId, destPath, workspacePath);
 
-    // 3. Validar que no se mueve a sí mismo
-    if (sourcePath === destPath || sourcePath.startsWith(destPath + path.sep)) {
-      throw new Error('No se puede mover un archivo a sí mismo o a una subcarpeta propia');
-    }
-
-    // 4. Calcular nueva ruta
-    const fileName = path.basename(sourcePath);
-    const newPath = path.join(destPath, fileName);
-
-    // 5. Validar que no existe archivo con mismo nombre en destino
-    if (await fs.pathExists(newPath)) {
-      throw new Error('Ya existe un archivo con ese nombre en el destino');
-    }
-
-    // 6. Leer metadata del archivo origen
-    const fileContent = await readFileWithMetadata(sourcePath);
-
-    // 7. Actualizar metadata con nueva ubicación
-    fileContent.parentPath = destPath;
-    fileContent.lastUpdated = Date.now();
-
-    // 8. Mover archivo físicamente
-    await fs.move(sourcePath, newPath);
-
-    // 9. Si tiene carpeta .d asociada, moverla también
-    const assocDir = sourcePath + '.d';
-    if (await fs.pathExists(assocDir)) {
-      await fs.move(assocDir, newPath + '.d');
-    }
-
-    // 10. Guardar metadata actualizada
-    const metadataToSave = {
-      status: fileContent.status,
-      goal: fileContent.goal,
-      lastCharCount: fileContent.lastCharCount,
-      initialCharCount: fileContent.initialCharCount,
-      comments: fileContent.comments,
-      lastUpdated: fileContent.lastUpdated,
-      parentPath: fileContent.parentPath
-    };
-
-    const fullContent = `<!--METADATA\n${JSON.stringify(metadataToSave, null, 2)}\n-->\n\n${fileContent.content}`;
-    await fs.writeFile(newPath, fullContent, 'utf-8');
-
+    log(`[MOVE-FILE] Success: ${fileMeta.id} moved to parent ${newParentId}`);
     if (mainWindow) mainWindow.webContents.send('workspace-changed');
-    return newPath;
+    return sourcePath;
   } catch (error) {
-    console.error('Error moving file:', error);
+    console.error(`[MOVE-FILE] FAILED: ${error.message}`);
     throw error;
   } finally {
     endOp(op);
   }
 });
 
+
+
+
+
 /**
  * IPC Handler: rename-file
- * Renombra un archivo existente.
- * 
- * @param {Event} event - Evento IPC
- * @param {string} oldPath - Ruta actual del archivo
- * @param {string} newName - Nuevo nombre (se añade .txt si es necesario)
- * @returns {string} Nueva ruta del archivo
  */
 ipcMain.handle('rename-file', async (event, oldPath, newName) => {
   const op = beginOp();
   try {
-    const dir = path.dirname(oldPath);
-    const finalName = newName.endsWith('.txt') ? newName : newName + '.txt';
-    const newPath = path.join(dir, finalName);
+    log('[RENAME-FILE] Renombrando:', oldPath, '->', newName);
+    const projectPath = path.dirname(oldPath);
 
-    // Operación atómica: mover dentro del mismo sistema de archivos
-    await fs.move(oldPath, newPath, { overwrite: false });
+    // Parsear metadata del archivo
+    const { metadata: fileMeta } = await metadata.parseFile(oldPath);
+    log('[RENAME-FILE] ID del archivo:', fileMeta.id);
+    log('[RENAME-FILE] Nombre anterior:', fileMeta.name);
+    log('[RENAME-FILE] Nombre nuevo:', newName);
 
-    // Mover carpeta asociada si existe (.d)
-    const oldAssocDir = oldPath + '.d';
-    const newAssocDir = newPath + '.d';
-    if (await fs.pathExists(oldAssocDir)) {
-      await fs.move(oldAssocDir, newAssocDir, { overwrite: false });
-    }
+    // Rename using new system (renombra archivo físico)
+    const newPath = await metadata.renameFile(projectPath, fileMeta.id, newName);
 
-    // Emitir evento para que el renderer pueda refrescar si lo desea
+    log('[RENAME-FILE] Archivo renombrado exitosamente');
+    log('[RENAME-FILE] Nueva ruta:', newPath);
+
     if (mainWindow) mainWindow.webContents.send('workspace-changed');
+
+    // Retornar la nueva ruta
     return newPath;
   } catch (error) {
-    console.error('Error renaming file:', error);
+    console.error('[RENAME-FILE] Error:', error);
     throw error;
   } finally {
     endOp(op);
@@ -1198,7 +1688,6 @@ ipcMain.handle('rename-file', async (event, oldPath, newName) => {
 
 /**
  * IPC Handler: rename-folder
- * Renombra una carpeta existente.
  */
 ipcMain.handle('rename-folder', async (event, oldPath, newName) => {
   const op = beginOp();
@@ -1218,7 +1707,6 @@ ipcMain.handle('rename-folder', async (event, oldPath, newName) => {
 
 /**
  * IPC Handler: rename-project
- * Renombra la carpeta de un proyecto (por índice).
  */
 ipcMain.handle('rename-project', async (event, projectIndex, newName) => {
   const op = beginOp();
@@ -1244,32 +1732,22 @@ ipcMain.handle('rename-project', async (event, projectIndex, newName) => {
 
 /**
  * IPC Handler: delete-item
- * Elimina un archivo o carpeta.
- * 
- * @param {Event} event - Evento IPC
- * @param {string} itemPath - Ruta del elemento a eliminar
- * @param {boolean} isDirectory - true si es carpeta, false si es archivo
- * @returns {boolean} true si se eliminó correctamente
  */
 ipcMain.handle('delete-item', async (event, itemPath, isDirectory) => {
   const op = beginOp();
   try {
+    log('[DELETE-ITEM]', itemPath);
     if (isDirectory) {
-      // Eliminar carpeta y todo su contenido (recursive: true)
       await fs.remove(itemPath);
     } else {
-      // Eliminar archivo individual
-      await fs.unlink(itemPath);
-      // Eliminar carpeta asociada si existe
-      const assocDir = itemPath + '.d';
-      if (await fs.pathExists(assocDir)) {
-        await fs.remove(assocDir);
-      }
+      const projectPath = path.dirname(itemPath);
+      const { metadata: fileMeta } = await metadata.parseFile(itemPath);
+      await metadata.deleteFile(projectPath, fileMeta.id);
     }
     if (mainWindow) mainWindow.webContents.send('workspace-changed');
     return true;
   } catch (error) {
-    console.error('Error deleting item:', error);
+    console.error('[DELETE-ITEM] Error:', error);
     throw error;
   } finally {
     endOp(op);
@@ -1277,55 +1755,22 @@ ipcMain.handle('delete-item', async (event, itemPath, isDirectory) => {
 });
 
 /**
- * IPC Handler: move-file
- * Mueve un archivo de una ubicación a otra.
- * 
- * @param {Event} event - Evento IPC
- * @param {string} sourcePath - Ruta del archivo origen
- * @param {string} targetPath - Ruta del archivo destino (carpeta)
- * @param {string} position - Posición ('before', 'after', o 'inside')
- * @returns {boolean} true si se movió correctamente
+ * IPC Handler: reorder-siblings
  */
-ipcMain.handle('move-file', async (event, sourcePath, targetPath, position) => {
+ipcMain.handle('reorder-siblings', async (event, projectPath, reorderData) => {
   const op = beginOp();
   try {
-    const sourceFileName = path.basename(sourcePath);
-    let destPath;
-    try {
-      const stat = await fs.stat(targetPath);
-      if (stat.isDirectory()) {
-        destPath = path.join(targetPath, sourceFileName);
-      } else {
-        // targetPath es un archivo, tomar su directorio
-        destPath = path.join(path.dirname(targetPath), sourceFileName);
-      }
-    } catch (e) {
-      // Si el targetPath no existe, asumimos que es un directorio destino
-      destPath = path.join(targetPath, sourceFileName);
-    }
-
-    // Si el destino es diferente del origen, mover de forma atómica
-    if (sourcePath !== destPath) {
-      await fs.move(sourcePath, destPath, { overwrite: false });
-
-      // Mover carpeta asociada si existe (.d)
-      const sourceAssocDir = sourcePath + '.d';
-      const destAssocDir = destPath + '.d';
-      if (await fs.pathExists(sourceAssocDir)) {
-        await fs.move(sourceAssocDir, destAssocDir, { overwrite: false });
-      }
-
-      if (mainWindow) mainWindow.webContents.send('workspace-changed');
-    }
-
-    return destPath;
+    await metadata.reorderFiles(projectPath, reorderData);
+    if (mainWindow) mainWindow.webContents.send('workspace-changed');
+    return true;
   } catch (error) {
-    console.error('Error moving file:', error);
+    console.error('[REORDER-SIBLINGS] Error:', error);
     throw error;
   } finally {
     endOp(op);
   }
 });
+
 
 // -----------------------------------------------------------------------------
 // SECCIÓN: CONFIGURACIÓN Y AVATAR
@@ -1338,12 +1783,11 @@ ipcMain.handle('move-file', async (event, sourcePath, targetPath, position) => {
  * 
  * @returns {Object} Objeto de configuración
  */
-ipcMain.handle('get-app-version', () => {
-  return app.getVersion();
-});
-
 ipcMain.handle('get-config', () => {
-  return store.get('config', {
+  log('[GET-CONFIG] Obteniendo configuración...');
+  log('[GET-CONFIG] Ruta del archivo:', store.storePath);
+
+  const config = store.get('config', {
     // Configuración por defecto
     theme: 'dark',
     autosaveInterval: 30,
@@ -1383,6 +1827,11 @@ ipcMain.handle('get-config', () => {
       underline: { key: 'u', ctrl: true, shift: false, alt: false }
     }
   });
+
+  log('[GET-CONFIG] Configuración obtenida:', config ? 'OK' : 'NULL');
+  log('[GET-CONFIG] Tema actual:', config.theme);
+
+  return config;
 });
 
 /**
@@ -1394,8 +1843,22 @@ ipcMain.handle('get-config', () => {
  * @returns {boolean} true si se guardó correctamente
  */
 ipcMain.handle('save-config', (event, config) => {
-  store.set('config', config);
-  return true;
+  log('[SAVE-CONFIG] Guardando configuración:', JSON.stringify(config, null, 2));
+  log('[SAVE-CONFIG] Ruta del archivo:', store.storePath);
+
+  try {
+    store.set('config', config);
+    log('[SAVE-CONFIG] Configuración guardada exitosamente');
+
+    // Verificar que se guardó correctamente
+    const saved = store.get('config');
+    log('[SAVE-CONFIG] Verificación - Configuración leída:', saved ? 'OK' : 'NULL');
+
+    return true;
+  } catch (error) {
+    console.error('[SAVE-CONFIG] Error al guardar:', error);
+    throw error;
+  }
 });
 
 /**
@@ -1407,8 +1870,17 @@ ipcMain.handle('save-config', (event, config) => {
  * @returns {boolean} true si se guardó correctamente
  */
 ipcMain.handle('save-avatar', (event, avatarData) => {
-  store.set('avatar', avatarData);
-  return true;
+  log('[SAVE-AVATAR] Guardando avatar...');
+  log('[SAVE-AVATAR] Tamaño de datos:', avatarData ? avatarData.length : 0);
+
+  try {
+    store.set('avatar', avatarData);
+    log('[SAVE-AVATAR] Avatar guardado exitosamente');
+    return true;
+  } catch (error) {
+    console.error('[SAVE-AVATAR] Error al guardar:', error);
+    throw error;
+  }
 });
 
 /**
@@ -1418,7 +1890,10 @@ ipcMain.handle('save-avatar', (event, avatarData) => {
  * @returns {string|null} Imagen en base64 o null si no existe
  */
 ipcMain.handle('get-avatar', () => {
-  return store.get('avatar', null);
+  log('[GET-AVATAR] Obteniendo avatar...');
+  const avatar = store.get('avatar', null);
+  log('[GET-AVATAR] Avatar obtenido:', avatar ? 'OK' : 'NULL');
+  return avatar;
 });
 
 // -----------------------------------------------------------------------------
@@ -1437,6 +1912,17 @@ ipcMain.handle('open-external', (event, url) => {
 });
 
 /**
+ * IPC Handler: show-item-in-folder
+ * Muestra un archivo o carpeta en el explorador del sistema.
+ * 
+ * @param {Event} event - Evento IPC
+ * @param {string} fullPath - Ruta completa del archivo o carpeta
+ */
+ipcMain.handle('show-item-in-folder', (event, fullPath) => {
+  shell.showItemInFolder(fullPath);
+});
+
+/**
  * IPC Handler: copy-to-clipboard
  * Copia texto al portapapeles del sistema.
  * 
@@ -1448,6 +1934,77 @@ ipcMain.handle('copy-to-clipboard', (event, text) => {
   const { clipboard } = require('electron');
   clipboard.writeText(text);
   return true;
+});
+
+/**
+ * IPC Handler: edit-action
+ * Ejecuta acciones nativas de edición sobre el elemento enfocado (incluye HTML/rich content).
+ *
+ * Acciones soportadas: copy, cut, paste, selectAll, undo, redo
+ */
+ipcMain.handle('edit-action', (event, action) => {
+  try {
+    const wc = mainWindow && !mainWindow.isDestroyed() ? mainWindow.webContents : null;
+    if (!wc) return false;
+
+    switch (action) {
+      case 'copy':
+        wc.copy();
+        return true;
+      case 'cut':
+        wc.cut();
+        return true;
+      case 'paste':
+        wc.paste();
+        return true;
+      case 'selectAll':
+        wc.selectAll();
+        return true;
+      case 'undo':
+        wc.undo();
+        return true;
+      case 'redo':
+        wc.redo();
+        return true;
+      default:
+        return false;
+    }
+  } catch (err) {
+    logWarn('[EDIT-ACTION] Error:', err?.message || err);
+    return false;
+  }
+});
+
+/**
+ * Reemplaza la palabra mal escrita bajo el cursor por la sugerencia (corrector nativo).
+ */
+ipcMain.handle('replace-misspelling', (event, suggestion) => {
+  if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
+    mainWindow.webContents.replaceMisspelling(suggestion);
+  }
+});
+
+ipcMain.handle('add-word-to-spell-dictionary', (event, word) => {
+  if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents && word) {
+    mainWindow.webContents.session.addWordToSpellCheckerDictionary(word);
+  }
+});
+
+// =============================================================================
+// SECCIÓN: ZOOM DE VENTANA
+// =============================================================================
+
+ipcMain.handle('set-zoom-level', (event, level) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.setZoomLevel(level);
+  }
+});
+
+ipcMain.handle('get-zoom-level', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    return mainWindow.webContents.getZoomLevel();
+  }
+  return 0;
 });
 
 // -----------------------------------------------------------------------------
@@ -1465,8 +2022,8 @@ ipcMain.handle('copy-to-clipboard', (event, text) => {
  */
 ipcMain.handle('export-data', async (event, data) => {
   const result = await dialog.showSaveDialog(mainWindow, {
-    title: 'Exportar datos de Block Guard',
-    defaultPath: `block_guard_backup_${new Date().toISOString().split('T')[0]}.json`,
+    title: 'Exportar datos de Blopy',
+    defaultPath: `Bloopy_backup_${new Date().toISOString().split('T')[0]}.json`,
     filters: [{ name: 'JSON', extensions: ['json'] }]
   });
 
@@ -1485,7 +2042,7 @@ ipcMain.handle('export-data', async (event, data) => {
  */
 ipcMain.handle('import-data', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: 'Importar datos de Block Guard',
+    title: 'Importar datos de Bloopy',
     filters: [{ name: 'JSON', extensions: ['json'] }],
     properties: ['openFile']
   });
@@ -1495,6 +2052,45 @@ ipcMain.handle('import-data', async () => {
     return JSON.parse(content);
   }
   return null;
+});
+
+// -----------------------------------------------------------------------------
+// SECCIÓN: VERIFICACIÓN DE RUTAS Y DIRECTORIOS
+// -----------------------------------------------------------------------------
+
+/**
+ * IPC Handler: path-exists
+ * Verifica si una ruta (archivo o carpeta) existe en el sistema de archivos.
+ * 
+ * @param {Event} event - Evento IPC
+ * @param {string} targetPath - Ruta a verificar
+ * @returns {boolean} true si la ruta existe, false en caso contrario
+ */
+ipcMain.handle('path-exists', async (event, targetPath) => {
+  try {
+    return await fs.pathExists(targetPath);
+  } catch (error) {
+    console.error('Error checking path existence:', error);
+    return false;
+  }
+});
+
+/**
+ * IPC Handler: read-directory
+ * Lee el contenido de un directorio y retorna la lista de archivos y carpetas.
+ * 
+ * @param {Event} event - Evento IPC
+ * @param {string} dirPath - Ruta del directorio a leer
+ * @returns {Array<string>} Lista de nombres de archivos y carpetas
+ */
+ipcMain.handle('read-directory', async (event, dirPath) => {
+  try {
+    const entries = await fs.readdir(dirPath);
+    return entries;
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    return [];
+  }
 });
 
 // -----------------------------------------------------------------------------
@@ -1509,9 +2105,9 @@ ipcMain.handle('import-data', async () => {
  */
 async function createWelcomeFiles(workspacePath) {
   // Contenido del archivo de bienvenida
-  const welcomeContent = `# ¡Bienvenido a Block Guard!
+  const welcomeContent = `# ¡Bienvenido a Bloopy!
 
-Block Guard es tu espacio de escritura protegido, diseñado para ayudarte a organizar tus proyectos de escritura de manera eficiente y segura.
+Bloopy es tu espacio de escritura protegido, diseñado para ayudarte a organizar tus proyectos de escritura de manera eficiente y segura.
 
 ## Características principales:
 
@@ -1556,7 +2152,7 @@ Block Guard es tu espacio de escritura protegido, diseñado para ayudarte a orga
 
 ## Corrector Ortográfico
 
-Block Guard integra herramientas externas de corrección:
+Bloopy integra herramientas externas de corrección:
 - LanguageTool
 - Corrector.co
 - Otras páginas personalizables
@@ -1587,7 +2183,7 @@ Block Guard integra herramientas externas de corrección:
 
   const exampleContent = `# Mi Primer Proyecto
 
-Este es un archivo de ejemplo para que veas cómo funciona Block Guard.
+Este es un archivo de ejemplo para que veas cómo funciona Bloopy.
 
 Puedes:
 - Escribir texto normal
@@ -1618,3 +2214,6 @@ Organiza tu escritura en secciones claras y concisas.
 
   await fs.writeFile(path.join(exampleProjectPath, 'Capítulo 1.txt'), exampleFullContent, 'utf-8');
 }
+
+
+// (Patch de metadatos eliminado - integrado en electron.js)

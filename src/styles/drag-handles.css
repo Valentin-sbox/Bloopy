@@ -1,0 +1,189 @@
+/**
+ * ============================================================================
+ *  DRAG-HANDLES.CSS
+ * ============================================================================
+ * 
+ * Estilos para los drag handles que permiten reordenar bloques en el editor.
+ * 
+ * COMPONENTES:
+ * - .drag-handle: Handle visual (⋮⋮) al lado de cada bloque
+ * - .drag-handle-icon: Icono del handle
+ * - .drop-indicator: Línea horizontal que indica posición de drop
+ * - .dragging: Clase aplicada al bloque siendo arrastrado
+ * 
+ * RELACIONADO CON:
+ * - src/components/DragHandle.js: Componente que usa estos estilos
+ * - src/components/Editor.js: Integra los handles en el editor
+ * ============================================================================
+ */
+
+/* =============================================================================
+   DRAG HANDLE
+   ============================================================================= */
+
+.drag-handle {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  background: rgba(0, 113, 227, 0.1);
+  border: none;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+  z-index: 2000;
+  user-select: none;
+  pointer-events: auto;
+  position: absolute;
+  left: -44px;
+}
+
+.drag-handle:hover {
+  background: rgba(0, 113, 227, 0.25);
+  transform: translateY(-50%) scale(1.1) !important;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.drag-handle-icon {
+  font-size: 18px;
+  color: var(--accent-blue);
+  line-height: 1;
+  letter-spacing: -1px;
+  transition: color var(--transition-fast);
+}
+
+.drag-handle:hover .drag-handle-icon {
+  color: white;
+}
+
+/* =============================================================================
+   DRAGGING STATE
+   ============================================================================= */
+
+.dragging {
+  opacity: 0.5 !important;
+  pointer-events: none;
+  border: 2px dashed var(--accent-blue);
+  background: var(--bg-active);
+  transition: opacity var(--transition-fast);
+}
+
+/* =============================================================================
+   DROP INDICATOR
+   ============================================================================= */
+
+.drop-indicator,
+.drag-drop-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-blue);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 150;
+  /* Por encima de drag handles */
+  
+  animation: pulse-indicator var(--transition-slow) ease-in-out infinite;
+}
+
+.drop-indicator::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: -3px;
+  width: 9px;
+  height: 9px;
+  background: var(--accent-blue);
+  border-radius: 50%;
+}
+
+.drop-indicator::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: -3px;
+  width: 9px;
+  height: 9px;
+  background: var(--accent-blue);
+  border-radius: 50%;
+}
+
+@keyframes pulse-indicator {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* =============================================================================
+   DRAG OVER STATE - MEJORADO
+   ============================================================================= */
+
+.drag-over {
+  border-top: 3px solid var(--accent-blue);
+  margin-top: 3px;
+  position: relative;
+  transition: border-color var(--transition-fast);
+}
+
+.drag-over::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-blue);
+  animation: pulse-drag 1s ease-in-out infinite;
+}
+
+@keyframes pulse-drag {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Elemento siendo arrastrado (duplicado eliminado, consolidado arriba) */
+
+/* Indicador de drop válido - usando variables CSS existentes */
+.drop-target-valid {
+  background: var(--bg-active);
+  border: 2px dashed var(--accent-blue);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+}
+
+/* Indicador de drop inválido - usando variables CSS existentes */
+.drop-target-invalid {
+  background: var(--bg-tertiary);
+  border: 2px dashed var(--accent-red);
+  border-radius: var(--border-radius-sm);
+  cursor: not-allowed;
+  transition: all var(--transition-fast);
+}
+
+/* =============================================================================
+   RESPONSIVE
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .drag-handle {
+    width: 20px;
+    height: 20px;
+  }
+
+  .drag-handle-icon {
+    font-size: 12px;
+  }
+}

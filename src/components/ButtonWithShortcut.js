@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD v4.0.0 - BUTTONWITHSHORTCUT.JS
+ *  BUTTONWITHSHORTCUT.JS
  * ============================================================================
  * 
  * COMPONENTE: BOTÓN CON ATAJO DE TECLADO INTEGRADO
@@ -37,7 +37,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { getShortcutTitle, registerShortcutCallback, unregisterShortcutCallback, subscribeToShortcutChanges } from '../utils/shortcuts';
+import { getShortcutTitle, registerShortcutCallback, subscribeToShortcutChanges } from '../utils/shortcuts';
+import Icon from '@mdi/react';
 
 export default function ButtonWithShortcut({
   shortcutId,
@@ -110,7 +111,7 @@ export default function ButtonWithShortcut({
       title={finalTooltip}
       aria-label={label || shortcutId}
     >
-      {icon && <i className={`fas ${icon}`}></i>}
+      {icon && <Icon path={icon} size={0.7} />}
       {label && variant !== 'icon' && <span>{label}</span>}
     </button>
   );

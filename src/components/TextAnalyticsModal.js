@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * BLOCK GUARD - TEXT ANALYTICS MODAL
+ * TEXT ANALYTICS MODAL
  * ============================================================================
  * 
  * Modal que muestra análisis detallado del texto del editor.
@@ -16,10 +16,26 @@
 
 import React from 'react';
 import { useTranslation } from '../utils/i18n';
+import Icon from '@mdi/react';
+import * as mdi from '@mdi/js';
+const { 
+  mdiChartBar, 
+  mdiClose, 
+  mdiKeyboard, 
+  mdiArrowCollapse, 
+  mdiFormatSize, 
+  mdiStar, 
+  mdiFormatHeaderPound, 
+  mdiFormatParagraph, 
+  mdiDivision, 
+  mdiClock, 
+  mdiRuler, 
+  mdiFormatListBulleted 
+} = mdi;
 
 function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
   const { t } = useTranslation();
-  
+
   /**
    * Realiza análisis completo del texto basado en el contenido del editor
    * @returns {Object} Objeto con todas las métricas de análisis
@@ -66,8 +82,8 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
     const charsPerWord = words > 0 ? (totalChars / words).toFixed(1) : 0;
 
     // Promedio de longitud de palabra
-    const avgWordLength = words > 0 
-      ? (charsNoSpaces / words).toFixed(1) 
+    const avgWordLength = words > 0
+      ? (charsNoSpaces / words).toFixed(1)
       : 0;
 
     // Oraciones (dividir por puntuación final)
@@ -77,8 +93,8 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
     const sentences = sentenceArray.length;
 
     // Promedio de palabras por oración
-    const avgSentenceLength = sentences > 0 
-      ? (words / sentences).toFixed(1) 
+    const avgSentenceLength = sentences > 0
+      ? (words / sentences).toFixed(1)
       : 0;
 
     // Párrafos (contar líneas vacías o párrafos HTML)
@@ -114,21 +130,21 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
         {/* Header */}
         <div className="modal-header">
           <h2>
-            <i className="fas fa-chart-bar"></i> {t('analytics.title')}
+            <Icon path={mdiChartBar} size={0.9} /> {t('analytics.title')}
           </h2>
           <button className="modal-close-btn" onClick={onClose}>
-            <i className="fas fa-times"></i>
+            <Icon path={mdiClose} size={0.8} />
           </button>
         </div>
 
         {/* Contenido */}
         <div className="modal-body">
           <div className="analytics-grid">
-            
+
             {/* Card: Caracteres */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-keyboard"></i>
+                <Icon path={mdiKeyboard} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.characters')}</span>
@@ -139,7 +155,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Caracteres sin espacios */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-compress"></i>
+                <Icon path={mdiArrowCollapse} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.charactersNoSpaces')}</span>
@@ -150,7 +166,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Palabras */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-font"></i>
+                <Icon path={mdiFormatSize} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.words')}</span>
@@ -161,7 +177,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Palabras únicas */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-star"></i>
+                <Icon path={mdiStar} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.mostUsedWords')}</span>
@@ -172,7 +188,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Oraciones */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-heading"></i>
+                <Icon path={mdiFormatHeaderPound} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.sentences')}</span>
@@ -183,7 +199,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Párrafos */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-paragraph"></i>
+                <Icon path={mdiFormatParagraph} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.paragraphs')}</span>
@@ -194,7 +210,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Caracteres por palabra */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-divide"></i>
+                <Icon path={mdiDivision} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.averageWordLength')}</span>
@@ -205,7 +221,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Tiempo de lectura */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-clock"></i>
+                <Icon path={mdiClock} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.readingTime')}</span>
@@ -216,7 +232,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Promedio longitud de palabra */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-ruler"></i>
+                <Icon path={mdiRuler} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.averageWordLength')}</span>
@@ -227,7 +243,7 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
             {/* Card: Promedio palabras por oración */}
             <div className="analytics-card">
               <div className="card-icon">
-                <i className="fas fa-list"></i>
+                <Icon path={mdiFormatListBulleted} size={0.8} />
               </div>
               <div className="card-content">
                 <span className="card-label">{t('analytics.averageSentenceLength')}</span>
@@ -239,18 +255,22 @@ function TextAnalyticsModal({ isOpen, onClose, editorContent }) {
           {/* Resumen */}
           <div className="analytics-summary">
             <h3>{t('analytics.title')}</h3>
-            <p>
-              Tu texto contiene <strong>{analytics.words.toLocaleString()} palabras</strong> y{' '}
-              <strong>{analytics.paragraphs} párrafo{analytics.paragraphs !== 1 ? 's' : ''}</strong>.
-              Tomará aproximadamente <strong>{analytics.readingTime} minuto{analytics.readingTime !== 1 ? 's' : ''}</strong> leerlo.
-            </p>
+            <p dangerouslySetInnerHTML={{
+              __html: t('analytics.summary', {
+                words: analytics.words.toLocaleString(),
+                paragraphs: analytics.paragraphs,
+                paragraphPlural: analytics.paragraphs !== 1 ? 's' : '',
+                minutes: analytics.readingTime,
+                minutePlural: analytics.readingTime !== 1 ? 's' : ''
+              })
+            }} />
           </div>
         </div>
 
         {/* Footer */}
         <div className="modal-footer">
           <button className="btn-secondary" onClick={onClose}>
-            <i className="fas fa-times"></i> {t('analytics.close')}
+            <Icon path={mdiClose} size={0.7} /> {t('analytics.close')}
           </button>
         </div>
       </div>

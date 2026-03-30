@@ -1,0 +1,130 @@
+/**
+ * ============================================================================
+ * CANVAS NOTE STYLES
+ * ============================================================================
+ * 
+ * Estilos mínimos para el componente CanvasNote con tldraw
+ * Dejamos que tldraw maneje su propio tema y estilos
+ * ============================================================================
+ */
+
+.canvas-note-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  min-height: 0;
+}
+
+/* Asegurar que tldraw ocupe todo el espacio */
+.canvas-wrapper > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Estados de carga y error */
+.canvas-note-container.loading,
+.canvas-note-container.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary, #1e1e1e);
+}
+
+.canvas-loading,
+.canvas-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+  color: var(--text-primary, #ffffff);
+}
+
+.canvas-loading i,
+.canvas-error i {
+  font-size: 48px;
+  opacity: 0.6;
+}
+
+.canvas-loading p,
+.canvas-error p {
+  font-size: 16px;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.retry-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #8B5CF6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-button:hover {
+  background: #7C3AED;
+}
+
+.retry-button i {
+  font-size: 14px;
+}
+
+/* Indicador de cambios sin guardar */
+.canvas-unsaved-indicator {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #FFA500;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.canvas-unsaved-indicator i {
+  font-size: 8px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .canvas-unsaved-indicator {
+    top: 8px;
+    right: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}

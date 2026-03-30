@@ -25,89 +25,111 @@
  * @param {Object} config - Configuración de la app
  * @param {number} intervalSeconds - Intervalo en segundos (default: 30)
  * @param {function} onNotify - Función para notificaciones
+ * @param {Object} contentHashManager - Manager para hashes de contenido
+ * @param {Object} saveTracker - Tracker para operaciones de guardado
  * 
  * @returns {Object} { isSaving, saveFile, startAutoSave, stopAutoSave, lastSaved }
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { saveFileWithHierarchyCheck } from '../utils/fileOperations';
 
 export function useAutoSave(
-  activeFile,
-  content,
+  openTabs = [],
   config,
   intervalSeconds = 30,
-  onNotify = () => { }
+  onNotify = () => { },
+  contentHashManager,
+  saveTracker
 ) {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(new Date());
   const autosaveTimerRef = useRef(null);
-  const lastContentRef = useRef(content);
-  const lastCommentsRef = useRef(activeFile?.comments || []);
+  const cooldownRef = useRef(false);
 
   /**
-   * Guarda el archivo actual.
+   * Guarda todos los archivos abiertos con cambios.
    */
-  const saveFile = useCallback(async (showNotification = false) => {
-    if (!activeFile || !content) return;
-
+  const saveOpenTabs = useCallback(async (showNotification = false) => {
+    if (!openTabs || openTabs.length === 0) return;
+    if (cooldownRef.current) {
+      console.log('[SAVE-CYCLE] useAutoSave in cooldown, skipping save');
+      return;
+    }
     setIsSaving(true);
-
+    cooldownRef.current = true;
+    let savedCount = 0;
     try {
-      // Guardar en localStorage como caché
-      const cache = JSON.parse(localStorage.getItem('blockguard_cache') || '{}');
-      cache[activeFile.fullPath] = {
-        content,
-        timestamp: new Date().toISOString(),
-        status: activeFile.status || 'initial'
-      };
-      localStorage.setItem('blockguard_cache', JSON.stringify(cache));
-
-      // Intentar guardar en filesystem via Electron API
-      if (window.electronAPI && activeFile.fullPath) {
-        await window.electronAPI.saveFile(
-          activeFile.fullPath,
-          content,
-          {
-            status: activeFile.status,
-            goal: activeFile.goal,
-            lastCharCount: activeFile.lastCharCount,
-            comments: activeFile.comments
-          }
-        );
+      for (const tab of openTabs) {
+        if (!tab.hasChanges || !tab.fullPath || !tab.content) continue;
+        // Check hash
+        if (contentHashManager && tab.fullPath) {
+          const hasChanged = contentHashManager.hasChanged(tab.fullPath, tab.content);
+          if (!hasChanged) continue;
+        }
+        // Guardar en localStorage como caché
+        const cache = JSON.parse(localStorage.getItem('Bloopy_cache') || '{}');
+        cache[tab.fullPath] = {
+          content: tab.content,
+          timestamp: new Date().toISOString(),
+          status: tab.status || 'initial',
+          hash: contentHashManager ? contentHashManager.updateHash(tab.fullPath, tab.content) : ''
+        };
+        localStorage.setItem('Bloopy_cache', JSON.stringify(cache));
+        // Guardar archivo
+        if (window.electronAPI && window.electronAPI.saveFile) {
+          await window.electronAPI.saveFile(
+            tab.fullPath,
+            tab.content,
+            {
+              status: tab.status,
+              goal: tab.goal,
+              lastCharCount: tab.content.length,
+              comments: tab.comments
+            }
+          );
+        } else if (window.electronAPI && tab.fullPath) {
+          await saveFileWithHierarchyCheck(
+            tab.fullPath,
+            tab.content,
+            {
+              status: tab.status,
+              goal: tab.goal,
+              lastCharCount: tab.content.length,
+              comments: tab.comments
+            }
+          );
+        }
+        savedCount++;
       }
-
       setLastSaved(new Date());
-      setLastSaved(new Date());
-      lastContentRef.current = content;
-      lastCommentsRef.current = activeFile.comments || [];
-
-      if (showNotification) {
-        onNotify('Archivo guardado correctamente', 'success');
+      if (showNotification && savedCount > 0) {
+        onNotify(`${savedCount} archivo(s) guardado(s) correctamente`, 'success');
       }
-
       return true;
     } catch (error) {
-      console.error('Error saving file:', error);
-      onNotify('Error al guardar el archivo', 'error');
+      console.error('[SAVE-CYCLE] useAutoSave error saving open tabs:', error);
+      onNotify('Error al guardar archivos', 'error');
       return false;
     } finally {
       setIsSaving(false);
+      setTimeout(() => {
+        cooldownRef.current = false;
+      }, 1000);
     }
-  }, [activeFile, content, onNotify]);
+  }, [openTabs, onNotify, contentHashManager, saveTracker]);
 
   /**
    * Inicia el auto-guardado.
    */
   const startAutoSave = useCallback(() => {
     if (autosaveTimerRef.current) return; // Ya está activo
-
     autosaveTimerRef.current = setInterval(() => {
-      const commentsChanged = JSON.stringify(activeFile?.comments || []) !== JSON.stringify(lastCommentsRef.current || []);
-      if (activeFile && (content !== lastContentRef.current || commentsChanged)) {
-        saveFile(false);
+      if (openTabs && openTabs.length > 0) {
+        saveOpenTabs(false);
       }
     }, intervalSeconds * 1000);
-  }, [activeFile, content, saveFile, intervalSeconds]);
+  }, [openTabs, saveOpenTabs, intervalSeconds]);
 
   /**
    * Detiene el auto-guardado.
@@ -123,31 +145,22 @@ export function useAutoSave(
    * Efecto: Iniciar auto-guardado cuando hay archivo activo.
    */
   useEffect(() => {
-    if (activeFile) {
+    if (openTabs && openTabs.length > 0) {
       startAutoSave();
     }
-
     return () => {
       stopAutoSave();
     };
-  }, [activeFile, startAutoSave, stopAutoSave]);
+  }, [openTabs, startAutoSave, stopAutoSave]);
 
   /**
    * Efecto: Guardar cuando el contenido cambia sin auto-guardado activo.
    */
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (activeFile && content !== lastContentRef.current) {
-        lastContentRef.current = content;
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [content, activeFile]);
+  // Eliminado: ya no se requiere para múltiples archivos
 
   return {
     isSaving,
-    saveFile,
+    saveOpenTabs,
     startAutoSave,
     stopAutoSave,
     lastSaved

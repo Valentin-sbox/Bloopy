@@ -65,7 +65,8 @@ export default {
     fullscreen: 'Fullscreen',
     minimize: 'Minimize',
     maximize: 'Maximize',
-    restore: 'Restore'
+    restore: 'Restore',
+    untitled: 'Untitled'
   },
 
   // =============================================================================
@@ -95,11 +96,17 @@ export default {
     createWorkspaceHint: 'Create a new workspace or select an existing one to start',
     yourProjects: 'Your Projects',
     recentFiles: 'Recent Files',
-    noProjects: "You don't have any projects yet",
+    noProjects: 'You don\'t have any projects yet',
     noRecentFiles: 'No recent files',
     createFirstProject: 'Create First Project',
     filesCount: '{count} files',
     workspaceLocation: 'Workspace location',
+    currentWorkspace: 'Current workspace:',
+    changeWorkspace: 'Change workspace',
+    goodMorning: 'Good morning',
+    goodAfternoon: 'Good afternoon',
+    goodEvening: 'Good evening',
+    whatToWriteToday: 'What are you going to write today?',
     features: {
       organize: 'Organize your projects',
       write: 'Write without distractions',
@@ -112,7 +119,7 @@ export default {
   // =============================================================================
   splash: {
     checking: 'Checking for updates...',
-    loading: 'Loading Block Guard...',
+    loading: 'Loading Bloopy...',
     initializing: 'Initializing...',
     almostReady: 'Almost ready...'
   },
@@ -121,20 +128,29 @@ export default {
   // ONBOARDING
   // =============================================================================
   onboarding: {
-    welcome: 'Welcome to Block Guard!',
+    welcome: 'Welcome to Bloopy!',
     step1Title: 'Organize your projects',
     step1Desc: 'Your protected writing space. Organize your projects, write with rich formatting and track your progress.',
     step2Title: 'Your Profile',
     step2Desc: 'Customize your experience with bold, italic, headings and more',
-    step3Title: 'Progress tracking',
-    step3Desc: 'Set goals and watch your progress in real time',
-    step4Title: 'Comments and notes',
-    step4Desc: 'Add comments to specific paragraphs for reminders',
+    step3Title: 'Workspace Location',
+    step3Desc: 'Select where you want to save your projects and files',
+    step4Title: 'Progress tracking',
+    step4Desc: 'Set goals and watch your progress in real time',
+    step5Title: 'Comments and notes',
+    step5Desc: 'Add comments to specific paragraphs for reminders',
     getStarted: 'Get Started',
     skip: 'Skip',
     next: 'Next',
     previous: 'Previous',
-    finish: 'Finish'
+    finish: 'Finish',
+    invalidImage: 'Please select a valid image',
+    imageTooLarge: 'Image is too large (max 5MB)',
+    optional: 'optional',
+    selectAvatar: 'Select Avatar',
+    workspaceLocation: 'Workspace Location',
+    changeLocation: 'Change Location',
+    selectLocation: 'Select Location'
   },
 
   // =============================================================================
@@ -142,41 +158,77 @@ export default {
   // =============================================================================
   sidebar: {
     projects: 'PROJECTS',
+    looseFiles: 'Loose Files',
     newProject: 'New Project',
     newFile: 'New File',
-    newFolder: 'New Folder',
+    newFileInRoot: 'New file in root',
+    newFolder: 'New Section',
     newSubfile: 'New Subfile',
+    newSubFile: 'New sub-file',
     rename: 'Rename',
     delete: 'Delete',
     viewStructure: 'View Structure',
     information: 'Information',
     collapse: 'Collapse',
+    collapseSidebar: 'Collapse sidebar',
     expand: 'Expand',
+    expandCollapse: 'Click to expand/collapse',
+    changeProject: 'Change Project',
+    noProjects: 'No projects',
+    noProjectsToCreateFile: 'Create a project first',
+    noWorkspace: 'Open a workspace first',
     home: 'Home',
     recent: 'Recent',
     tutorial: 'Tutorial',
     settings: 'Settings',
     user: 'User',
     local: 'Local',
+    menu: 'Menu',
     lastUpdated: 'Last updated',
     never: 'Never',
     now: 'Now',
     minutesAgo: '{minutes}m ago',
     hoursAgo: '{hours}h ago',
     daysAgo: '{days}d ago',
+    fileNamePlaceholder: 'file_name',
+    cannotMoveIntoItself: 'You cannot move a file into itself',
+    fileMovedToWorkspaceRoot: 'File moved to workspace root',
+    fileMovedToProjectRoot: 'File moved to project root',
+    fileMovedTo: 'File moved to {projectName}',
+    dragFileToProject: 'Drag the file to the desired project',
+    errorMovingFile: 'Error moving file',
+    folderInfo: 'Folder: {folderName}',
+    fileLabel: 'File',
+    openSettings: 'Open settings',
+    userLabel: 'User',
     contextMenu: {
       newFile: 'New File',
       newSubfile: 'New Subfile',
-      newFileInFolder: 'New File in Folder',
+      newSubFile: 'New sub-file',
+      newFileInFolder: 'New File in Section',
+      newFolder: 'Create new folder',
+      createNewFile: 'Create new file',
       renameProject: 'Rename Project',
       renameFile: 'Rename File',
-      renameFolder: 'Rename Folder',
+      renameFolder: 'Rename Section',
       deleteProject: 'Delete Project',
       deleteFile: 'Delete File',
-      deleteFolder: 'Delete Folder',
+      deleteFolder: 'Delete Section',
+      moveToProject: 'Move to project',
       openEdit: 'Open/Edit',
       projectInfo: 'Project Information',
-      folderInfo: 'Folder Information'
+      folderInfo: 'Section Information',
+      // New Obsidian-style options
+      open: 'Open',
+      openToRight: 'Open to the right',
+      openInNewWindow: 'Open in new window',
+      showInExplorer: 'Show in system explorer',
+      newNote: 'New note',
+      closeTab: 'Close',
+      closeOthers: 'Close others',
+      closeAll: 'Close all',
+      splitRight: 'Split right',
+      moveToNewWindow: 'Move to new window'
     }
   },
 
@@ -189,15 +241,37 @@ export default {
     charCount: 'Characters',
     readingTime: 'Reading time',
     minutes: 'min',
+    subFiles: 'Sub-files',
+    newSubFile: 'New Sub-file',
+    loading: 'Loading content...',
+    dragToReorder: 'Drag to reorder',
+    specialChars: 'Special Characters',
+    specialCharsTooltip: 'Special characters',
+    openComments: 'Open comments',
+    spellCheckTooltip: 'Spell check (Ctrl+K)',
+    closePanel: 'Close',
+    detailedAnalytics: 'Detailed text analytics',
+    charCategories: {
+      quotes: 'Quotes',
+      punctuation: 'Punctuation',
+      math: 'Math',
+      arrows: 'Arrows',
+      symbols: 'Symbols',
+      others: 'Others'
+    },
     formatting: {
       bold: 'Bold',
+      boldShortcut: 'Bold (Ctrl+B)',
       italic: 'Italic',
+      italicShortcut: 'Italic (Ctrl+I)',
       underline: 'Underline',
+      underlineShortcut: 'Underline (Ctrl+U)',
       strikethrough: 'Strikethrough',
       heading1: 'Heading 1',
       heading2: 'Heading 2',
       heading3: 'Heading 3',
       bulletList: 'Bullet list',
+      listShortcut: 'List',
       numberedList: 'Numbered list',
       blockquote: 'Quote',
       code: 'Code',
@@ -242,8 +316,25 @@ export default {
     comments: 'Comments',
     analytics: 'Analytics',
     export: 'Export',
+    exportDocument: 'Export document',
+    exportMarkdown: 'Export as Markdown',
+    exportHTML: 'Export as HTML',
+    exportPlainText: 'Export as Plain Text',
+    exportDOCX: 'Export as DOCX',
     import: 'Import',
-    settings: 'Settings'
+    settings: 'Settings',
+    restoreSplitView: 'Restore split view (30s)',
+    exportFormatNotRecognized: 'Export format not recognized'
+  },
+
+  // =============================================================================
+  // TABBAR
+  // =============================================================================
+  tabBar: {
+    closeLeftFile: 'Close left file',
+    closeRightFile: 'Close right file',
+    closeSplitView: 'Close split view',
+    splitHorizontally: 'Split horizontally'
   },
 
   // =============================================================================
@@ -320,7 +411,8 @@ export default {
     mostUsedWords: 'Most used words',
     wordFrequency: 'Word frequency',
     close: 'Close',
-    noText: 'No text to analyze'
+    noText: 'No text to analyze',
+    summary: 'Your text contains <strong>{words} words</strong> and <strong>{paragraphs} paragraph{paragraphPlural}</strong>. It will take approximately <strong>{minutes} minute{minutePlural}</strong> to read.'
   },
 
   // =============================================================================
@@ -339,8 +431,30 @@ export default {
     previousSection: 'Previous section',
     nextSection: 'Next section',
     close: 'Close',
-    noText: 'No text to review'
+    noText: 'No text to review',
+    managePages: 'Manage Spell Check Pages',
+    back: 'Back',
+    setDefault: 'Set as default',
+    namePlaceholder: 'Name',
+    urlPlaceholder: 'https://...',
+    defaultBadge: 'Default',
+    deleteButton: 'Delete',
+    errorCopying: 'Error copying to clipboard',
+    minOnePage: 'There must be at least one page',
+    newPage: 'New Page'
+  },
 
+  // =============================================================================
+  // SPELLING CONTEXT MENU
+  // =============================================================================
+  spelling: {
+    suggestions: 'Suggestions:',
+    noSuggestions: 'No suggestions available',
+    addToDictionary: 'Add to dictionary',
+    ignoreWord: 'Ignore word',
+    replaceWith: 'Replace with',
+    wordAdded: 'Word added to dictionary',
+    wordIgnored: 'Word ignored'
   },
 
   // =============================================================================
@@ -350,20 +464,22 @@ export default {
     title: 'Project Structure',
     back: 'Back',
     newFile: 'New File',
-    newFolder: 'New Folder',
+    newFolder: 'New Section',
     emptyProject: 'This project has no files yet',
     filesCount: '{count} files',
     rename: 'Rename',
     delete: 'Delete',
-    addSubfile: 'Add Subfile',
+    addSubfile: 'Add Sub-file',
     confirmDelete: 'Delete "{name}"?',
-    folderCreated: 'Folder created successfully',
+    folderCreated: 'Section created successfully',
     fileCreated: 'File created successfully',
     renamed: 'Renamed successfully',
     deleted: 'Deleted successfully',
     errorCreating: 'Error creating',
     errorRenaming: 'Error renaming',
-    errorDeleting: 'Error deleting'
+    errorDeleting: 'Error deleting',
+    collapseFolder: 'Collapse folder',
+    expandFolder: 'Expand folder'
   },
 
   // =============================================================================
@@ -399,22 +515,28 @@ export default {
       repository: 'Project Repository',
       repositoryDesc: 'Visit the GitHub repository to report bugs or contribute',
       viewOnGitHub: 'View on GitHub',
-      about: 'About Block Guard',
+      about: 'About Bloopy',
       currentVersion: 'Current version: {version}',
       checkUpdates: 'Check for Updates',
       updateAvailable: 'New version available! Downloading in background...',
-      upToDate: 'Block Guard is up to date',
-      updateError: 'Error checking for updates',
-      updateNotAvailable: 'Update checking is not available in this environment',
+      upToDate: 'Bloopy is up to date.',
+      updateError: 'Error checking for updates.',
+      updateNotAvailable: 'Update checking is not available in this environment.',
       defaultGoal: 'Default goal',
       defaultGoalDesc: 'Word/character goal for new files',
-      words: 'words'
+      defaultGoalLabel: 'Default character goal',
+      defaultGoalLabelDesc: 'Initial goal for new files.',
+      words: 'words',
+      invalidImage: 'Please select a valid image',
+      imageTooLarge: 'Image is too large (max 5MB)'
     },
 
     // Appearance
     appearance: {
       theme: 'Theme',
       themeDesc: 'Select the application color theme',
+      themeLabel: 'Color Themes',
+      themeLabelDesc: 'Choose a predefined theme to customize the appearance.',
       themes: {
         dark: 'Dark',
         light: 'Light',
@@ -426,6 +548,8 @@ export default {
       },
       customTheme: 'Custom Theme',
       customThemeDesc: 'Create your own color theme',
+      customColors: 'Custom colors',
+      customColorsDesc: 'Customize the main interface colors.',
       themeName: 'Theme name',
       themeNamePlaceholder: 'My custom theme',
       colors: {
@@ -459,28 +583,37 @@ export default {
     states: {
       title: 'Writing States',
       description: 'Configure progress states for your files',
+      label: 'Project states',
+      labelDesc: 'Define the progress levels for your files.',
       addState: 'Add State',
       stateName: 'State name',
+      stateNamePlaceholder: 'State name',
       stateColor: 'Color',
       stateGoal: 'Goal',
+      stateGoalPlaceholder: 'Goal',
       countType: 'Count type',
       countTypes: {
-        absolute: 'Absolute (total words)',
-        edited: 'Edited (modified words)',
-        delta: 'Delta (new words)'
+        absolute: 'Count Totals',
+        edited: 'Count Edits',
+        delta: 'Count New'
       },
       deleteState: 'Delete state',
       confirmDelete: 'Delete state "{name}"?',
       stateAdded: 'State added',
       stateDeleted: 'State deleted',
-      stateUpdated: 'State updated'
+      stateUpdated: 'State updated',
+      minOneState: 'There must be at least one state'
     },
 
     // Shortcuts
     shortcuts: {
       title: 'Keyboard Shortcuts',
       description: 'Click on a shortcut to edit it. Press any key combination.',
+      label: 'Keyboard Shortcuts',
+      labelDesc: 'Click on a shortcut to edit it. Press any key combination.',
       resetDefault: 'Reset to default',
+      resetTooltip: 'Reset to default value',
+      editTooltip: 'Click to edit',
       categories: {
         file: 'File',
         edit: 'Edit',
@@ -515,18 +648,27 @@ export default {
         deleteProject: 'Delete project'
       },
       conflictWarning: 'This shortcut is already in use by: {action}',
+      conflictAlert: 'There are conflicts in the shortcuts. Please resolve them before saving.',
       shortcutUpdated: 'Shortcut updated to: {shortcut}',
       shortcutReset: 'Shortcut reset to default',
       pressKeys: 'Press keys...',
+      pressCombination: 'Press a combination...',
+      pressAnyKey: 'Press any key...',
+      listening: 'Listening...',
       ctrl: 'Ctrl',
       shift: 'Shift',
       alt: 'Alt',
-      meta: 'Cmd'
+      meta: 'Cmd',
+      invalidFile: '✗ Invalid file: does not contain shortcut configuration',
+      invalidJSON: '✗ Error reading file: invalid JSON format',
+      invalidKeyCombination: '✗ Invalid key combination'
     },
 
     // Data
     data: {
       title: 'Data Management',
+      label: 'Data Management',
+      labelDesc: 'Export or import your settings and data.',
       export: 'Export Data',
       exportDesc: 'Export your settings, projects and files',
       exportButton: 'Export',
@@ -543,7 +685,9 @@ export default {
       createBackup: 'Create Backup',
       restoreBackup: 'Restore from Backup',
       backupCreated: 'Backup created',
-      backupRestored: 'Backup restored'
+      backupRestored: 'Backup restored',
+      shortcutProfiles: 'Shortcut Profiles',
+      shortcutProfilesDesc: 'Export and import your custom shortcut configurations.'
     },
 
     // Buttons
@@ -562,31 +706,42 @@ export default {
     workspaceCreated: 'New workspace created',
     workspaceSelected: 'Workspace selected',
     workspaceError: 'Error loading workspace',
+    workspaceErrorWithMessage: 'Error loading workspace: {message}',
     projectCreated: 'Project "{name}" created',
     projectError: 'Error creating project',
+    projectNotFound: 'Project not found',
     fileCreated: 'File "{name}" created',
     fileError: 'Error creating file',
-    subfileCreated: 'Subfile "{name}" created',
-    subfileError: 'Error creating subfile',
+    subfileCreated: 'Sub-file "{name}" created',
+    subfileError: 'Error creating sub-file',
     fileSaved: 'File saved',
     fileSaveError: 'Error saving file',
+    fileSaveErrorWithMessage: 'Error saving file: {message}',
     fileRenamed: 'File renamed',
     fileRenameError: 'Error renaming',
+    fileRenameErrorWithMessage: 'Error renaming file: {message}',
     projectRenamed: 'Project renamed',
     projectRenameError: 'Error renaming project',
-    folderRenamed: 'Folder renamed',
-    folderRenameError: 'Error renaming folder',
+    folderRenamed: 'Section renamed',
+    folderRenameError: 'Error renaming section',
     itemDeleted: 'Item deleted',
     deleteError: 'Error deleting',
-    folderCreated: 'Folder created successfully',
-    folderError: 'Error creating folder',
-    folderNotSupported: 'Folder creation not supported in this environment',
-    fileMoved: 'File moved successfully',
+    deleteErrorWithMessage: 'Error deleting item: {message}',
+    folderCreated: 'Section created successfully',
+    folderError: 'Error creating section',
+    folderNotSupported: 'Section creation not supported in this environment',
+    fileMoved: 'File moved',
+    fileMovedCorrectly: 'File moved successfully',
     fileMoveError: 'Error moving file',
+    fileMoveErrorWithMessage: 'Error moving file: {message}',
     cannotDragSelf: 'You cannot drag onto the same item',
+    cannotMoveIntoItself: 'You cannot move a file into itself',
     updateAvailable: 'Update available',
     selectProjectFirst: 'Select a project first',
+    selectProjectAlert: 'You must first connect a folder or create a project.',
+    openFileFirst: 'You must have a file open to create a sub-file.',
     noTextToCheck: 'No text to check',
+    noFileOpen: 'No file open',
     textCopied: 'Text copied to clipboard',
     commentAdded: 'Comment added',
     commentDeleted: 'Comment deleted',
@@ -594,7 +749,31 @@ export default {
     stateReset: 'State reset to: {state}',
     stateUpdated: 'State updated to: {state}',
     initError: 'Error initializing application',
-    subfilesOnlyInFolders: 'Subfiles can only be created inside folders'
+    initErrorWithMessage: 'Error initializing application: {message}',
+    subfilesOnlyInFolders: 'Sub-files can only be created inside sections',
+    errorPreparingData: 'Error preparing data to save',
+    savingLargeFile: 'Saving large file...',
+    loadingLargeFile: 'Loading large file...',
+    fileLoadedCorrectly: 'File loaded successfully',
+    fileOpenError: 'Error opening file',
+    safetyDraftsRestored: 'Safety drafts restored',
+    noSplitToRestore: 'No split view to restore',
+    splitExpired: 'Split view expired (30 seconds)',
+    tabsNoLongerExist: 'One or both tabs no longer exist',
+    splitRestored: 'Split view restored',
+    splitViewActivated: 'Split view activated',
+    needActiveFileForSplit: 'You need an active file to open in split view',
+    cannotOpenSameFileInBothPanels: 'Cannot open the same file in both panels',
+    dataExported: 'Data exported successfully',
+    dataExportError: 'Error exporting data',
+    dataImported: 'Data imported successfully',
+    dataImportError: 'Error importing data',
+    welcomeToBloopy: 'Welcome to Bloopy!',
+    invalidCharacters: 'Name contains invalid characters',
+    iconUpdated: 'Icon updated',
+    iconUpdateError: 'Error updating icon',
+    iconUpdateErrorWithMessage: 'Error updating icon: {message}',
+    settingsSaved: 'Settings saved successfully'
   },
 
   // =============================================================================
@@ -607,17 +786,24 @@ export default {
       yes: 'Yes',
       no: 'No',
       delete: 'Delete',
-      cancel: 'Cancel'
+      cancel: 'Cancel',
+      saveChanges: 'Save changes?',
+      unsavedChanges: 'File "{name}" has unsaved changes.'
     },
     input: {
       title: 'Input',
       placeholder: 'Type here...',
       submit: 'OK',
-      cancel: 'Cancel'
+      cancel: 'Cancel',
+      projectName: 'Project name:',
+      defaultProjectName: 'My Project',
+      fileName: 'Enter file name:',
+      projectIndex: 'Enter project index (0 to {max}):',
+      linkUrl: 'Link URL:'
     },
     update: {
       title: 'Update Available',
-      message: 'A new version of Block Guard is available',
+      message: 'A new version of Bloopy is available',
       currentVersion: 'Current version',
       newVersion: 'New version',
       download: 'Download',
@@ -626,8 +812,71 @@ export default {
       installing: 'Installing...',
       readyToInstall: 'Ready to install',
       installNow: 'Install now',
-      installOnQuit: 'Install on quit'
+      installOnQuit: 'Install on quit',
+      checking: 'Checking for updates...',
+      connectingGithub: 'Connecting to GitHub releases',
+      upToDate: 'Bloopy is up to date',
+      latestVersion: 'You have the most recent version available.',
+      downloadingVersion: 'Downloading Bloopy {version}',
+      doNotClose: 'Do not close the application during download',
+      willClose: 'Bloopy will close to apply the update',
+      saveWork: 'Save your work before continuing',
+      openManually: 'Open Bloopy manually after installation',
+      preparing: 'Preparing Installation...',
+      willCloseShortly: 'The application will close shortly',
+      errorTitle: 'Update Error',
+      unknownError: 'An unknown error occurred',
+      downloadError: 'Error downloading update',
+      installError: 'Error installing update',
+      selectUpdate: 'Select Update',
+      stableVersion: 'Stable and tested version, recommended for all users',
+      snapshotVersion: 'Latest development version, may have bugs',
+      preStableVersion: 'Almost stable version, in final testing phase',
+      versionAvailable: 'Version available'
     }
+  },
+
+  // =============================================================================
+  // CANVAS NOTES
+  // =============================================================================
+  canvas: {
+    newNote: 'New Note',
+    note: 'Note',
+    errors: {
+      loadFailed: 'Failed to load canvas note',
+      saveFailed: 'Failed to save canvas note',
+      invalidFile: 'Invalid file',
+      invalidJSON: 'The file contains invalid JSON',
+      invalidStructure: 'The canvas structure is invalid',
+      createNew: 'Create new canvas?',
+      createNewPrompt: 'Do you want to create a new canvas? Corrupted content will be lost.'
+    },
+    success: {
+      created: 'Canvas note created',
+      renamed: 'Canvas note renamed',
+      deleted: 'Canvas note deleted',
+      saved: 'Canvas note saved'
+    },
+    confirmClose: {
+      title: 'Unsaved changes',
+      message: 'Do you want to save changes?',
+      saveAndClose: 'Save and Close',
+      closeWithoutSave: 'Close without Saving',
+      cancel: 'Cancel'
+    }
+  },
+
+  // =============================================================================
+  // TITLEBAR
+  // =============================================================================
+  titlebar: {
+    minimize: 'Minimize',
+    maximize: 'Maximize',
+    close: 'Close',
+    connectWorkspace: 'Connect a folder',
+    checkUpdates: 'Check for updates',
+    devTools: 'DevTools (Console)',
+    renameCurrentFile: 'Rename current file'
   },
 
   // =============================================================================
@@ -636,7 +885,7 @@ export default {
   errors: {
     generic: 'An error has occurred',
     fileNotFound: 'File not found',
-    folderNotFound: 'Folder not found',
+    folderNotFound: 'Section not found',
     projectNotFound: 'Project not found',
     workspaceNotFound: 'Workspace not found',
     permissionDenied: 'Permission denied',

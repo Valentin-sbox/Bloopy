@@ -34,7 +34,8 @@ import {
   getAllShortcuts,
   getShortcutDisplay,
   registerShortcutCallback,
-  subscribeToShortcutChanges
+  subscribeToShortcutChanges,
+  executeShortcut
 } from '../utils/shortcuts';
 
 /**
@@ -126,6 +127,17 @@ export function useKeyboardShortcuts(shortcuts = {}, dependencies = [], config =
   };
 
   /**
+   * Verifica si un shortcut es una operación de clipboard
+   */
+  const isClipboardShortcut = (event) => {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+    const ctrlKey = isMac ? event.metaKey : event.ctrlKey;
+    const key = event.key.toLowerCase();
+    
+    return ctrlKey && !event.shiftKey && !event.altKey && (key === 'c' || key === 'x' || key === 'v');
+  };
+
+  /**
    * Handler del evento keydown
    */
   const handleKeyDown = (event) => {
@@ -136,10 +148,15 @@ export function useKeyboardShortcuts(shortcuts = {}, dependencies = [], config =
     // Determinar si estamos en un elemento editable
     const isInput = tagName === 'INPUT' || tagName === 'TEXTAREA';
     const isContentEditable = target.isContentEditable || target.closest('[contenteditable="true"]');
-    const isEditor = target.closest('.editor-body');
+    const isEditor = target.closest('.editor-body') || target.closest('.canvas-wrapper');
     
     // No procesar shortcuts en inputs/textareas regulares a menos que sea universal
     if (isInput && !isEditor) return;
+    
+    // Skip preventDefault for clipboard shortcuts - let browser handle natively
+    if (isClipboardShortcut(event)) {
+      return;
+    }
     
     // Primero intentar con atajos legacy (para compatibilidad hacia atrás)
     for (const [shortcutStr, callback] of Object.entries(shortcutsRef.current)) {
@@ -173,10 +190,10 @@ export function useKeyboardShortcuts(shortcuts = {}, dependencies = [], config =
    * Efecto: Agregar listener cuando el componente se monta
    */
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown, true);
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown, true);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
