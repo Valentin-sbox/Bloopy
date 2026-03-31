@@ -67,10 +67,4 @@ Sin recopilación de datos.
 
 ---
 
-## Próximamente
-
-* Sistema más inteligente de detección y análisis de texto.
-* Más estados y opciones de gestión de progreso.
-* Mejoras en la implementación léxica.
-* Nuevas herramientas enfocadas en escritores.
 
