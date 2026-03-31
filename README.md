@@ -2,7 +2,8 @@
 **Bloopy** es un editor de texto especializado para escritores.
 Inspirado en la simplicidad de herramientas como Obsidian, pero con un enfoque más ligero, minimalista y centrado exclusivamente en la escritura.
 
----
+---<img width="1366" height="729" alt="Captura de pantalla (31)" src="https://github.com/user-attachments/assets/56c24976-1d00-4d28-9a0a-c091014f4368" />
+
 
 ## Características Principales
 
